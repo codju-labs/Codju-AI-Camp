@@ -88,6 +88,27 @@ html {
   -moz-osx-font-smoothing: grayscale;
 }
 
+/* Premium Scrollbar */
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--white);
+  border-left: 1px solid var(--gray-100);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--purple-200);
+  border: 2px solid var(--white);
+  border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--purple-400);
+}
+
 body {
   font-family: var(--font-body);
   font-size: 16px;
@@ -95,6 +116,10 @@ body {
   color: var(--gray-800);
   background: var(--white);
   overflow-x: hidden;
+}
+
+body.mobile-menu-open {
+  overflow: hidden;
 }
 
 img {
@@ -464,8 +489,21 @@ button {
   transition: all var(--transition-fast);
 }
 
+/* Animate hamburger lines to X */
+.nav__mobile-toggle[aria-expanded="true"] span:nth-child(1) {
+  transform: translateY(7px) rotate(45deg);
+}
+
+.nav__mobile-toggle[aria-expanded="true"] span:nth-child(2) {
+  opacity: 0;
+}
+
+.nav__mobile-toggle[aria-expanded="true"] span:nth-child(3) {
+  transform: translateY(-7px) rotate(-45deg);
+}
+
 .nav__mobile-menu {
-  display: none;
+  display: flex;
   position: fixed;
   top: 72px;
   left: 0;
@@ -476,13 +514,21 @@ button {
   flex-direction: column;
   gap: 16px;
   box-shadow: var(--shadow-md);
+  
+  /* Smooth Fade & Slide Transition */
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(-12px);
+  transition: opacity 0.3s var(--ease-out), transform 0.3s var(--ease-out);
 }
 
 .nav__mobile-menu.active {
-  display: flex;
+  opacity: 1;
+  pointer-events: auto;
+  transform: translateY(0);
 }
 
-.nav__mobile-menu a {
+.nav__mobile-menu a:not(.btn) {
   color: var(--gray-700);
   font-size: 1.05rem;
   font-weight: 600;
@@ -1440,6 +1486,14 @@ button {
   .feature-split-card__image {
     min-width: 100%;
     padding: 24px;
+  }
+  #support-image-container {
+    height: 280px;
+    width: 100%;
+    align-self: center;
+  }
+  .support-img-slide {
+    padding: 20px;
   }
   .feature-split-card__content {
     padding: 32px 24px;
@@ -2520,6 +2574,18 @@ button {
     max-width: 500px;
   }
 
+  /* Scale down hero assets on tablet */
+  .hero__mascot--dino {
+    width: 80px;
+    bottom: -25px;
+    left: -20px;
+  }
+
+  .hero__float {
+    font-size: 0.75rem;
+    padding: 8px 12px;
+  }
+
   .overview-card {
     width: calc(50% - 12px);
   }
@@ -2589,6 +2655,91 @@ button {
   }
 }
 
+/* Tablet & Mobile Curriculum Tabs and Schedule Row Stack */
+@media (max-width: 768px) {
+  /* Scrollable tabs instead of vertical block stack */
+  .tabs-nav {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    justify-content: flex-start;
+    -webkit-overflow-scrolling: touch;
+    padding: 6px;
+    scrollbar-width: none;
+    border-radius: 16px;
+  }
+  
+  .tabs-nav::-webkit-scrollbar {
+    display: none;
+  }
+  
+  .tab-btn {
+    flex: 0 0 auto;
+    width: auto;
+    min-width: max-content;
+    height: auto;
+    padding: 10px 16px;
+    gap: 8px;
+    border-radius: 10px;
+  }
+  
+  .tab-icon {
+    width: 30px;
+    height: 30px;
+    border-radius: 6px;
+  }
+  
+  .tab-icon svg {
+    width: 15px;
+    height: 15px;
+  }
+
+  .tab-text span {
+    display: none; /* Hide description for sleek horizontal list */
+  }
+
+  .tab-text strong {
+    font-size: 0.85rem;
+    margin-bottom: 0;
+  }
+
+  /* Schedule Stack */
+  .schedule-row {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 18px 20px;
+  }
+  
+  .schedule-row__day {
+    width: 100%;
+  }
+  
+  .schedule-row__date {
+    width: 100%;
+    text-align: left;
+    padding-left: 0;
+    margin-top: -4px;
+    margin-bottom: 4px;
+    font-size: 0.9rem;
+  }
+  
+  .schedule-row__slots {
+    width: 100%;
+    justify-content: flex-start;
+    flex-wrap: wrap;
+    gap: 12px 24px;
+    margin-top: 4px;
+  }
+
+  .session-card__visual {
+    height: 200px;
+  }
+
+  .session-card__visual--padded {
+    padding: 20px;
+  }
+}
+
 /* Mobile */
 @media (max-width: 640px) {
   :root {
@@ -2606,6 +2757,33 @@ button {
     font-size: 1.75rem;
   }
 
+  .btn {
+    padding: 12px 24px;
+    font-size: 0.9rem;
+  }
+
+  .btn--large {
+    padding: 14px 28px;
+    font-size: 0.95rem;
+  }
+
+  .founder__portrait {
+    width: 220px;
+    height: 250px;
+  }
+
+  /* Hero assets mobile tweaks */
+  .hero__mascot--dino {
+    width: 65px;
+    bottom: -20px;
+    left: -15px;
+  }
+
+  .hero__float {
+    padding: 6px 10px;
+    font-size: 0.72rem;
+  }
+
   .hero__cta-group {
     flex-direction: column;
     align-items: stretch;
@@ -2619,9 +2797,11 @@ button {
     width: 100%;
   }
 
+  /* We override tab-btn 100% block view here to preserve horizontal scroll from 768px query */
   .tab-btn {
-    min-width: 100%;
+    min-width: max-content;
   }
+
   .tabs-content-container {
     padding: 16px;
   }
@@ -2629,8 +2809,32 @@ button {
     padding: 20px;
   }
 
+  /* Grid auto-fit tools nicely */
+  .tools-grid-container {
+    padding: 32px 16px;
+    border-radius: 16px;
+  }
+
   .tools-grid {
-    grid-template-columns: repeat(2, 1fr);
+    grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+    gap: 24px 12px;
+  }
+
+  .tool-card {
+    width: 100%;
+    max-width: 90px;
+  }
+
+  .tool-card__icon {
+    width: 52px;
+    height: 52px;
+    font-size: 24px;
+    margin-bottom: 8px;
+    border-radius: 12px;
+  }
+
+  .tool-card__name {
+    font-size: 0.75rem;
   }
 
   .support-grid {
@@ -2665,11 +2869,15 @@ button {
   }
 
   .section-header {
-    margin-bottom: 40px;
+    margin-bottom: 32px;
   }
 
   .section-header__title {
-    font-size: 1.5rem;
+    font-size: 1.6rem;
+  }
+
+  .feature-split-card__image > img {
+    max-width: 260px;
   }
 
   .recognition-grid {
@@ -2704,5 +2912,12 @@ button {
   .footer__inner {
     flex-direction: column;
     text-align: center;
+  }
+}
+
+/* Extra Small Mobile Viewport Edge Cleanups */
+@media (max-width: 480px) {
+  .hero__float {
+    display: none; /* Hide floating tags to prevent extreme visual clutter and edge overflow */
   }
 }

@@ -28,6 +28,7 @@
       mobileMenu.classList.toggle('active');
       const isOpen = mobileMenu.classList.contains('active');
       mobileToggle.setAttribute('aria-expanded', isOpen);
+      document.body.classList.toggle('mobile-menu-open', isOpen);
     });
 
     // Close mobile menu on link click
@@ -35,8 +36,18 @@
       link.addEventListener('click', () => {
         mobileMenu.classList.remove('active');
         mobileToggle.setAttribute('aria-expanded', 'false');
+        document.body.classList.remove('mobile-menu-open');
       });
     });
+
+    // Handle screen resize to clean up mobile menu state
+    window.addEventListener('resize', () => {
+      if (window.innerWidth > 1024) {
+        mobileMenu.classList.remove('active');
+        mobileToggle.setAttribute('aria-expanded', 'false');
+        document.body.classList.remove('mobile-menu-open');
+      }
+    }, { passive: true });
   }
 
   // --- Learning Path Tabs ---
@@ -56,6 +67,9 @@
         if (targetPane) {
           targetPane.classList.add('active');
         }
+        
+        // Smoothly scroll the clicked tab button into view in its horizontal container on mobile
+        btn.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
       });
     });
   }
@@ -68,7 +82,9 @@
       const targetEl = document.querySelector(targetId);
       if (targetEl) {
         e.preventDefault();
-        const navHeight = nav ? nav.offsetHeight : 0;
+        // Measure navigation header height (using .nav__inner to ignore open mobile menu height)
+        const navInner = document.querySelector('.nav__inner');
+        const navHeight = navInner ? navInner.offsetHeight : 72;
         const targetPosition = targetEl.getBoundingClientRect().top + window.pageYOffset - navHeight - 16;
         window.scrollTo({
           top: targetPosition,
@@ -254,5 +270,24 @@
       }
     });
   });
+
+  // --- Hero Video Play Handler ---
+  const playBtn = document.querySelector('.hero__play-btn');
+  const heroVideo = document.querySelector('.hero__video-wrapper video');
+
+  if (playBtn && heroVideo) {
+    playBtn.addEventListener('click', () => {
+      // Add a high-quality video clip fitting the programming/creator theme
+      heroVideo.src = 'https://assets.mixkit.co/videos/preview/mixkit-hands-of-a-programmer-typing-on-a-keyboard-41718-large.mp4';
+      heroVideo.load();
+      heroVideo.play().then(() => {
+        heroVideo.controls = true;
+        playBtn.style.opacity = '0';
+        playBtn.style.pointerEvents = 'none';
+      }).catch(err => {
+        console.log('Video play failed:', err);
+      });
+    });
+  }
 
 })();

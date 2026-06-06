@@ -1,5 +1,5 @@
 /* ============================================
-   CODJU CREATOR CAMP — Interactions & Animations
+   CODJU AI CREATOR CAMP — Interactions & Animations
    ============================================ */
 
 (function () {

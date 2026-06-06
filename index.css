@@ -1180,6 +1180,19 @@ button {
   border: 1px solid rgba(0, 0, 0, 0.03);
 }
 
+.tool-card__icon img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  border-radius: 12px;
+  padding: 8px;
+  transition: transform var(--transition-fast, 0.2s) ease;
+}
+
+.tool-card:hover .tool-card__icon img {
+  transform: scale(1.1);
+}
+
 .tool-card__name {
   font-family: var(--font-heading);
   font-weight: 500;

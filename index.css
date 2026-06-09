@@ -1077,7 +1077,7 @@ button {
   display: inline-flex;
   align-items: center;
   padding: 4px 12px;
-  background: #2563eb;
+  background: var(--purple-600);
   color: var(--white);
   font-weight: 700;
   font-size: 0.75rem;
@@ -3675,5 +3675,183 @@ button {
   .container {
     padding-left: max(var(--section-px), env(safe-area-inset-left));
     padding-right: max(var(--section-px), env(safe-area-inset-right));
+  }
+}
+
+/* ============================================
+   VERSION 1.1 ADDITIONS
+   ============================================ */
+
+/* Subtle Pricing in Hero */
+.hero__pricing-subtle {
+  display: inline-flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
+  margin: 6px 0 18px;
+}
+
+.hero__price-val {
+  font-family: var(--font-heading);
+  font-size: 1.5rem;
+  font-weight: 800;
+  color: var(--purple-600);
+}
+
+.hero__price-seats {
+  font-family: var(--font-heading);
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--indigo-600);
+  background: rgba(99, 102, 241, 0.08);
+  padding: 4px 10px;
+  border-radius: 6px;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+}
+
+/* Social proof below Hero headline */
+.hero__top-social-proof {
+  font-family: var(--font-body);
+  font-size: 0.95rem;
+  color: var(--gray-600);
+  margin-top: 10px;
+  font-weight: 500;
+}
+
+.hero__top-social-proof strong {
+  color: var(--purple-600);
+  font-weight: 700;
+}
+
+/* Trust note below Hero CTA buttons */
+.hero__cta-trust {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--font-body);
+  font-size: 0.85rem;
+  color: var(--gray-600);
+  margin-top: 12px;
+  font-weight: 600;
+}
+
+.hero__cta-trust .trust-icon {
+  color: var(--success);
+  font-weight: 800;
+}
+
+/* Curriculum brochure supporting text */
+.brochure-support-text {
+  font-family: var(--font-body);
+  font-size: 0.85rem;
+  color: var(--gray-500);
+  margin-top: 8px;
+  font-weight: 500;
+}
+
+/* Final CTA Pricing */
+.final-cta__pricing {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin-bottom: 24px;
+  text-align: left;
+}
+
+.final-cta__price {
+  font-family: var(--font-heading);
+  font-size: 2.1rem;
+  font-weight: 800;
+  color: var(--purple-600);
+}
+
+.final-cta__pricing-note {
+  font-family: var(--font-heading);
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--indigo-600);
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+}
+
+/* Accepted Payment Methods card area */
+.final-cta__payment-methods {
+  margin-top: 24px;
+  padding-top: 20px;
+  border-top: 1px solid var(--gray-100);
+  text-align: left;
+}
+
+.payment-methods__title {
+  font-family: var(--font-heading);
+  font-size: 0.8rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: var(--gray-400);
+  letter-spacing: 0.05em;
+  margin-bottom: 12px;
+}
+
+.payment-methods__list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 16px;
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.payment-methods__list li {
+  font-family: var(--font-body);
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: var(--gray-600);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.payment-methods__list li::before {
+  content: "•";
+  color: var(--purple-500);
+  font-weight: bold;
+}
+
+/* Sticky Mobile Button */
+.sticky-mobile-cta {
+  display: none;
+}
+
+@media (max-width: 768px) {
+  .sticky-mobile-cta {
+    display: flex;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    padding: 12px 16px;
+    box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.08);
+    z-index: 999;
+    border-top: 1px solid var(--gray-200);
+  }
+
+  @supports (padding-bottom: env(safe-area-inset-bottom)) {
+    .sticky-mobile-cta {
+      padding-bottom: calc(12px + env(safe-area-inset-bottom));
+    }
+  }
+
+  .sticky-mobile-cta .btn {
+    width: 100%;
+    text-align: center;
+  }
+
+  /* Add bottom padding to body to prevent sticky CTA overlay on footer contents */
+  body {
+    padding-bottom: 80px;
   }
 }

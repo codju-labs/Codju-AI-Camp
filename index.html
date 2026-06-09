@@ -143,7 +143,7 @@
       </ul>
 
       <div class="nav__cta">
-        <a href="https://payment-link-placeholder/" class="btn btn--primary btn--small">Reserve Your Seat</a>
+        <a href="#reserve" class="btn btn--primary btn--small">Reserve Your Seat</a>
         <button class="nav__mobile-toggle" id="mobileToggle" aria-label="Toggle menu">
           <span></span>
           <span></span>
@@ -206,8 +206,7 @@
           </ul>
 
           <div class="hero__cta-group">
-            <a href="https://payment-link-placeholder/" class="btn btn--primary">Reserve Your Seat</a>
-            <a href="#school-bookings" class="btn btn--outline-purple" style="border-radius: 50px;">For Schools & Groups</a>
+            <a href="#reserve" class="btn btn--primary">Reserve Your Seat</a>
           </div>
           <div class="hero__cta-trust">
             <span class="trust-icon">✓</span> 100% Refund Before Day 1
@@ -1137,7 +1136,7 @@
           </div>
 
           <div class="final-cta__buttons">
-            <a href="https://payment-link-placeholder/" class="btn btn--primary btn--large">Reserve Your Seat</a>
+            <a href="#reserve" class="btn btn--primary btn--large">Reserve Your Seat</a>
             <a href="assets/Codju%20-%20AI%20Creator%20Camp%20Brochure.pdf" target="_blank" class="btn btn--outline-purple btn--large">
               <span>Download Brochure</span>
               <svg aria-hidden=\"true\" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="btn-icon"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" x2="12" y1="15" y2="3"/></svg>
@@ -1256,9 +1255,64 @@
     </div>
   </footer>
 
-  <!-- ========== STICKY MOBILE CTA ========== -->
-  <div class="sticky-mobile-cta">
-    <a href="https://payment-link-placeholder/" class="btn btn--primary">Reserve Your Seat &bull; ₹2,999</a>
+  <!-- ========== PAYMENT MODAL ========== -->
+  <div class="payment-modal" id="payment-modal" role="dialog" aria-modal="true" aria-labelledby="payment-modal-title" hidden>
+    <div class="payment-modal__backdrop" data-payment-close></div>
+    <div class="payment-modal__dialog">
+      <button class="payment-modal__close" type="button" aria-label="Close payment form" data-payment-close>
+        <svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"/></svg>
+      </button>
+
+      <div class="payment-card" id="payment-card">
+        <div class="payment-card__header">
+          <span class="payment-card__secure-icon" aria-hidden="true">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="11" x="3" y="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+          </span>
+          <div>
+            <h3 class="payment-card__title" id="payment-modal-title">Reserve a camp seat</h3>
+            <p class="payment-card__subtitle">Enter the parent and student details to continue to secure payment.</p>
+          </div>
+        </div>
+
+        <form class="payment-form" action="/api/payments/initiate" method="post" data-payment-form>
+          <div class="payment-form__field">
+            <label for="parent-name">Parent name</label>
+            <input id="parent-name" name="parent_name" type="text" maxlength="80" autocomplete="name" required>
+          </div>
+
+          <div class="payment-form__field">
+            <label for="student-name">Student name</label>
+            <input id="student-name" name="student_name" type="text" maxlength="80" required>
+          </div>
+
+          <div class="payment-form__field">
+            <label for="parent-email">Email address</label>
+            <input id="parent-email" name="email" type="email" maxlength="120" autocomplete="email" required>
+          </div>
+
+          <div class="payment-form__field">
+            <label for="parent-phone">Mobile number</label>
+            <input id="parent-phone" name="phone" type="tel" maxlength="16" inputmode="tel" autocomplete="tel" placeholder="+91 98765 43210" required>
+          </div>
+
+          <div class="payment-quote" aria-live="polite">
+            <div><span>Camp fee</span><strong data-quote-base>Loading...</strong></div>
+            <div><span data-quote-gst-label>GST</span><strong data-quote-gst>--</strong></div>
+            <div class="payment-quote__total"><span>Total payable</span><strong data-quote-total>--</strong></div>
+          </div>
+
+          <button class="btn btn--primary btn--large payment-form__submit" type="submit">
+            <span data-payment-label>Continue to secure payment</span>
+            <svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+          </button>
+        </form>
+
+        <div class="payment-card__footer">
+          <span>Payment processed securely by CCAvenue</span>
+          <span>Need help? <a href="tel:+918288863132">Call</a> or <a href="https://wa.me/918288863132?text=Hi%2C%20I%20need%20help%20reserving%20an%20AI%20Creator%20Camp%20seat." target="_blank" rel="noopener">WhatsApp</a></span>
+        </div>
+      </div>
+    </div>
   </div>
 
   <!-- ========== SCRIPTS ========== -->

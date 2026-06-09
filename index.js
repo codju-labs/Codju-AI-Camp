@@ -79,6 +79,7 @@
     anchor.addEventListener('click', function (e) {
       const targetId = this.getAttribute('href');
       if (targetId === '#') return;
+      if (targetId === '#reserve') return;
       const targetEl = document.querySelector(targetId);
       if (targetEl) {
         e.preventDefault();
@@ -287,6 +288,118 @@
     }, { threshold: 0.1 });
     
     videoObserver.observe(heroIframe);
+  }
+
+  // --- Enrollment payment form ---
+  const paymentModal = document.getElementById('payment-modal');
+  const paymentForm = document.querySelector('[data-payment-form]');
+  if (paymentModal && paymentForm) {
+    const phoneInput = paymentForm.querySelector('input[name="phone"]');
+    const submitButton = paymentForm.querySelector('button[type="submit"]');
+    const submitLabel = paymentForm.querySelector('[data-payment-label]');
+    const parentNameInput = paymentForm.querySelector('input[name="parent_name"]');
+    const reserveLinks = document.querySelectorAll('a[href="#reserve"]');
+    const quoteBase = paymentModal.querySelector('[data-quote-base]');
+    const quoteGst = paymentModal.querySelector('[data-quote-gst]');
+    const quoteGstLabel = paymentModal.querySelector('[data-quote-gst-label]');
+    const quoteTotal = paymentModal.querySelector('[data-quote-total]');
+    let lastTrigger = null;
+    let quoteLoaded = false;
+
+    const formatInr = (amount) => new Intl.NumberFormat('en-IN', {
+      style: 'currency',
+      currency: 'INR',
+    }).format(Number(amount));
+
+    const loadPaymentQuote = async () => {
+      if (quoteLoaded) return;
+
+      try {
+        const response = await fetch('/api/payments/quote', {
+          headers: { Accept: 'application/json' },
+        });
+        if (!response.ok) throw new Error('Unable to load payment amount.');
+
+        const quote = await response.json();
+        quoteBase.textContent = formatInr(quote.base);
+        quoteGstLabel.textContent = `GST (${quote.gstRate}%)`;
+        quoteGst.textContent = formatInr(quote.gst);
+        quoteTotal.textContent = formatInr(quote.total);
+        quoteLoaded = true;
+      } catch (error) {
+        quoteBase.textContent = 'Unavailable';
+        quoteGst.textContent = '--';
+        quoteTotal.textContent = '--';
+        console.error(error);
+      }
+    };
+
+    const openPaymentModal = (trigger) => {
+      lastTrigger = trigger;
+      paymentModal.hidden = false;
+      document.body.classList.add('payment-modal-open');
+      loadPaymentQuote();
+      requestAnimationFrame(() => parentNameInput?.focus());
+    };
+
+    const closePaymentModal = () => {
+      paymentModal.hidden = true;
+      document.body.classList.remove('payment-modal-open');
+      lastTrigger?.focus();
+    };
+
+    reserveLinks.forEach((link) => {
+      link.addEventListener('click', (event) => {
+        event.preventDefault();
+        mobileMenu?.classList.remove('active');
+        mobileToggle?.setAttribute('aria-expanded', 'false');
+        document.body.classList.remove('mobile-menu-open');
+        openPaymentModal(link);
+      });
+    });
+
+    paymentModal.querySelectorAll('[data-payment-close]').forEach((button) => {
+      button.addEventListener('click', closePaymentModal);
+    });
+
+    document.addEventListener('keydown', (event) => {
+      if (paymentModal.hidden) return;
+
+      if (event.key === 'Escape') {
+        closePaymentModal();
+        return;
+      }
+
+      if (event.key === 'Tab') {
+        const focusable = Array.from(paymentModal.querySelectorAll(
+          'button:not([disabled]), input:not([disabled]), select:not([disabled]), a[href]',
+        )).filter((element) => element.offsetParent !== null);
+        const first = focusable[0];
+        const last = focusable[focusable.length - 1];
+
+        if (event.shiftKey && document.activeElement === first) {
+          event.preventDefault();
+          last?.focus();
+        } else if (!event.shiftKey && document.activeElement === last) {
+          event.preventDefault();
+          first?.focus();
+        }
+      }
+    });
+
+    if (phoneInput) {
+      phoneInput.addEventListener('input', () => {
+        const hasLeadingPlus = phoneInput.value.trim().startsWith('+');
+        const digits = phoneInput.value.replace(/\D/g, '').slice(0, 15);
+        phoneInput.value = `${hasLeadingPlus ? '+' : ''}${digits}`;
+      });
+    }
+
+    paymentForm.addEventListener('submit', () => {
+      if (!paymentForm.checkValidity()) return;
+      submitButton.disabled = true;
+      submitLabel.textContent = 'Opening CCAvenue...';
+    });
   }
 
 })();

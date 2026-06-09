@@ -2231,6 +2231,218 @@ button {
   width: 100%;
 }
 
+.payment-card {
+  width: 100%;
+  max-width: 520px;
+  padding: 30px;
+  background: rgba(255, 255, 255, 0.96);
+  border: 1px solid var(--purple-200);
+  border-radius: 24px;
+  box-shadow: var(--shadow-xl);
+}
+
+.payment-modal[hidden] {
+  display: none;
+}
+
+.payment-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 2000;
+  display: grid;
+  place-items: center;
+  padding: 24px;
+}
+
+.payment-modal__backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(24, 24, 27, 0.68);
+  backdrop-filter: blur(8px);
+}
+
+.payment-modal__dialog {
+  position: relative;
+  z-index: 1;
+  width: min(520px, 100%);
+  max-height: calc(100vh - 48px);
+  overflow-y: auto;
+  border-radius: 24px;
+}
+
+.payment-modal__dialog .payment-card {
+  max-width: none;
+}
+
+.payment-modal__close {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  z-index: 2;
+  width: 40px;
+  height: 40px;
+  display: grid;
+  place-items: center;
+  color: var(--gray-600);
+  background: var(--gray-100);
+  border: 0;
+  border-radius: 50%;
+  cursor: pointer;
+  transition: color var(--transition-fast), background var(--transition-fast);
+}
+
+.payment-modal__close:hover {
+  color: var(--purple-700);
+  background: var(--purple-100);
+}
+
+body.payment-modal-open {
+  overflow: hidden;
+}
+
+.payment-card__header {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  margin-bottom: 24px;
+}
+
+.payment-card__secure-icon {
+  width: 44px;
+  height: 44px;
+  flex: 0 0 44px;
+  display: grid;
+  place-items: center;
+  color: var(--purple-600);
+  background: var(--purple-50);
+  border: 1px solid var(--purple-200);
+  border-radius: 13px;
+}
+
+.payment-card__title {
+  margin-bottom: 4px;
+  color: var(--gray-900);
+  font-family: var(--font-heading);
+  font-size: 1.25rem;
+  font-weight: 800;
+}
+
+.payment-card__subtitle {
+  color: var(--gray-600);
+  font-size: 0.88rem;
+  line-height: 1.55;
+}
+
+.payment-form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.payment-form__row {
+  display: grid;
+  grid-template-columns: 1fr 110px;
+  gap: 12px;
+}
+
+.payment-form__field {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+}
+
+.payment-form__field label {
+  color: var(--gray-700);
+  font-size: 0.78rem;
+  font-weight: 700;
+}
+
+.payment-form__field input,
+.payment-form__field select {
+  width: 100%;
+  min-height: 46px;
+  padding: 10px 13px;
+  color: var(--gray-900);
+  background: var(--white);
+  border: 1px solid var(--gray-300);
+  border-radius: 11px;
+  font: inherit;
+  font-size: 0.92rem;
+  outline: none;
+  transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
+}
+
+.payment-form__field input:focus,
+.payment-form__field select:focus {
+  border-color: var(--purple-500);
+  box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.12);
+}
+
+.payment-quote {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 14px 16px;
+  color: var(--gray-600);
+  background: var(--gray-50);
+  border: 1px solid var(--gray-200);
+  border-radius: 12px;
+  font-size: 0.82rem;
+}
+
+.payment-quote > div {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.payment-quote strong {
+  color: var(--gray-800);
+}
+
+.payment-quote__total {
+  margin-top: 3px;
+  padding-top: 9px;
+  color: var(--gray-900);
+  border-top: 1px solid var(--gray-200);
+  font-size: 0.92rem;
+  font-weight: 800;
+}
+
+.payment-quote__total strong {
+  color: var(--purple-700);
+}
+
+.payment-form__submit {
+  width: 100%;
+  justify-content: center;
+  margin-top: 4px;
+  border: 0;
+  cursor: pointer;
+}
+
+.payment-form__submit[disabled] {
+  cursor: wait;
+  opacity: 0.72;
+}
+
+.payment-card__footer {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  margin-top: 18px;
+  padding-top: 16px;
+  color: var(--gray-500);
+  border-top: 1px solid var(--gray-200);
+  font-size: 0.75rem;
+  text-align: center;
+}
+
+.payment-card__footer a {
+  color: var(--purple-600);
+  font-weight: 700;
+}
+
 .final-cta__contact-card {
   background: var(--white);
   border: 1px solid rgba(124, 58, 237, 0.1);
@@ -3580,6 +3792,27 @@ button {
   .btn--large {
     padding: 12px 20px;
     font-size: 0.88rem;
+  }
+}
+
+@media (max-width: 600px) {
+  .payment-modal {
+    align-items: end;
+    padding: 12px;
+  }
+
+  .payment-modal__dialog {
+    max-height: calc(100vh - 24px);
+    border-radius: 20px;
+  }
+
+  .payment-card {
+    padding: 22px 18px;
+    border-radius: 18px;
+  }
+
+  .payment-form__row {
+    grid-template-columns: 1fr;
   }
 }
 

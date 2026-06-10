@@ -20,7 +20,7 @@
 	},
 	"d1_databases": [
 		{
-			"binding": "codju_camp_payments",
+			"binding": "PAYMENTS",
 			"database_name": "codju-camp-payments",
 			"database_id": "0fd4579b-8073-46cc-b0e3-7d8c779a20b8"
 		}

@@ -118,6 +118,13 @@ CAMP_PRICE_INR=1999.00
 GST_RATE_PERCENT=18
 PUBLIC_SITE_URL=http://localhost:8787
 CCAVENUE_ENVIRONMENT=production
+EMAILOCTOPUS_API_KEY=your_api_key
+EMAILOCTOPUS_LIST_ID=your_list_id
+EMAILOCTOPUS_AUTOMATION_ID=your_automation_id
+GOOGLE_SERVICE_ACCOUNT_EMAIL=worker@project.iam.gserviceaccount.com
+GOOGLE_SERVICE_ACCOUNT_PRIVATE_KEY="-----BEGIN PRIVATE KEY-----\n...\n-----END PRIVATE KEY-----\n"
+GOOGLE_SHEETS_SPREADSHEET_ID=your_spreadsheet_id
+GOOGLE_SHEETS_RANGE=Enrollments!A:Q
 ```
 
 Use the actual local port printed by Wrangler if it is not `8787`.
@@ -133,6 +140,8 @@ Run:
 npx wrangler secret put CCAVENUE_MERCHANT_ID
 npx wrangler secret put CCAVENUE_ACCESS_CODE
 npx wrangler secret put CCAVENUE_WORKING_KEY
+npx wrangler secret put EMAILOCTOPUS_API_KEY
+npx wrangler secret put GOOGLE_SERVICE_ACCOUNT_PRIVATE_KEY
 ```
 
 Enter each value when prompted. Secrets remain in Cloudflare and are not
@@ -149,17 +158,17 @@ https://your-camp-domain.example/api/payments/callback
 The Worker also sends this URL as both `redirect_url` and `cancel_url`.
 The domain must match `PUBLIC_SITE_URL`.
 
-### 5. Store orders in D1 (recommended)
+### 5. Store and fulfill orders with D1
 
-The payment flow works without D1, but D1 provides an order ledger,
-idempotent reconciliation, and a place to investigate support requests.
+D1 is required. It stores the payment, enrollment ID, EmailOctopus status,
+Google Sheets status, and fulfillment errors.
 
 ```bash
 npx wrangler d1 create codju-camp-payments
 ```
 
-Copy the returned database ID into the commented `d1_databases` block in
-`wrangler.jsonc`, then run:
+Copy the returned database ID into the `d1_databases` block in
+`wrangler.jsonc`, then apply the initial migration:
 
 ```bash
 npx wrangler d1 migrations apply codju-camp-payments --remote
@@ -167,7 +176,122 @@ npx wrangler d1 migrations apply codju-camp-payments --remote
 
 The migration is in `migrations/0001_payment_orders.sql`.
 
-### 6. Test before going live
+### 6. Configure EmailOctopus confirmation email
+
+EmailOctopus does not expose direct transactional email sending. This
+integration adds or updates the parent as a contact and starts an automation
+that sends the confirmation email.
+
+1. Create a dedicated EmailOctopus list for paid camp enrollments.
+2. Create these text fields using these exact tags:
+   `ParentName`, `StudentName`, `EnrollmentId`, `OrderId`, `AmountPaid`, and
+   `TrackingId`.
+3. Create an automation attached to that list.
+4. Choose the **Started via API** trigger.
+5. Add the enrollment confirmation email and use the fields above for
+   personalization.
+6. Enable repeat entry only if one parent may purchase multiple enrollments
+   with the same email address.
+7. Start the automation and copy its automation ID and list ID into
+   `wrangler.jsonc`.
+
+Use this as a dedicated operational list. Do not automatically send unrelated
+marketing without the parent’s consent.
+
+### 7. Configure Google Sheets
+
+1. Create a Google Cloud project and enable the Google Sheets API.
+2. Create a service account and download a JSON key.
+3. Put `client_email` in `GOOGLE_SERVICE_ACCOUNT_EMAIL`.
+4. Store `private_key` as the `GOOGLE_SERVICE_ACCOUNT_PRIVATE_KEY` Worker
+   secret.
+5. Share the spreadsheet with the service account email as an Editor.
+6. Put the spreadsheet ID in `GOOGLE_SHEETS_SPREADSHEET_ID`.
+7. Create an `Enrollments` worksheet with this header row:
+
+```text
+Enrollment ID | Order ID | Tracking ID | Parent Name | Student Name |
+Email | Phone | Base Amount | GST Amount | GST Rate | Total Amount |
+Currency | Payment Mode | Bank Reference | Status | Order Created |
+Fulfilled At
+```
+
+The Worker checks column A for the enrollment ID before appending, preventing
+duplicate rows when CCAvenue retries its callback.
+
+### 8. Fulfillment sequence
+
+After a successful encrypted callback, the Worker:
+
+1. Decrypts the callback and verifies merchant ID, currency, order amount, and
+   successful status.
+2. Stores the callback result and deterministic enrollment ID in D1.
+3. Immediately displays the success page with the enrollment ID.
+4. Uses `ctx.waitUntil()` to process EmailOctopus and Google Sheets in the
+   background.
+5. Upserts the EmailOctopus contact and starts the confirmation automation.
+6. Adds the enrollment to Google Sheets at the same time.
+7. Marks fulfillment complete in D1.
+
+Creating or updating an EmailOctopus contact and then starting its automation
+requires sequential API calls because the second call needs the contact ID.
+Those calls do not delay the success page. EmailOctopus and Google Sheets run
+concurrently in the background.
+
+If an external API fails, the payment and enrollment remain stored and the
+order is marked `Failed` with the specific step status. A Cron Trigger retries
+pending or failed fulfillment every five minutes. Completed email or sheet
+steps are not repeated, and stale `Processing` orders are recovered after ten
+minutes.
+
+Cloudflare limits request `waitUntil()` work to 30 seconds, so the scheduled
+retry is important if an external service is slow or unavailable.
+
+### Test fulfillment in isolation
+
+The credential-free mock commands exercise the same EmailOctopus and Google
+Sheets helper functions used after payment and print the outgoing requests:
+
+```bash
+npm run test:email
+npm run test:sheet
+```
+
+They do not contact either provider or send an email. The existing automated
+tests can also be run with `npm test`.
+
+After receiving the credentials, add the following values to `.dev.vars`:
+
+```dotenv
+TEST_ENROLLMENT_EMAIL=your-own-email@example.com
+EMAILOCTOPUS_API_KEY=your_api_key
+EMAILOCTOPUS_LIST_ID=your_list_id
+EMAILOCTOPUS_AUTOMATION_ID=your_automation_id
+GOOGLE_SERVICE_ACCOUNT_EMAIL=worker@project.iam.gserviceaccount.com
+GOOGLE_SERVICE_ACCOUNT_PRIVATE_KEY="-----BEGIN PRIVATE KEY-----\n...\n-----END PRIVATE KEY-----\n"
+GOOGLE_SHEETS_SPREADSHEET_ID=your_spreadsheet_id
+GOOGLE_SHEETS_RANGE=Enrollments!A:Q
+```
+
+Then run each live integration independently:
+
+```bash
+npm run test:email:live
+npm run test:sheet:live
+```
+
+The email command creates or updates `TEST_ENROLLMENT_EMAIL` and starts the
+real EmailOctopus automation. The sheet command appends a uniquely identified
+test enrollment row. Neither command invokes CCAvenue or requires a payment.
+
+If EmailOctopus returns `403 UNAUTHORISED` only when starting the automation,
+the contact operation has already succeeded. Confirm that the automation is
+active, its trigger is exactly **Started via API**, and its automation ID and
+API key come from the same EmailOctopus account/workspace. Correct the setting
+and rerun `npm run test:email:live`; the existing contact will be updated
+rather than duplicated.
+
+### 9. Test before going live
 
 If CCAvenue supplied test credentials:
 
@@ -187,7 +311,7 @@ If you only have live credentials:
 6. Cancel or refund the test transaction in the CCAvenue dashboard.
 7. Restore the actual camp price before opening registrations.
 
-### 7. Switch to production
+### 10. Switch to production
 
 1. Replace the test credentials with the production credentials using
    `wrangler secret put`.
@@ -195,8 +319,8 @@ If you only have live credentials:
 3. Confirm `PUBLIC_SITE_URL` is the final HTTPS domain.
 4. Confirm the fee in `CAMP_PRICE_INR`.
 5. Deploy with `npm run deploy`.
-6. Complete one low-value live transaction and reconcile it in both CCAvenue
-   and D1 before opening registrations.
+6. Complete one low-value live transaction and confirm it appears in
+   CCAvenue, D1, EmailOctopus, and Google Sheets before opening registrations.
 
 CCAvenue may require the live site to expose business contact details,
 privacy policy, terms, cancellation/refund policy, and pricing before final

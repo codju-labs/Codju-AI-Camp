@@ -1,4 +1,9 @@
 import { decrypt, encrypt } from './ccavenue.js';
+import {
+  appendEnrollmentSheet,
+  createEnrollmentId,
+  sendEnrollmentEmail,
+} from './fulfillment.js';
 
 const CCAVENUE_URLS = {
   test: 'https://test.ccavenue.com/transaction/transaction.do?command=initiateTransaction',
@@ -74,6 +79,26 @@ function requireConfiguration(env) {
   }
 }
 
+function requireFulfillmentConfiguration(env) {
+  const required = [
+    'EMAILOCTOPUS_API_KEY',
+    'EMAILOCTOPUS_LIST_ID',
+    'EMAILOCTOPUS_AUTOMATION_ID',
+    'GOOGLE_SERVICE_ACCOUNT_EMAIL',
+    'GOOGLE_SERVICE_ACCOUNT_PRIVATE_KEY',
+    'GOOGLE_SHEETS_SPREADSHEET_ID',
+  ];
+  const missing = required.filter((key) => {
+    const value = env[key];
+    return !value || String(value).includes('REPLACE_WITH');
+  });
+
+  if (!env.PAYMENTS) missing.push('PAYMENTS D1 binding');
+  if (missing.length > 0) {
+    throw new Error(`Missing fulfillment configuration: ${missing.join(', ')}`);
+  }
+}
+
 function getPricing(env) {
   const basePaise = Math.round(Number(env.CAMP_PRICE_INR) * 100);
   const gstRate = Number(env.GST_RATE_PERCENT ?? 18);
@@ -126,15 +151,20 @@ function validateEnrollment(data) {
 }
 
 async function storeOrder(env, order) {
-  if (!env.PAYMENTS) return;
+  if (!env.PAYMENTS) {
+    throw new Error('PAYMENTS D1 binding is required.');
+  }
 
   await env.PAYMENTS.prepare(`
     INSERT INTO payment_orders (
-      order_id, amount, currency, status, parent_name, student_name,
-      email, phone, created_at, updated_at
-    ) VALUES (?, ?, 'INR', 'Initiated', ?, ?, ?, ?, datetime('now'), datetime('now'))
+      order_id, base_amount, gst_amount, gst_rate, amount, currency, status,
+      parent_name, student_name, email, phone, created_at, updated_at
+    ) VALUES (?, ?, ?, ?, ?, 'INR', 'Initiated', ?, ?, ?, ?, datetime('now'), datetime('now'))
   `).bind(
     order.orderId,
+    order.base,
+    order.gst,
+    String(order.gstRate),
     order.amount,
     order.parentName,
     order.studentName,
@@ -144,7 +174,7 @@ async function storeOrder(env, order) {
 }
 
 async function updateOrder(env, payment) {
-  if (!env.PAYMENTS) return;
+  if (!env.PAYMENTS) throw new Error('PAYMENTS D1 binding is required.');
 
   await env.PAYMENTS.prepare(`
     UPDATE payment_orders
@@ -160,6 +190,132 @@ async function updateOrder(env, payment) {
     payment.status_message || null,
     payment.order_id,
   ).run();
+}
+
+async function getOrder(env, orderId) {
+  return env.PAYMENTS.prepare(`
+    SELECT * FROM payment_orders WHERE order_id = ?
+  `).bind(orderId).first();
+}
+
+async function updateFulfillmentStep(env, orderId, fields) {
+  const entries = Object.entries(fields);
+  const assignments = entries.map(([key]) => `${key} = ?`).join(', ');
+  await env.PAYMENTS.prepare(`
+    UPDATE payment_orders
+    SET ${assignments}, updated_at = datetime('now')
+    WHERE order_id = ?
+  `).bind(...entries.map(([, value]) => value), orderId).run();
+}
+
+async function claimFulfillment(env, orderId) {
+  const result = await env.PAYMENTS.prepare(`
+    UPDATE payment_orders
+    SET fulfillment_status = 'Processing', fulfillment_error = NULL,
+        updated_at = datetime('now')
+    WHERE order_id = ?
+      AND (
+        fulfillment_status IN ('Pending', 'Failed')
+        OR (
+          fulfillment_status = 'Processing'
+          AND updated_at <= datetime('now', '-10 minutes')
+        )
+      )
+  `).bind(orderId).run();
+
+  return Number(result.meta?.changes || 0) > 0;
+}
+
+async function fulfillOrder(env, orderId) {
+  const claimed = await claimFulfillment(env, orderId);
+  if (!claimed) return;
+
+  try {
+    requireFulfillmentConfiguration(env);
+    const order = await getOrder(env, orderId);
+    if (!order || order.status !== 'Success' || !order.enrollment_id) {
+      throw new Error('Paid order is not ready for fulfillment.');
+    }
+
+    const tasks = [];
+
+    if (order.email_status !== 'Complete') {
+      tasks.push((async () => {
+        try {
+          const result = await sendEnrollmentEmail(order, env);
+          await updateFulfillmentStep(env, orderId, {
+            email_status: 'Complete',
+            email_contact_id: result.contactId,
+          });
+        } catch (error) {
+          await updateFulfillmentStep(env, orderId, {
+            email_status: 'Failed',
+          });
+          throw error;
+        }
+      })());
+    }
+
+    if (order.sheet_status !== 'Complete') {
+      tasks.push((async () => {
+        try {
+          const result = await appendEnrollmentSheet(order, env);
+          await updateFulfillmentStep(env, orderId, {
+            sheet_status: 'Complete',
+            sheet_range: result.updatedRange,
+          });
+        } catch (error) {
+          await updateFulfillmentStep(env, orderId, {
+            sheet_status: 'Failed',
+          });
+          throw error;
+        }
+      })());
+    }
+
+    const results = await Promise.allSettled(tasks);
+    const failures = results.filter((result) => result.status === 'rejected');
+    if (failures.length > 0) {
+      throw new Error(
+        failures.map((result) => result.reason?.message || 'Unknown error').join('; '),
+      );
+    }
+
+    await env.PAYMENTS.prepare(`
+      UPDATE payment_orders
+      SET fulfillment_status = 'Complete', fulfillment_error = NULL,
+          fulfilled_at = datetime('now'), updated_at = datetime('now')
+      WHERE order_id = ?
+    `).bind(orderId).run();
+  } catch (error) {
+    console.error('Payment fulfillment failed', error);
+    await updateFulfillmentStep(env, orderId, {
+      fulfillment_status: 'Failed',
+      fulfillment_error: String(error?.message || error).slice(0, 1000),
+    });
+  }
+}
+
+async function retryPendingFulfillments(env) {
+  requireFulfillmentConfiguration(env);
+  const result = await env.PAYMENTS.prepare(`
+    SELECT order_id
+    FROM payment_orders
+    WHERE status = 'Success'
+      AND (
+        fulfillment_status IN ('Pending', 'Failed')
+        OR (
+          fulfillment_status = 'Processing'
+          AND updated_at <= datetime('now', '-10 minutes')
+        )
+      )
+    ORDER BY updated_at
+    LIMIT 20
+  `).all();
+
+  await Promise.all(
+    (result.results || []).map(({ order_id: orderId }) => fulfillOrder(env, orderId)),
+  );
 }
 
 function renderGatewayRedirect(gatewayUrl, encryptedRequest, accessCode) {
@@ -191,18 +347,18 @@ function renderGatewayRedirect(gatewayUrl, encryptedRequest, accessCode) {
 </html>`);
 }
 
-function renderResult(payment, expectedAmount) {
+function renderResult(payment, expectedAmount, order = null) {
   const status = payment.order_status || 'Unknown';
   const isSuccess = status === 'Success';
   const amountMatches = Number(payment.amount) === Number(expectedAmount);
   const verifiedSuccess = isSuccess && amountMatches;
   const title = verifiedSuccess
-    ? 'Payment successful'
+    ? 'Enrollment confirmed'
     : status === 'Aborted'
       ? 'Payment cancelled'
       : 'Payment not completed';
   const message = verifiedSuccess
-    ? 'Your child’s seat request has been received. Our team will contact you with the camp joining details.'
+    ? 'Payment is verified and the seat is reserved. The confirmation email will arrive shortly.'
     : status === 'Aborted'
       ? 'No payment was completed. You can return to the camp page and try again.'
       : 'We could not confirm this payment. Please try again or contact the Codju admissions team.';
@@ -229,6 +385,7 @@ function renderResult(payment, expectedAmount) {
     <p>${escapeHtml(message)}</p>
     <dl>
       <dt>Order ID</dt><dd>${escapeHtml(payment.order_id || 'Unavailable')}</dd>
+      ${order?.enrollment_id ? `<dt>Enrollment ID</dt><dd>${escapeHtml(order.enrollment_id)}</dd>` : ''}
       <dt>Amount</dt><dd>INR ${escapeHtml(payment.amount || expectedAmount)}</dd>
       <dt>Tracking ID</dt><dd>${escapeHtml(payment.tracking_id || 'Unavailable')}</dd>
     </dl>
@@ -240,6 +397,7 @@ function renderResult(payment, expectedAmount) {
 
 async function initiatePayment(request, env) {
   requireConfiguration(env);
+  requireFulfillmentConfiguration(env);
 
   const siteUrl = getSiteUrl(env);
   const requestOrigin = request.headers.get('Origin');
@@ -253,7 +411,12 @@ async function initiatePayment(request, env) {
   const amount = pricing.total;
   const callbackUrl = new URL('/api/payments/callback', siteUrl).toString();
 
-  await storeOrder(env, { ...enrollment, orderId, amount });
+  await storeOrder(env, {
+    ...enrollment,
+    orderId,
+    amount,
+    ...pricing,
+  });
 
   const paymentData = new URLSearchParams({
     merchant_id: env.CCAVENUE_MERCHANT_ID,
@@ -284,7 +447,7 @@ async function initiatePayment(request, env) {
   );
 }
 
-async function handleCallback(request, env) {
+async function handleCallback(request, env, ctx) {
   requireConfiguration(env);
   const pricing = getPricing(env);
   const formData = await request.formData();
@@ -298,26 +461,46 @@ async function handleCallback(request, env) {
     const payment = Object.fromEntries(
       new URLSearchParams(decrypt(encryptedResponse, env.CCAVENUE_WORKING_KEY)),
     );
+    let order = await getOrder(env, payment.order_id);
+    const expectedAmount = order?.amount || pricing.total;
 
     if (
       payment.merchant_id !== env.CCAVENUE_MERCHANT_ID
       || payment.currency !== 'INR'
-      || Number(payment.amount) !== Number(pricing.total)
+      || !order
+      || Number(payment.amount) !== Number(expectedAmount)
     ) {
       payment.order_status = 'Invalid';
       payment.status_message = 'Payment response did not match the order configuration.';
     }
 
     await updateOrder(env, payment);
-    return renderResult(payment, pricing.total);
+
+    if (payment.order_status !== 'Success') {
+      return renderResult(payment, expectedAmount);
+    }
+
+    if (!order.enrollment_id) {
+      const enrollmentId = createEnrollmentId(payment.order_id);
+      await updateFulfillmentStep(env, payment.order_id, {
+        enrollment_id: enrollmentId,
+      });
+      order = await getOrder(env, payment.order_id);
+    }
+
+    if (order.fulfillment_status !== 'Complete') {
+      ctx.waitUntil(fulfillOrder(env, payment.order_id));
+    }
+
+    return renderResult(payment, expectedAmount, order);
   } catch (error) {
-    console.error('CCAvenue callback decryption failed', error);
-    return htmlResponse('<h1>Unable to verify payment response</h1>', 400);
+    console.error('CCAvenue callback processing failed', error);
+    return htmlResponse('<h1>Unable to process payment response</h1>', 400);
   }
 }
 
 export default {
-  async fetch(request, env) {
+  async fetch(request, env, ctx) {
     const url = new URL(request.url);
 
     if (request.method === 'GET' && url.pathname === '/api/payments/quote') {
@@ -354,9 +537,13 @@ export default {
     }
 
     if (request.method === 'POST' && url.pathname === '/api/payments/callback') {
-      return handleCallback(request, env);
+      return handleCallback(request, env, ctx);
     }
 
     return env.ASSETS.fetch(request);
+  },
+
+  async scheduled(_controller, env, ctx) {
+    ctx.waitUntil(retryPendingFulfillments(env));
   },
 };

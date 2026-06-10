@@ -6,7 +6,11 @@
     "build:assets": "node scripts/prepare-assets.mjs",
     "dev": "npm run build:assets && wrangler dev",
     "deploy": "npm run build:assets && wrangler deploy",
-    "test": "node --test"
+    "test": "node --test",
+    "test:email": "node scripts/smoke-fulfillment.mjs email",
+    "test:email:live": "node scripts/smoke-fulfillment.mjs email --live",
+    "test:sheet": "node scripts/smoke-fulfillment.mjs sheet",
+    "test:sheet:live": "node scripts/smoke-fulfillment.mjs sheet --live"
   },
   "devDependencies": {
     "wrangler": "^4.20.0"

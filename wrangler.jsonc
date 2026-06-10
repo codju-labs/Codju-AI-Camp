@@ -11,15 +11,21 @@
   },
   "vars": {
     "CCAVENUE_ENVIRONMENT": "production",
-    "CAMP_PRICE_INR": "REPLACE_WITH_PRICE",
-    "GST_RATE_PERCENT": "18",
-    "PUBLIC_SITE_URL": "https://REPLACE_WITH_YOUR_DOMAIN"
+    "CAMP_PRICE_INR": "${CAMP_PRICE_INR}",
+    "GST_RATE_PERCENT": "${GST_RATE_PERCENT}",
+    "PUBLIC_SITE_URL": "https://summercamp.codju.com/",
+    "EMAILOCTOPUS_LIST_ID": "${EMAILOCTOPUS_LIST_ID}",
+    "EMAILOCTOPUS_AUTOMATION_ID": "${EMAILOCTOPUS_AUTOMATION_ID}",
+    "GOOGLE_SERVICE_ACCOUNT_EMAIL": "${GOOGLE_SERVICE_ACCOUNT_EMAIL}",
+    "GOOGLE_SHEETS_SPREADSHEET_ID": "${GOOGLE_SHEETS_SPREADSHEET_ID}",
+    "GOOGLE_SHEETS_RANGE": "${GOOGLE_SHEETS_RANGE}"
+  },
+  "d1_databases": [{
+    "binding": "PAYMENTS",
+    "database_name": "codju-camp-payments",
+    "database_id": "REPLACE_WITH_DATABASE_ID"
+  }],
+  "triggers": {
+    "crons": ["*/5 * * * *"]
   }
-
-  // Optional but recommended: add a D1 binding after creating the database.
-  // "d1_databases": [{
-  //   "binding": "PAYMENTS",
-  //   "database_name": "codju-camp-payments",
-  //   "database_id": "REPLACE_WITH_DATABASE_ID"
-  // }]
 }

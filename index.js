@@ -281,7 +281,7 @@
     if (!playerEl) return;
 
     player = new window.YT.Player('hero-player', {
-      host: 'https://www.youtube.com',
+      host: 'https://www.youtube-nocookie.com',
       videoId: 'xoCqW-ngJDQ',
       playerVars: {
         autoplay: 1,
@@ -420,8 +420,11 @@
     loadYouTubeAPI();
   };
 
-  // Defer YouTube load: trigger after 2.5s or on first user interaction
-  const youtubeTimeout = setTimeout(triggerYouTubeLoad, 2500);
+  // Defer YouTube load: trigger 5s after window load or on first user interaction
+  let youtubeTimeout;
+  window.addEventListener('load', () => {
+    youtubeTimeout = setTimeout(triggerYouTubeLoad, 5000);
+  }, { once: true });
   window.addEventListener('scroll', triggerYouTubeLoad, { passive: true });
   window.addEventListener('mousemove', triggerYouTubeLoad, { passive: true });
   window.addEventListener('touchstart', triggerYouTubeLoad, { passive: true });

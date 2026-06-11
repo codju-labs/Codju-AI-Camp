@@ -1121,6 +1121,7 @@ button {
   width: 100%;
   height: 100%;
   object-fit: contain;
+  aspect-ratio: 1 / 1;
 }
 
 .session-card__content {
@@ -1491,6 +1492,7 @@ button {
   max-width: 380px;
   max-height: 380px;
   object-fit: contain;
+  aspect-ratio: 1 / 1;
 }
 
 .feature-split-card__content {
@@ -1848,6 +1850,7 @@ button {
   background-clip: text;
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
+  font-variant-numeric: tabular-nums;
 }
 
 .stat-premium-card:nth-child(1) .stat-premium__number {
@@ -1975,6 +1978,7 @@ button {
   background-clip: text;
   -webkit-text-fill-color: transparent;
   display: inline-block;
+  font-variant-numeric: tabular-nums;
 }
 
 .why-card__text {

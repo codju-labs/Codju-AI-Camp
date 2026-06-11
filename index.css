@@ -1251,8 +1251,16 @@ button {
   transition: transform var(--transition-fast, 0.2s) ease;
 }
 
+.tool-card__icon img[alt="ChatGPT Logo"] {
+  transform: scale(1.3);
+}
+
 .tool-card:hover .tool-card__icon img {
   transform: scale(1.1);
+}
+
+.tool-card:hover .tool-card__icon img[alt="ChatGPT Logo"] {
+  transform: scale(1.4);
 }
 
 .tool-card__name {
@@ -3043,31 +3051,54 @@ body.payment-modal-open {
 
   /* Schedule Stack */
   .schedule-row {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 12px;
-    padding: 18px 20px;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px 16px;
+    gap: 6px;
+    flex-wrap: nowrap;
   }
   
   .schedule-row__day {
-    width: 100%;
+    width: auto;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    flex-shrink: 0;
+    white-space: nowrap;
   }
   
   .schedule-row__date {
-    width: 100%;
+    width: auto;
     text-align: left;
     padding-left: 0;
-    margin-top: -4px;
-    margin-bottom: 4px;
-    font-size: 0.9rem;
+    margin: 0;
+    font-size: 0.82rem;
+    font-weight: 600;
+    color: var(--gray-500);
+    display: inline-flex;
+    align-items: center;
+    flex-grow: 1;
+    margin-left: 2px;
+    white-space: nowrap;
+  }
+
+  .schedule-row__date::before {
+    content: "|";
+    color: var(--gray-300);
+    margin-right: 8px;
+    font-weight: 400;
   }
   
   .schedule-row__slots {
-    width: 100%;
-    justify-content: flex-start;
-    flex-wrap: wrap;
-    gap: 12px 24px;
-    margin-top: 4px;
+    width: auto;
+    justify-content: flex-end;
+    margin: 0;
+    display: flex;
+    align-items: center;
+    flex-shrink: 0;
+    white-space: nowrap;
   }
 
   .session-card__visual {

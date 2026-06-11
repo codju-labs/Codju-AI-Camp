@@ -15,6 +15,7 @@ const files = [
   'robots.txt',
   'sitemap.xml',
   'llm.txt',
+  'llms.txt',
   'favicon.ico',
   'favicon-16x16.png',
   'favicon-32x32.png',
@@ -22,6 +23,7 @@ const files = [
   'site.webmanifest',
   'android-chrome-192x192.png',
   'android-chrome-512x512.png',
+  '_headers',
 ];
 const directories = ['assets', 'logos'];
 

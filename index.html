@@ -324,18 +324,22 @@
   <!-- Preload primary font file -->
   <link rel="preload" href="assets/fonts/plus-jakarta-sans-latin.woff2" as="font" type="font/woff2" crossorigin>
 
+  <!-- Preload LCP hero video thumbnail facade -->
+  <link rel="preload" href="assets/hero_video_thumbnail-sm.avif" as="image" type="image/avif" media="(max-width: 640px)" fetchpriority="high">
+  <link rel="preload" href="assets/hero_video_thumbnail.avif" as="image" type="image/avif" media="(min-width: 641px)" fetchpriority="high">
+
   <!-- Full CSS loaded asynchronously (non-render-blocking) -->
-  <link rel="stylesheet" href="index.css" media="print" onload="this.media='all'">
+  <link rel="preload" href="index.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
   <noscript><link rel="stylesheet" href="index.css"></noscript>
 
   <!-- Preconnect for YouTube thumbnails (lite facade) -->
   <link rel="preconnect" href="https://i.ytimg.com">
 
-  <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
-  <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
-  <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
-  <link rel="manifest" href="/site.webmanifest">
-  <link rel="shortcut icon" href="/favicon.ico">
+  <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png?v=2">
+  <link rel="icon" type="image/png" sizes="32x32" href="favicon-32x32.png?v=2">
+  <link rel="icon" type="image/png" sizes="16x16" href="favicon-16x16.png?v=2">
+  <link rel="manifest" href="site.webmanifest?v=2">
+  <link rel="shortcut icon" href="favicon.ico?v=2">
 </head>
 <body>
 
@@ -432,11 +436,16 @@
         <!-- Right: Visual -->
         <div class="hero__visual">
           <div class="hero__video-wrapper" id="yt-lite-container">
+            <!-- Video preview facade -->
+            <picture id="video-facade" style="position:absolute;top:0;left:0;width:100%;height:100%;z-index:1;border-radius:24px;overflow:hidden;pointer-events:none;transition:opacity 0.5s;">
+              <source srcset="assets/hero_video_thumbnail-sm.avif 350w, assets/hero_video_thumbnail.avif 640w" sizes="(max-width: 640px) 350px, 640px" type="image/avif">
+              <source srcset="assets/hero_video_thumbnail-sm.webp 350w, assets/hero_video_thumbnail.webp 640w" sizes="(max-width: 640px) 350px, 640px" type="image/webp">
+              <img src="assets/hero_video_thumbnail.webp" width="640" height="360" fetchpriority="high" alt="AI Creator Camp Promo Video Preview" style="width:100%;height:100%;object-fit:cover;border-radius:24px;" />
+            </picture>
+
             <!-- YouTube player placeholder (16:9 aspect ratio matches container exactly) -->
-            <div id="hero-player" style="position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none;border-radius:24px;overflow:hidden;"></div>
+            <div id="hero-player" style="position:absolute;top:0;left:0;width:100%;height:100%;border-radius:24px;overflow:hidden;"></div>
             
-            <!-- Video interaction overlay for play/pause toggle clicks -->
-            <div id="video-interaction-overlay" style="position:absolute;top:0;left:0;width:100%;height:100%;cursor:pointer;z-index:2;border-radius:24px;"></div>
             
             <!-- Custom mute/unmute control (glassmorphism overlay) -->
             <button type="button" class="video-audio-toggle" id="video-audio-toggle" aria-label="Unmute video" title="Toggle Audio" style="z-index:3;">
@@ -447,8 +456,8 @@
             </button>
           </div>
         </div>
+
       </div>
-    </div>
   </section>
 
   <!-- ========== PROGRAM OVERVIEW ========== -->
@@ -578,7 +587,11 @@
             
             <div class="session-card">
               <div class="session-card__visual">
-                <img src="assets/day1.webp" width="512" height="512" loading="lazy" alt="Day 1 Curriculum: Prompt Engineering" />
+                <picture>
+                  <source srcset="assets/day1-sm.avif 350w, assets/day1.avif 512w" sizes="(max-width: 640px) 350px, 512px" type="image/avif">
+                  <source srcset="assets/day1-sm.webp 350w, assets/day1.webp 512w" sizes="(max-width: 640px) 350px, 512px" type="image/webp">
+                  <img src="assets/day1.webp" width="512" height="512" loading="lazy" alt="Day 1 Curriculum: Prompt Engineering" />
+                </picture>
               </div>
               <div class="session-card__content">
                 <span class="session-card__badge">Day 1</span>
@@ -601,7 +614,11 @@
           <div class="tab-pane" id="tab-2">
             <div class="session-card">
               <div class="session-card__visual session-card__visual--padded">
-                <img src="assets/day2.webp" width="512" height="512" loading="lazy" alt="Day 2 Curriculum: Creativity with AI" />
+                <picture>
+                  <source srcset="assets/day2-sm.avif 350w, assets/day2.avif 512w" sizes="(max-width: 640px) 350px, 512px" type="image/avif">
+                  <source srcset="assets/day2-sm.webp 350w, assets/day2.webp 512w" sizes="(max-width: 640px) 350px, 512px" type="image/webp">
+                  <img src="assets/day2.webp" width="512" height="512" loading="lazy" alt="Day 2 Curriculum: Creativity with AI" />
+                </picture>
               </div>
               <div class="session-card__content">
                 <span class="session-card__badge">Day 2</span>
@@ -621,7 +638,11 @@
 
             <div class="session-card">
               <div class="session-card__visual session-card__visual--padded">
-                <img src="assets/image.webp" width="512" height="512" loading="lazy" alt="Day 3 Curriculum: AI-Assisted Learning" />
+                <picture>
+                  <source srcset="assets/image-sm.avif 350w, assets/image.avif 512w" sizes="(max-width: 640px) 350px, 512px" type="image/avif">
+                  <source srcset="assets/image-sm.webp 350w, assets/image.webp 512w" sizes="(max-width: 640px) 350px, 512px" type="image/webp">
+                  <img src="assets/image.webp" width="512" height="512" loading="lazy" alt="Day 3 Curriculum: AI-Assisted Learning" />
+                </picture>
               </div>
               <div class="session-card__content">
                 <span class="session-card__badge">Day 3</span>
@@ -643,7 +664,11 @@
           <div class="tab-pane" id="tab-3">
             <div class="session-card">
               <div class="session-card__visual session-card__visual--padded">
-                <img src="assets/day4.webp" width="512" height="512" loading="lazy" alt="Day 4 Curriculum: Computational Thinking + Build a Website" />
+                <picture>
+                  <source srcset="assets/day4-sm.avif 350w, assets/day4.avif 512w" sizes="(max-width: 640px) 350px, 512px" type="image/avif">
+                  <source srcset="assets/day4-sm.webp 350w, assets/day4.webp 512w" sizes="(max-width: 640px) 350px, 512px" type="image/webp">
+                  <img src="assets/day4.webp" width="512" height="512" loading="lazy" alt="Day 4 Curriculum: Computational Thinking + Build a Website" />
+                </picture>
               </div>
               <div class="session-card__content">
                 <span class="session-card__badge">Day 4</span>
@@ -662,7 +687,11 @@
             </div>
             <div class="session-card">
               <div class="session-card__visual session-card__visual--padded">
-                <img src="assets/day5.webp" width="512" height="512" loading="lazy" alt="Day 5 Curriculum: Entrepreneurial Thinking + Build an App" />
+                <picture>
+                  <source srcset="assets/day5-sm.avif 350w, assets/day5.avif 512w" sizes="(max-width: 640px) 350px, 512px" type="image/avif">
+                  <source srcset="assets/day5-sm.webp 350w, assets/day5.webp 512w" sizes="(max-width: 640px) 350px, 512px" type="image/webp">
+                  <img src="assets/day5.webp" width="512" height="512" loading="lazy" alt="Day 5 Curriculum: Entrepreneurial Thinking + Build an App" />
+                </picture>
               </div>
               <div class="session-card__content">
                 <span class="session-card__badge">Day 5</span>
@@ -681,7 +710,11 @@
 
             <div class="session-card">
               <div class="session-card__visual session-card__visual--padded">
-                <img src="assets/day6.webp" width="512" height="512" loading="lazy" alt="Day 6 Curriculum: AI Agents & Automation" />
+                <picture>
+                  <source srcset="assets/day6-sm.avif 350w, assets/day6.avif 512w" sizes="(max-width: 640px) 350px, 512px" type="image/avif">
+                  <source srcset="assets/day6-sm.webp 350w, assets/day6.webp 512w" sizes="(max-width: 640px) 350px, 512px" type="image/webp">
+                  <img src="assets/day6.webp" width="512" height="512" loading="lazy" alt="Day 6 Curriculum: AI Agents & Automation" />
+                </picture>
               </div>
               <div class="session-card__content">
                 <span class="session-card__badge">Day 6</span>
@@ -703,7 +736,11 @@
           <div class="tab-pane" id="tab-4">
             <div class="session-card">
               <div class="session-card__visual session-card__visual--padded">
-                <img src="assets/day7.webp" width="512" height="512" loading="lazy" alt="Day 7 Curriculum: Hackathon + Demo Day" />
+                <picture>
+                  <source srcset="assets/day7-sm.avif 350w, assets/day7.avif 512w" sizes="(max-width: 640px) 350px, 512px" type="image/avif">
+                  <source srcset="assets/day7-sm.webp 350w, assets/day7.webp 512w" sizes="(max-width: 640px) 350px, 512px" type="image/webp">
+                  <img src="assets/day7.webp" width="512" height="512" loading="lazy" alt="Day 7 Curriculum: Hackathon + Demo Day" />
+                </picture>
               </div>
               <div class="session-card__content">
                 <span class="session-card__badge">Day 7</span>
@@ -725,7 +762,7 @@
       </div>
 
       <div style="text-align: center; margin-top: 56px;" class="reveal">
-        <a href="assets/Codju%20-%20AI%20Creator%20Camp%20Brochure.pdf" target="_blank" class="btn btn--secondary" style="background: var(--white); border: 1px solid var(--purple-200); box-shadow: 0 4px 12px rgba(0,0,0,0.05); color: var(--purple-600);">
+        <a href="assets/AI%20Creator%20Camp%20Brochure%202026.pdf" target="_blank" class="btn btn--secondary" style="background: var(--white); border: 1px solid var(--purple-200); box-shadow: 0 4px 12px rgba(0,0,0,0.05); color: var(--purple-600);">
           <svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 8px;"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" x2="12" y1="15" y2="3"/></svg>
           Download Full Brochure
         </a>
@@ -921,7 +958,11 @@
 
       <div class="feature-split-card reveal">
         <div class="feature-split-card__image">
-          <img src="assets/codju_certificate.webp" width="600" height="600" loading="lazy" alt="Official Codju AI Creator Camp Certificate of Completion" />
+          <picture>
+            <source srcset="assets/codju_certificate-sm.avif 350w, assets/codju_certificate.avif 600w" sizes="(max-width: 640px) 350px, 600px" type="image/avif">
+            <source srcset="assets/codju_certificate-sm.webp 350w, assets/codju_certificate.webp 600w" sizes="(max-width: 640px) 350px, 600px" type="image/webp">
+            <img src="assets/codju_certificate.webp" width="600" height="600" loading="lazy" alt="Official Codju AI Creator Camp Certificate of Completion" />
+          </picture>
         </div>
         <div class="feature-split-card__content">
           
@@ -1001,11 +1042,35 @@
         <div class="feature-split-card__image" id="support-image-container" style="overflow: hidden; padding: 0;">
           <div class="support-img-track" id="support-img-track">
             <!-- Original 3 Slides -->
-            <div class="support-img-slide"><img src="assets/codju_support_update.webp" width="600" height="600" loading="lazy" alt="12 Months of Extended AI Support and Mentorship" /></div>
-            <div class="support-img-slide"><img src="assets/codju_support_cohort.webp" width="600" height="600" loading="lazy" alt="12 Months of Extended AI Support and Mentorship" /></div>
-            <div class="support-img-slide"><img src="assets/codju_support_mentor.webp" width="600" height="600" loading="lazy" alt="12 Months of Extended AI Support and Mentorship" /></div>
+            <div class="support-img-slide">
+              <picture>
+                <source srcset="assets/codju_support_update-sm.avif 350w, assets/codju_support_update.avif 600w" sizes="(max-width: 640px) 350px, 600px" type="image/avif">
+                <source srcset="assets/codju_support_update-sm.webp 350w, assets/codju_support_update.webp 600w" sizes="(max-width: 640px) 350px, 600px" type="image/webp">
+                <img src="assets/codju_support_update.webp" width="600" height="600" loading="lazy" alt="12 Months of Extended AI Support and Mentorship" />
+              </picture>
+            </div>
+            <div class="support-img-slide">
+              <picture>
+                <source srcset="assets/codju_support_cohort-sm.avif 350w, assets/codju_support_cohort.avif 600w" sizes="(max-width: 640px) 350px, 600px" type="image/avif">
+                <source srcset="assets/codju_support_cohort-sm.webp 350w, assets/codju_support_cohort.webp 600w" sizes="(max-width: 640px) 350px, 600px" type="image/webp">
+                <img src="assets/codju_support_cohort.webp" width="600" height="600" loading="lazy" alt="12 Months of Extended AI Support and Mentorship" />
+              </picture>
+            </div>
+            <div class="support-img-slide">
+              <picture>
+                <source srcset="assets/codju_support_mentor-sm.avif 350w, assets/codju_support_mentor.avif 600w" sizes="(max-width: 640px) 350px, 600px" type="image/avif">
+                <source srcset="assets/codju_support_mentor-sm.webp 350w, assets/codju_support_mentor.webp 600w" sizes="(max-width: 640px) 350px, 600px" type="image/webp">
+                <img src="assets/codju_support_mentor.webp" width="600" height="600" loading="lazy" alt="12 Months of Extended AI Support and Mentorship" />
+              </picture>
+            </div>
             <!-- Cloned 1st Slide for Infinite Loop -->
-            <div class="support-img-slide"><img src="assets/codju_support_update.webp" width="600" height="600" loading="lazy" alt="12 Months of Extended AI Support and Mentorship" /></div>
+            <div class="support-img-slide">
+              <picture>
+                <source srcset="assets/codju_support_update-sm.avif 350w, assets/codju_support_update.avif 600w" sizes="(max-width: 640px) 350px, 600px" type="image/avif">
+                <source srcset="assets/codju_support_update-sm.webp 350w, assets/codju_support_update.webp 600w" sizes="(max-width: 640px) 350px, 600px" type="image/webp">
+                <img src="assets/codju_support_update.webp" width="600" height="600" loading="lazy" alt="12 Months of Extended AI Support and Mentorship" />
+              </picture>
+            </div>
           </div>
         </div>
         <div class="feature-split-card__content">
@@ -1058,7 +1123,11 @@
         <div class="founder-grid__glow"></div>
         
         <div class="founder__portrait">
-          <img src="assets/rohit_profile.webp" width="400" height="552" loading="lazy" alt="Rohit K Bishnoi - Lead Mentor at Codju AI Creator Camp" class="founder__portrait-img" />
+          <picture>
+            <source srcset="assets/rohit_profile-sm.avif 300w, assets/rohit_profile.avif 400w" sizes="(max-width: 640px) 300px, 400px" type="image/avif">
+            <source srcset="assets/rohit_profile-sm.webp 300w, assets/rohit_profile.webp 400w" sizes="(max-width: 640px) 300px, 400px" type="image/webp">
+            <img src="assets/rohit_profile.webp" width="400" height="552" loading="lazy" alt="Rohit K Bishnoi - Lead Mentor at Codju AI Creator Camp" class="founder__portrait-img" />
+          </picture>
         </div>
 
         <div class="founder__content">
@@ -1371,7 +1440,7 @@
 
           <div class="final-cta__buttons">
             <a href="#reserve" class="btn btn--primary btn--large">Reserve Your Seat</a>
-            <a href="assets/Codju%20-%20AI%20Creator%20Camp%20Brochure.pdf" target="_blank" class="btn btn--outline-purple btn--large">
+            <a href="assets/AI%20Creator%20Camp%20Brochure%202026.pdf" target="_blank" class="btn btn--outline-purple btn--large">
               <span>Download Brochure</span>
               <svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="btn-icon"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" x2="12" y1="15" y2="3"/></svg>
             </a>

@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 /**
  * Image Optimization Script for Codju AI Creator Camp
- * Converts PNG/JPEG to WebP with resize using sharp-cli.
+ * Converts PNG/JPEG to WebP and AVIF with resize using sharp-cli.
  * 
  * Usage: node scripts/optimize-images.mjs
  */
@@ -31,59 +31,81 @@ const CONFIGS = {
   'pika.png':          { maxWidth: 96,  quality: 80 },
 
   // Day curriculum images (displayed at ~400px max)
-  'day1.png':          { maxWidth: 512, quality: 75 },
-  'day2.png':          { maxWidth: 512, quality: 75 },
-  'day3.png':          { maxWidth: 512, quality: 75 },
-  'day4.png':          { maxWidth: 512, quality: 75 },
-  'day5.png':          { maxWidth: 512, quality: 75 },
-  'day6.png':          { maxWidth: 512, quality: 75 },
-  'day7.png':          { maxWidth: 512, quality: 75 },
-  'image.png':         { maxWidth: 512, quality: 75 },
+  'day1.png':          { maxWidth: 512, maxWidthSm: 350, quality: 75 },
+  'day2.png':          { maxWidth: 512, maxWidthSm: 350, quality: 75 },
+  'day3.png':          { maxWidth: 512, maxWidthSm: 350, quality: 75 },
+  'day4.png':          { maxWidth: 512, maxWidthSm: 350, quality: 75 },
+  'day5.png':          { maxWidth: 512, maxWidthSm: 350, quality: 75 },
+  'day6.png':          { maxWidth: 512, maxWidthSm: 350, quality: 75 },
+  'day7.png':          { maxWidth: 512, maxWidthSm: 350, quality: 75 },
+  'image.png':         { maxWidth: 512, maxWidthSm: 350, quality: 75 },
 
   // Certificate & support images (displayed at ~500px max)
-  'codju_certificate.png':     { maxWidth: 600, quality: 75 },
-  'codju_support_update.png':  { maxWidth: 600, quality: 75 },
-  'codju_support_cohort.png':  { maxWidth: 600, quality: 75 },
-  'codju_support_mentor.png':  { maxWidth: 600, quality: 75 },
+  'codju_certificate.png':     { maxWidth: 600, maxWidthSm: 350, quality: 75 },
+  'codju_support_update.png':  { maxWidth: 600, maxWidthSm: 350, quality: 75 },
+  'codju_support_cohort.png':  { maxWidth: 600, maxWidthSm: 350, quality: 75 },
+  'codju_support_mentor.png':  { maxWidth: 600, maxWidthSm: 350, quality: 75 },
 
   // Logo and profile
   'logo.png':             { maxWidth: 200, quality: 80 },
-  'rohit_profile.jpeg':   { maxWidth: 400, quality: 75 },
+  'rohit_profile.jpeg':   { maxWidth: 400, maxWidthSm: 300, quality: 75 },
+
+  // Video Facade Thumbnail
+  'hero_video_thumbnail.jpg': { maxWidth: 640, maxWidthSm: 350, quality: 75 },
 };
 
-console.log('=== Image Optimization ===\n');
+console.log('=== Image Optimization (WebP + AVIF) ===\n');
 
 let totalOriginal = 0;
 let totalWebP = 0;
+let totalAVIF = 0;
 
 for (const [filename, config] of Object.entries(CONFIGS)) {
   const inputPath = join(ASSETS_DIR, filename);
-  const webpName = filename.replace(/\.(png|jpe?g)$/i, '.webp');
-  const outputDir = ASSETS_DIR;
+  const baseName = filename.replace(/\.(png|jpe?g)$/i, '');
 
   try {
     const inputStat = await stat(inputPath);
     const origSize = inputStat.size;
-
-    // sharp-cli: -i input -o outputDir -f webp -q quality resize width
-    const cmd = `npx -y sharp-cli -i "${inputPath}" -o "${outputDir}" -f webp -q ${config.quality} resize ${config.maxWidth}`;
-    execSync(cmd, { stdio: 'pipe' });
-
-    const outputPath = join(ASSETS_DIR, webpName);
-    const outputStat = await stat(outputPath);
-    const webpSize = outputStat.size;
-
     totalOriginal += origSize;
-    totalWebP += webpSize;
 
-    const pct = Math.round((webpSize / origSize) * 100);
-    console.log(`  ${filename.padEnd(30)} ${Math.round(origSize/1024).toString().padStart(5)} KB → ${Math.round(webpSize/1024).toString().padStart(5)} KB (${pct}%)`);
+    console.log(`Processing: ${filename} (Original: ${Math.round(origSize/1024)} KB)`);
+
+    // Define formats to build
+    const formats = [
+      { ext: '.webp', format: 'webp', q: config.quality, sizeTracker: (s) => totalWebP += s },
+      { ext: '.avif', format: 'avif', q: Math.max(30, config.quality - 15), sizeTracker: (s) => totalAVIF += s }
+    ];
+
+    for (const fmt of formats) {
+      // 1. Large variant
+      const outName = `${baseName}${fmt.ext}`;
+      const outPath = join(ASSETS_DIR, outName);
+      const cmd = `npx -y sharp-cli -i "${inputPath}" -o "${outPath}" -f ${fmt.format} -q ${fmt.q} resize ${config.maxWidth}`;
+      execSync(cmd, { stdio: 'pipe' });
+      const outStat = await stat(outPath);
+      fmt.sizeTracker(outStat.size);
+      console.log(`  -> Generated: ${outName} (${Math.round(outStat.size/1024)} KB)`);
+
+      // 2. Small variant (if specified)
+      if (config.maxWidthSm) {
+        const outNameSm = `${baseName}-sm${fmt.ext}`;
+        const outPathSm = join(ASSETS_DIR, outNameSm);
+        const cmdSm = `npx -y sharp-cli -i "${inputPath}" -o "${outPathSm}" -f ${fmt.format} -q ${fmt.q} resize ${config.maxWidthSm}`;
+        execSync(cmdSm, { stdio: 'pipe' });
+        const outStatSm = await stat(outPathSm);
+        fmt.sizeTracker(outStatSm.size);
+        console.log(`  -> Generated: ${outNameSm} (${Math.round(outStatSm.size/1024)} KB)`);
+      }
+    }
   } catch (err) {
-    console.log(`  ${filename.padEnd(30)} ERROR: ${err.stderr?.toString().split('\n')[0] || err.message}`);
+    console.log(`  ERROR on ${filename}: ${err.stderr?.toString().split('\n')[0] || err.message}`);
   }
 }
 
 console.log(`\n=== Summary ===`);
 console.log(`  Original total: ${Math.round(totalOriginal / 1024)} KB`);
 console.log(`  WebP total:     ${Math.round(totalWebP / 1024)} KB`);
-console.log(`  Savings:        ${Math.round((totalOriginal - totalWebP) / 1024)} KB (${Math.round((1 - totalWebP / totalOriginal) * 100)}%)`);
+console.log(`  AVIF total:     ${Math.round(totalAVIF / 1024)} KB`);
+console.log(`  Combined saved: ${Math.round((totalOriginal * 2 - (totalWebP + totalAVIF)) / 1024)} KB`);
+

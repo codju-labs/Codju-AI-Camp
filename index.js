@@ -281,6 +281,7 @@
     if (!playerEl) return;
 
     player = new window.YT.Player('hero-player', {
+      host: 'https://www.youtube.com',
       videoId: 'xoCqW-ngJDQ',
       playerVars: {
         autoplay: 1,
@@ -306,6 +307,18 @@
           // Loop video explicitly if it ends (0)
           if (event.data === 0) {
             event.target.playVideo();
+          }
+          // Fade out visual facade when video starts playing (1 is PLAYING)
+          if (event.data === 1) {
+            const facade = document.getElementById('video-facade');
+            if (facade) {
+              facade.style.opacity = '0';
+              setTimeout(() => {
+                if (facade.parentNode) {
+                  facade.parentNode.removeChild(facade);
+                }
+              }, 500);
+            }
           }
         }
       }
@@ -392,7 +405,27 @@
   };
 
   // Load YouTube API deferred to prevent blocking critical path
-  window.addEventListener('load', loadYouTubeAPI);
+  let youtubeApiLoaded = false;
+  const triggerYouTubeLoad = () => {
+    if (youtubeApiLoaded) return;
+    youtubeApiLoaded = true;
+
+    // Clean up event listeners and timeout
+    window.removeEventListener('scroll', triggerYouTubeLoad);
+    window.removeEventListener('mousemove', triggerYouTubeLoad);
+    window.removeEventListener('touchstart', triggerYouTubeLoad);
+    window.removeEventListener('click', triggerYouTubeLoad);
+    clearTimeout(youtubeTimeout);
+
+    loadYouTubeAPI();
+  };
+
+  // Defer YouTube load: trigger after 2.5s or on first user interaction
+  const youtubeTimeout = setTimeout(triggerYouTubeLoad, 2500);
+  window.addEventListener('scroll', triggerYouTubeLoad, { passive: true });
+  window.addEventListener('mousemove', triggerYouTubeLoad, { passive: true });
+  window.addEventListener('touchstart', triggerYouTubeLoad, { passive: true });
+  window.addEventListener('click', triggerYouTubeLoad, { passive: true });
 
   // --- Razorpay enrollment checkout ---
   const paymentModal = document.getElementById('payment-modal');

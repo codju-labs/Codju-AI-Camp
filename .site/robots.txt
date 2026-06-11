@@ -2,6 +2,7 @@
 # Robots.txt for AI Creator Camp by Codju
 # ==========================================================
 
+# Allow all search engine crawlers
 User-agent: *
 Allow: /
 
@@ -9,5 +10,29 @@ Allow: /
 Disallow: /*.json$
 Disallow: /*.webmanifest$
 
-# Sitemap Location
+# Allow LLM crawlers to access the site and read curriculum
+User-agent: GPTBot
+Allow: /
+
+User-agent: ChatGPT-User
+Allow: /
+
+User-agent: ClaudeBot
+Allow: /
+
+User-agent: Claude-Web
+Allow: /
+
+User-agent: Google-Extended
+Allow: /
+
+User-agent: PerplexityBot
+Allow: /
+
+User-agent: Applebot-Extended
+Allow: /
+
+# Sitemap & LLM Location
 Sitemap: https://summercamp.codju.com/sitemap.xml
+Link: https://summercamp.codju.com/llms.txt; rel="llms-txt"
+

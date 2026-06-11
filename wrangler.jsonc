@@ -16,6 +16,7 @@
 	},
 	"vars": {
 		"CCAVENUE_ENVIRONMENT": "production",
+		"REGISTRATION_STATUS": "open",
 		"PUBLIC_SITE_URL": "https://summercamp.codju.com/"
 	},
 	"d1_databases": [

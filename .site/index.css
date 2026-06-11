@@ -2426,6 +2426,55 @@ body.payment-modal-open {
   opacity: 0.72;
 }
 
+.payment-consent {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 10px;
+  align-items: flex-start;
+  color: var(--gray-600);
+  font-size: 0.78rem;
+  line-height: 1.55;
+}
+
+.payment-consent input {
+  margin-top: 3px;
+  accent-color: var(--purple-600);
+}
+
+.payment-consent a {
+  color: var(--purple-600);
+  font-weight: 700;
+}
+
+.payment-form__message:empty {
+  display: none;
+}
+
+.payment-form__message {
+  padding: 11px 13px;
+  border-radius: 10px;
+  background: var(--purple-50);
+  color: var(--purple-800);
+  font-size: 0.8rem;
+  font-weight: 650;
+  line-height: 1.5;
+}
+
+.payment-form__message[data-tone="success"] {
+  background: #ecfdf5;
+  color: #166534;
+}
+
+.payment-form__message[data-tone="warning"] {
+  background: #fffbeb;
+  color: #92400e;
+}
+
+.payment-form__message[data-tone="error"] {
+  background: #fef2f2;
+  color: #b91c1c;
+}
+
 .payment-card__footer {
   display: flex;
   flex-direction: column;
@@ -4008,6 +4057,29 @@ body.payment-modal-open {
   text-transform: uppercase;
 }
 
+.final-cta__deliverables {
+  display: grid;
+  gap: 10px;
+  margin: 0 0 24px;
+  padding: 0;
+  list-style: none;
+  color: var(--gray-700);
+  font-weight: 600;
+}
+
+.final-cta__deliverables li {
+  position: relative;
+  padding-left: 24px;
+}
+
+.final-cta__deliverables li::before {
+  content: "✓";
+  position: absolute;
+  left: 0;
+  color: var(--success);
+  font-weight: 800;
+}
+
 /* Accepted Payment Methods card area */
 .final-cta__payment-methods {
   margin-top: 24px;
@@ -4049,6 +4121,132 @@ body.payment-modal-open {
   content: "•";
   color: var(--purple-500);
   font-weight: bold;
+}
+
+.final-cta__payment-methods p {
+  margin: 0;
+  color: var(--gray-600);
+  line-height: 1.6;
+}
+
+.payment-card--status {
+  max-width: 560px;
+}
+
+.payment-status-message {
+  display: grid;
+  gap: 12px;
+}
+
+.payment-status-message p {
+  margin: 0 0 8px;
+  color: var(--gray-600);
+  line-height: 1.65;
+}
+
+/* Policy and contact pages */
+.policy-page {
+  min-height: 100vh;
+  background: linear-gradient(180deg, #f8f7ff 0%, var(--white) 320px);
+}
+
+.policy-nav {
+  position: static;
+}
+
+.policy-main {
+  padding: 72px 24px 96px;
+}
+
+.policy-shell {
+  width: min(860px, 100%);
+  margin: 0 auto;
+}
+
+.policy-header {
+  margin-bottom: 32px;
+}
+
+.policy-kicker {
+  display: inline-block;
+  margin-bottom: 12px;
+  color: var(--purple-600);
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  font-size: 0.78rem;
+}
+
+.policy-header h1 {
+  margin: 0 0 14px;
+  font-size: clamp(2.1rem, 5vw, 3.5rem);
+}
+
+.policy-header p {
+  color: var(--gray-600);
+  line-height: 1.7;
+}
+
+.policy-card {
+  padding: clamp(24px, 5vw, 48px);
+  background: var(--white);
+  border: 1px solid var(--gray-200);
+  border-radius: 24px;
+  box-shadow: 0 20px 60px rgba(45, 29, 94, 0.08);
+}
+
+.policy-card h2 {
+  margin: 32px 0 10px;
+  font-size: 1.3rem;
+}
+
+.policy-card h2:first-child {
+  margin-top: 0;
+}
+
+.policy-card p,
+.policy-card li,
+.contact-list address {
+  color: var(--gray-700);
+  line-height: 1.75;
+}
+
+.policy-card ul {
+  padding-left: 22px;
+}
+
+.policy-card a {
+  color: var(--purple-600);
+  font-weight: 700;
+}
+
+.policy-updated {
+  margin-top: 32px;
+  padding-top: 20px;
+  border-top: 1px solid var(--gray-200);
+  font-size: 0.9rem;
+  color: var(--gray-500);
+}
+
+.contact-list {
+  display: grid;
+  gap: 18px;
+  margin: 0;
+}
+
+.contact-list dt {
+  font-weight: 800;
+  color: var(--gray-900);
+}
+
+.contact-list dd {
+  margin: 4px 0 0;
+  color: var(--gray-700);
+}
+
+.policy-footer-links {
+  justify-content: center;
+  flex-wrap: wrap;
 }
 
 /* Sticky Mobile Button */

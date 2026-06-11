@@ -50,6 +50,22 @@ function normalizeText(value, maxLength) {
   return String(value || '').trim().replace(/\s+/g, ' ').slice(0, maxLength);
 }
 
+function requestError(message, status = 400) {
+  const error = new Error(message);
+  error.status = status;
+  return error;
+}
+
+function jsonResponse(data, status = 200) {
+  return Response.json(data, {
+    status,
+    headers: {
+      'Cache-Control': 'no-store',
+      'X-Content-Type-Options': 'nosniff',
+    },
+  });
+}
+
 function requireConfiguration(env) {
   const required = [
     'CCAVENUE_MERCHANT_ID',
@@ -79,6 +95,29 @@ function requireConfiguration(env) {
   }
 }
 
+function requireRazorpayConfiguration(env) {
+  const required = [
+    'RAZORPAY_KEY_ID',
+    'RAZORPAY_KEY_SECRET',
+    'CAMP_PRICE_INR',
+    'PUBLIC_SITE_URL',
+  ];
+  const missing = required.filter((key) => {
+    const value = env[key];
+    return !value || String(value).includes('REPLACE_WITH');
+  });
+
+  if (!env.PAYMENTS) missing.push('PAYMENTS D1 binding');
+  if (missing.length > 0) {
+    throw new Error(`Missing Razorpay configuration: ${missing.join(', ')}`);
+  }
+
+  const pricing = getPricing(env);
+  if (Math.round(Number(pricing.total) * 100) < 100) {
+    throw new Error('Payment amount must be at least 100 paise.');
+  }
+}
+
 function requireFulfillmentConfiguration(env) {
   const required = [
     'EMAILOCTOPUS_API_KEY',
@@ -100,15 +139,16 @@ function requireFulfillmentConfiguration(env) {
 }
 
 function getPricing(env) {
-  const basePaise = Math.round(Number(env.CAMP_PRICE_INR) * 100);
+  const totalPaise = Math.round(Number(env.CAMP_PRICE_INR) * 100);
   const gstRate = Number(env.GST_RATE_PERCENT ?? 18);
-  const gstPaise = Math.round(basePaise * gstRate / 100);
+  const basePaise = Math.round(totalPaise * 100 / (100 + gstRate));
+  const gstPaise = totalPaise - basePaise;
 
   return {
     base: (basePaise / 100).toFixed(2),
     gst: (gstPaise / 100).toFixed(2),
     gstRate,
-    total: ((basePaise + gstPaise) / 100).toFixed(2),
+    total: (totalPaise / 100).toFixed(2),
   };
 }
 
@@ -148,6 +188,17 @@ function validateEnrollment(data) {
   }
 
   return enrollment;
+}
+
+function validateRequestOrigin(request, env) {
+  const requestOrigin = request.headers.get('Origin');
+  const allowedOrigins = new Set([
+    getSiteUrl(env).origin,
+    new URL(request.url).origin,
+  ]);
+  if (requestOrigin && !allowedOrigins.has(requestOrigin)) {
+    throw requestError('Invalid request origin.', 403);
+  }
 }
 
 async function storeOrder(env, order) {
@@ -190,6 +241,16 @@ async function updateOrder(env, payment) {
     payment.status_message || null,
     payment.order_id,
   ).run();
+}
+
+async function markRazorpayPaymentVerified(env, orderId, paymentId) {
+  await env.PAYMENTS.prepare(`
+    UPDATE payment_orders
+    SET status = 'Success', tracking_id = ?, payment_mode = 'Razorpay',
+        response_code = 'verified', response_message = 'Signature verified',
+        updated_at = datetime('now')
+    WHERE order_id = ?
+  `).bind(paymentId, orderId).run();
 }
 
 async function getOrder(env, orderId) {
@@ -316,6 +377,187 @@ async function retryPendingFulfillments(env) {
   await Promise.all(
     (result.results || []).map(({ order_id: orderId }) => fulfillOrder(env, orderId)),
   );
+}
+
+async function createRazorpayOrder(request, env) {
+  requireRazorpayConfiguration(env);
+  requireFulfillmentConfiguration(env);
+  validateRequestOrigin(request, env);
+
+  let payload;
+  try {
+    payload = await request.json();
+  } catch {
+    return jsonResponse({ error: 'Invalid JSON request body.' }, 400);
+  }
+
+  const formData = new FormData();
+  formData.set('parent_name', payload.parent_name || '');
+  formData.set('student_name', payload.student_name || '');
+  formData.set('email', payload.email || '');
+  formData.set('phone', payload.phone || '');
+  let enrollment;
+  try {
+    enrollment = validateEnrollment(formData);
+  } catch (error) {
+    return jsonResponse({ error: error.message }, 400);
+  }
+  const pricing = getPricing(env);
+  const amount = Math.round(Number(pricing.total) * 100);
+  if (!Number.isInteger(amount) || amount < 100) {
+    return jsonResponse({ error: 'Payment amount must be at least 100 paise.' }, 400);
+  }
+
+  const receipt = `CODJU-${Date.now()}-${crypto.randomUUID().slice(0, 6)}`;
+  const credentials = btoa(`${env.RAZORPAY_KEY_ID}:${env.RAZORPAY_KEY_SECRET}`);
+  let razorpayResponse;
+
+  try {
+    razorpayResponse = await fetch('https://api.razorpay.com/v1/orders', {
+      method: 'POST',
+      headers: {
+        Authorization: `Basic ${credentials}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        amount,
+        currency: 'INR',
+        receipt,
+        notes: {
+          student_name: enrollment.studentName,
+          parent_email: enrollment.email,
+        },
+      }),
+    });
+  } catch (error) {
+    console.error('Razorpay order request failed', error);
+    return jsonResponse({ error: 'Unable to contact the payment provider.' }, 500);
+  }
+
+  const responseData = await razorpayResponse.json().catch(() => ({}));
+  if (!razorpayResponse.ok) {
+    console.error('Razorpay order creation failed', {
+      status: razorpayResponse.status,
+      code: responseData.error?.code,
+    });
+    const status = razorpayResponse.status === 401 ? 401 : 500;
+    return jsonResponse(
+      {
+        error: status === 401
+          ? 'Payment provider authentication failed.'
+          : 'Unable to create a payment order.',
+      },
+      status,
+    );
+  }
+
+  if (
+    !responseData.id
+    || responseData.amount !== amount
+    || responseData.currency !== 'INR'
+  ) {
+    return jsonResponse({ error: 'Payment provider returned an invalid order.' }, 500);
+  }
+
+  await storeOrder(env, {
+    ...enrollment,
+    orderId: responseData.id,
+    amount: pricing.total,
+    ...pricing,
+  });
+
+  return jsonResponse({
+    order_id: responseData.id,
+    amount: responseData.amount,
+    currency: responseData.currency,
+    key_id: env.RAZORPAY_KEY_ID,
+  });
+}
+
+async function generateRazorpaySignature(orderId, paymentId, secret) {
+  const encoder = new TextEncoder();
+  const key = await crypto.subtle.importKey(
+    'raw',
+    encoder.encode(secret),
+    { name: 'HMAC', hash: 'SHA-256' },
+    false,
+    ['sign'],
+  );
+  const signature = await crypto.subtle.sign(
+    'HMAC',
+    key,
+    encoder.encode(`${orderId}|${paymentId}`),
+  );
+  return Array.from(new Uint8Array(signature))
+    .map((byte) => byte.toString(16).padStart(2, '0'))
+    .join('');
+}
+
+function signaturesMatch(expected, received) {
+  if (
+    typeof received !== 'string'
+    || expected.length !== received.length
+    || !/^[a-f0-9]+$/i.test(received)
+  ) {
+    return false;
+  }
+
+  let mismatch = 0;
+  for (let index = 0; index < expected.length; index += 1) {
+    mismatch |= expected.charCodeAt(index) ^ received.charCodeAt(index);
+  }
+  return mismatch === 0;
+}
+
+async function verifyRazorpayPayment(request, env, ctx) {
+  requireRazorpayConfiguration(env);
+  validateRequestOrigin(request, env);
+
+  let payload;
+  try {
+    payload = await request.json();
+  } catch {
+    return jsonResponse({ error: 'Invalid JSON request body.' }, 400);
+  }
+
+  const orderId = normalizeText(payload.razorpay_order_id, 80);
+  const paymentId = normalizeText(payload.razorpay_payment_id, 80);
+  const receivedSignature = normalizeText(payload.razorpay_signature, 128);
+  if (!orderId || !paymentId || !receivedSignature) {
+    return jsonResponse({ error: 'Missing payment verification fields.' }, 400);
+  }
+
+  const order = await getOrder(env, orderId);
+  if (!order) {
+    return jsonResponse({ error: 'Payment order was not found.' }, 400);
+  }
+
+  const expectedSignature = await generateRazorpaySignature(
+    order.order_id,
+    paymentId,
+    env.RAZORPAY_KEY_SECRET,
+  );
+  if (!signaturesMatch(expectedSignature, receivedSignature)) {
+    return jsonResponse({ error: 'Payment signature verification failed.' }, 400);
+  }
+
+  await markRazorpayPaymentVerified(env, order.order_id, paymentId);
+  let verifiedOrder = await getOrder(env, order.order_id);
+  if (!verifiedOrder.enrollment_id) {
+    await updateFulfillmentStep(env, order.order_id, {
+      enrollment_id: createEnrollmentId(order.order_id),
+    });
+    verifiedOrder = await getOrder(env, order.order_id);
+  }
+
+  if (verifiedOrder.fulfillment_status !== 'Complete') {
+    ctx.waitUntil(fulfillOrder(env, order.order_id));
+  }
+
+  return jsonResponse({
+    success: true,
+    enrollment_id: verifiedOrder.enrollment_id,
+  });
 }
 
 function renderGatewayRedirect(gatewayUrl, encryptedRequest, accessCode) {
@@ -503,6 +745,34 @@ export default {
   async fetch(request, env, ctx) {
     const url = new URL(request.url);
 
+    if (request.method === 'POST' && url.pathname === '/api/create-order') {
+      if (env.REGISTRATION_STATUS !== 'open') {
+        return jsonResponse(
+          { error: 'Online registrations are temporarily unavailable.' },
+          503,
+        );
+      }
+
+      try {
+        return await createRazorpayOrder(request, env);
+      } catch (error) {
+        console.error('Razorpay order creation failed', error);
+        return jsonResponse(
+          { error: error.status ? error.message : 'Unable to create payment order.' },
+          error.status || 500,
+        );
+      }
+    }
+
+    if (request.method === 'POST' && url.pathname === '/api/verify-payment') {
+      try {
+        return await verifyRazorpayPayment(request, env, ctx);
+      } catch (error) {
+        console.error('Razorpay payment verification failed', error);
+        return jsonResponse({ error: 'Unable to verify payment.' }, 500);
+      }
+    }
+
     if (request.method === 'GET' && url.pathname === '/api/payments/quote') {
       try {
         requireConfiguration(env);
@@ -528,12 +798,10 @@ export default {
     }
 
     if (request.method === 'POST' && url.pathname === '/api/payments/initiate') {
-      try {
-        return await initiatePayment(request, env);
-      } catch (error) {
-        console.error('CCAvenue payment initiation failed', error);
-        return htmlResponse(`<!doctype html><html><body><h1>Payment could not be started</h1><p>${escapeHtml(error.message)}</p><p><a href="/#reserve">Return to the camp page</a></p></body></html>`, 400);
-      }
+      return jsonResponse(
+        { error: 'CCAvenue checkout has been retired. Use Razorpay checkout.' },
+        410,
+      );
     }
 
     if (request.method === 'POST' && url.pathname === '/api/payments/callback') {
@@ -544,6 +812,7 @@ export default {
   },
 
   async scheduled(_controller, env, ctx) {
+    if (env.REGISTRATION_STATUS !== 'open') return;
     ctx.waitUntil(retryPendingFulfillments(env));
   },
 };

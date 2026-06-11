@@ -136,7 +136,14 @@ export async function sendEnrollmentEmail(order, env, fetchImpl = fetch) {
     requireOk(queued.response, 'EmailOctopus automation', JSON.stringify(queued.data));
   }
 
-  return { contactId: contact.id };
+  const automationAlreadyStarted = automationErrorCode === 'ALREADY_STARTED';
+  if (automationAlreadyStarted) {
+    console.warn(
+      `EmailOctopus automation already started for ${order.email}; no new welcome email was queued.`,
+    );
+  }
+
+  return { contactId: contact.id, automationAlreadyStarted };
 }
 
 async function getGoogleAccessToken(env, fetchImpl) {

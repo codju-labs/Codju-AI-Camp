@@ -1,4 +1,5 @@
 import assert from 'node:assert/strict';
+import { createHmac } from 'node:crypto';
 import test from 'node:test';
 import { decrypt, encrypt } from './ccavenue.js';
 import worker from './index.js';
@@ -23,11 +24,14 @@ function createD1Stub() {
 }
 
 const env = {
+  REGISTRATION_STATUS: 'open',
+  RAZORPAY_KEY_ID: 'rzp_test_example',
+  RAZORPAY_KEY_SECRET: 'razorpay-test-secret',
   CCAVENUE_ENVIRONMENT: 'test',
   CCAVENUE_MERCHANT_ID: 'test-merchant',
   CCAVENUE_ACCESS_CODE: 'test-access',
   CCAVENUE_WORKING_KEY: '0123456789abcdef0123456789abcdef',
-  CAMP_PRICE_INR: '1999.00',
+  CAMP_PRICE_INR: '2999.00',
   GST_RATE_PERCENT: '18',
   PUBLIC_SITE_URL: 'https://camp.example.com',
   EMAILOCTOPUS_API_KEY: 'email-api-key',
@@ -42,61 +46,223 @@ const env = {
   },
 };
 
-test('payment initiation uses the server-configured amount', async () => {
-  const form = new URLSearchParams({
-    parent_name: 'Test Parent',
-    student_name: 'Test Student',
-    email: 'test@example.com',
-    phone: '9876543210',
-    amount: '1.00',
-  });
-  const request = new Request(
-    'https://camp.example.com/api/payments/initiate',
-    {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/x-www-form-urlencoded',
-        Origin: 'https://camp.example.com',
-      },
-      body: form,
+test('Razorpay order creation uses the server-calculated amount', async () => {
+  const originalFetch = globalThis.fetch;
+  const storedOrders = [];
+  const payments = {
+    prepare(sql) {
+      return {
+        bind(...values) {
+          return {
+            async run() {
+              if (sql.includes('INSERT INTO payment_orders')) {
+                storedOrders.push(values);
+              }
+              return { meta: { changes: 1 } };
+            },
+          };
+        },
+      };
     },
+  };
+
+  globalThis.fetch = async (_url, options) => {
+    const body = JSON.parse(options.body);
+    assert.equal(body.amount, 299900);
+    assert.equal(body.currency, 'INR');
+    return Response.json({
+      id: 'order_razorpay_test',
+      amount: body.amount,
+      currency: body.currency,
+    });
+  };
+
+  try {
+    const response = await worker.fetch(
+      new Request('https://camp.example.com/api/create-order', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Origin: 'https://camp.example.com',
+        },
+        body: JSON.stringify({
+          parent_name: 'Test Parent',
+          student_name: 'Test Student',
+          email: 'test@example.com',
+          phone: '9876543210',
+          amount: 100,
+        }),
+      }),
+      { ...env, PAYMENTS: payments },
+      { waitUntil() {} },
+    );
+
+    assert.equal(response.status, 200);
+    assert.deepEqual(await response.json(), {
+      order_id: 'order_razorpay_test',
+      amount: 299900,
+      currency: 'INR',
+      key_id: env.RAZORPAY_KEY_ID,
+    });
+    assert.equal(storedOrders.length, 1);
+    assert.equal(storedOrders[0][0], 'order_razorpay_test');
+    assert.equal(storedOrders[0][1], '2541.53');
+    assert.equal(storedOrders[0][2], '457.47');
+    assert.equal(storedOrders[0][4], '2999.00');
+  } finally {
+    globalThis.fetch = originalFetch;
+  }
+});
+
+test('Razorpay authentication failures return 401', async () => {
+  const originalFetch = globalThis.fetch;
+  globalThis.fetch = async () => Response.json(
+    { error: { code: 'BAD_REQUEST_ERROR' } },
+    { status: 401 },
   );
 
-  const response = await worker.fetch(request, env);
-  const html = await response.text();
-  const encryptedRequest = html.match(
-    /name="encRequest" value="([a-f0-9]+)"/,
-  )?.[1];
+  try {
+    const response = await worker.fetch(
+      new Request('https://camp.example.com/api/create-order', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          parent_name: 'Test Parent',
+          student_name: 'Test Student',
+          email: 'test@example.com',
+          phone: '9876543210',
+        }),
+      }),
+      env,
+      { waitUntil() {} },
+    );
+
+    assert.equal(response.status, 401);
+    assert.match((await response.json()).error, /authentication failed/i);
+  } finally {
+    globalThis.fetch = originalFetch;
+  }
+});
+
+test('Razorpay verification accepts a valid signature and marks the order paid', async () => {
+  const order = {
+    order_id: 'order_valid_signature',
+    enrollment_id: null,
+    status: 'Initiated',
+    fulfillment_status: 'Pending',
+    email_status: 'Pending',
+    sheet_status: 'Pending',
+  };
+  const backgroundTasks = [];
+  const payments = {
+    prepare(sql) {
+      return {
+        bind(...values) {
+          return {
+            async first() {
+              return { ...order };
+            },
+            run() {
+              if (sql.includes("payment_mode = 'Razorpay'")) {
+                order.status = 'Success';
+                order.tracking_id = values[0];
+                return Promise.resolve({ meta: { changes: 1 } });
+              }
+              if (sql.includes('enrollment_id = ?')) {
+                order.enrollment_id = values[0];
+                return Promise.resolve({ meta: { changes: 1 } });
+              }
+              if (sql.includes("SET fulfillment_status = 'Processing'")) {
+                return new Promise(() => {});
+              }
+              return Promise.resolve({ meta: { changes: 1 } });
+            },
+          };
+        },
+      };
+    },
+  };
+  const paymentId = 'pay_valid_signature';
+  const signature = createHmac('sha256', env.RAZORPAY_KEY_SECRET)
+    .update(`${order.order_id}|${paymentId}`)
+    .digest('hex');
+
+  const response = await worker.fetch(
+    new Request('https://camp.example.com/api/verify-payment', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        razorpay_order_id: order.order_id,
+        razorpay_payment_id: paymentId,
+        razorpay_signature: signature,
+      }),
+    }),
+    { ...env, PAYMENTS: payments },
+    { waitUntil: (promise) => backgroundTasks.push(promise) },
+  );
+  const result = await response.json();
 
   assert.equal(response.status, 200);
-  assert.match(
-    html,
-    /https:\/\/test\.ccavenue\.com\/transaction\/transaction\.do/,
-  );
-  assert.match(html, /<script src="\/payment\/submit\.js"><\/script>/);
-  assert.match(
-    response.headers.get('Content-Security-Policy'),
-    /script-src 'self'/,
-  );
-  assert.match(
-    response.headers.get('Content-Security-Policy'),
-    /connect-src 'self'/,
-  );
-  assert.ok(encryptedRequest);
+  assert.equal(result.success, true);
+  assert.match(result.enrollment_id, /AICC-2026-[A-F0-9]{10}/);
+  assert.equal(order.status, 'Success');
+  assert.equal(order.tracking_id, paymentId);
+  assert.equal(backgroundTasks.length, 1);
+});
 
-  const payment = new URLSearchParams(
-    decrypt(encryptedRequest, env.CCAVENUE_WORKING_KEY),
+test('Razorpay verification rejects an invalid signature without marking paid', async () => {
+  const order = {
+    order_id: 'order_invalid_signature',
+    enrollment_id: null,
+    status: 'Initiated',
+    fulfillment_status: 'Pending',
+  };
+  const payments = {
+    prepare() {
+      return {
+        bind() {
+          return {
+            async first() {
+              return { ...order };
+            },
+            async run() {
+              throw new Error('Invalid signatures must not update the order.');
+            },
+          };
+        },
+      };
+    },
+  };
+
+  const response = await worker.fetch(
+    new Request('https://camp.example.com/api/verify-payment', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        razorpay_order_id: order.order_id,
+        razorpay_payment_id: 'pay_invalid_signature',
+        razorpay_signature: '0'.repeat(64),
+      }),
+    }),
+    { ...env, PAYMENTS: payments },
+    { waitUntil() {} },
   );
-  assert.equal(payment.get('amount'), '2358.82');
-  assert.equal(payment.get('merchant_param3'), '1999.00');
-  assert.equal(payment.get('merchant_param4'), '359.82');
-  assert.equal(payment.get('merchant_param5'), '18');
-  assert.equal(payment.has('merchant_param2'), false);
-  assert.equal(payment.get('merchant_id'), env.CCAVENUE_MERCHANT_ID);
-  assert.equal(
-    payment.get('redirect_url'),
-    'https://camp.example.com/api/payments/callback',
+
+  assert.equal(response.status, 400);
+  assert.match((await response.json()).error, /signature verification failed/i);
+  assert.equal(order.status, 'Initiated');
+});
+
+test('legacy CCAvenue payment initiation is retired', async () => {
+  const response = await worker.fetch(
+    new Request('https://camp.example.com/api/payments/initiate', {
+      method: 'POST',
+    }),
+    env,
   );
+
+  assert.equal(response.status, 410);
+  assert.match((await response.json()).error, /retired/i);
 });
 
 test('payment quote returns the server-calculated GST breakdown', async () => {
@@ -107,10 +273,10 @@ test('payment quote returns the server-calculated GST breakdown', async () => {
 
   assert.equal(response.status, 200);
   assert.deepEqual(await response.json(), {
-    base: '1999.00',
-    gst: '359.82',
+    base: '2541.53',
+    gst: '457.47',
     gstRate: 18,
-    total: '2358.82',
+    total: '2999.00',
   });
 });
 
@@ -146,7 +312,7 @@ test('successful callbacks return before background fulfillment completes', asyn
   const order = {
     order_id: 'CODJU-1781000000000-ABC12345',
     enrollment_id: null,
-    amount: '2358.82',
+    amount: '2999.00',
     status: 'Initiated',
     fulfillment_status: 'Pending',
     email_status: 'Pending',

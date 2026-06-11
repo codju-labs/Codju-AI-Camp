@@ -1,4 +1,13 @@
+# ==========================================================
+# Robots.txt for AI Creator Camp by Codju
+# ==========================================================
+
 User-agent: *
 Allow: /
 
+# Exclude potential dynamic files or configurations
+Disallow: /*.json$
+Disallow: /*.webmanifest$
+
+# Sitemap Location
 Sitemap: https://codju.com/sitemap.xml

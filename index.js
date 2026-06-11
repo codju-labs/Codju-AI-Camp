@@ -290,59 +290,40 @@
     videoObserver.observe(heroIframe);
   }
 
-  // --- Enrollment payment form ---
+  // --- Razorpay enrollment checkout ---
   const paymentModal = document.getElementById('payment-modal');
   const paymentForm = document.querySelector('[data-payment-form]');
   if (paymentModal && paymentForm) {
+    const reserveLinks = document.querySelectorAll('a[href="#reserve"]');
+    const closeButton = paymentModal.querySelector('.payment-modal__close');
     const phoneInput = paymentForm.querySelector('input[name="phone"]');
     const submitButton = paymentForm.querySelector('button[type="submit"]');
     const submitLabel = paymentForm.querySelector('[data-payment-label]');
+    const message = paymentForm.querySelector('[data-payment-message]');
     const parentNameInput = paymentForm.querySelector('input[name="parent_name"]');
-    const reserveLinks = document.querySelectorAll('a[href="#reserve"]');
-    const quoteBase = paymentModal.querySelector('[data-quote-base]');
-    const quoteGst = paymentModal.querySelector('[data-quote-gst]');
-    const quoteGstLabel = paymentModal.querySelector('[data-quote-gst-label]');
-    const quoteTotal = paymentModal.querySelector('[data-quote-total]');
     let lastTrigger = null;
-    let quoteLoaded = false;
+    let checkoutOpen = false;
 
-    const formatInr = (amount) => new Intl.NumberFormat('en-IN', {
-      style: 'currency',
-      currency: 'INR',
-    }).format(Number(amount));
+    const setMessage = (text, tone = '') => {
+      message.textContent = text;
+      message.dataset.tone = tone;
+    };
 
-    const loadPaymentQuote = async () => {
-      if (quoteLoaded) return;
-
-      try {
-        const response = await fetch('/api/payments/quote', {
-          headers: { Accept: 'application/json' },
-        });
-        if (!response.ok) throw new Error('Unable to load payment amount.');
-
-        const quote = await response.json();
-        quoteBase.textContent = formatInr(quote.base);
-        quoteGstLabel.textContent = `GST (${quote.gstRate}%)`;
-        quoteGst.textContent = formatInr(quote.gst);
-        quoteTotal.textContent = formatInr(quote.total);
-        quoteLoaded = true;
-      } catch (error) {
-        quoteBase.textContent = 'Unavailable';
-        quoteGst.textContent = '--';
-        quoteTotal.textContent = '--';
-        console.error(error);
-      }
+    const setSubmitting = (submitting, label = 'Pay ₹2,999 securely') => {
+      submitButton.disabled = submitting;
+      submitLabel.textContent = label;
     };
 
     const openPaymentModal = (trigger) => {
       lastTrigger = trigger;
       paymentModal.hidden = false;
       document.body.classList.add('payment-modal-open');
-      loadPaymentQuote();
+      setMessage('');
       requestAnimationFrame(() => parentNameInput?.focus());
     };
 
     const closePaymentModal = () => {
+      if (checkoutOpen) return;
       paymentModal.hidden = true;
       document.body.classList.remove('payment-modal-open');
       lastTrigger?.focus();
@@ -395,11 +376,114 @@
       });
     }
 
-    paymentForm.addEventListener('submit', () => {
-      if (!paymentForm.checkValidity()) return;
-      submitButton.disabled = true;
-      submitLabel.textContent = 'Opening CCAvenue...';
+    paymentForm.addEventListener('submit', async (event) => {
+      event.preventDefault();
+      if (!paymentForm.checkValidity()) {
+        paymentForm.reportValidity();
+        return;
+      }
+
+      if (typeof window.Razorpay !== 'function') {
+        setMessage('Secure checkout could not be loaded. Please refresh and try again.', 'error');
+        return;
+      }
+
+      const enrollment = Object.fromEntries(new FormData(paymentForm).entries());
+      setSubmitting(true, 'Creating secure order...');
+      setMessage('');
+
+      try {
+        const orderResponse = await fetch('/api/create-order', {
+          method: 'POST',
+          headers: {
+            Accept: 'application/json',
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(enrollment),
+        });
+        const order = await orderResponse.json();
+        if (!orderResponse.ok) {
+          throw new Error(order.error || 'Unable to create a payment order.');
+        }
+
+        const checkout = new window.Razorpay({
+          key: order.key_id,
+          amount: order.amount,
+          currency: order.currency,
+          name: 'M/s CODJU TECHNOLOGIES',
+          description: 'AI Creator Camp | June 22–28, 2026',
+          image: `${window.location.origin}/assets/logo.png`,
+          order_id: order.order_id,
+          prefill: {
+            name: enrollment.parent_name,
+            email: enrollment.email,
+            contact: enrollment.phone,
+          },
+          notes: {
+            student_name: enrollment.student_name,
+          },
+          theme: {
+            color: '#7c3aed',
+          },
+          modal: {
+            confirm_close: true,
+            ondismiss: () => {
+              checkoutOpen = false;
+              setSubmitting(false);
+              setMessage('Payment was cancelled. No charge was confirmed.', 'warning');
+            },
+          },
+          handler: async (payment) => {
+            checkoutOpen = false;
+            setSubmitting(true, 'Verifying payment...');
+            setMessage('Payment received. Verifying securely...', 'info');
+
+            try {
+              const verificationResponse = await fetch('/api/verify-payment', {
+                method: 'POST',
+                headers: {
+                  Accept: 'application/json',
+                  'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(payment),
+              });
+              const result = await verificationResponse.json();
+              if (!verificationResponse.ok || !result.success) {
+                throw new Error(result.error || 'Payment verification failed.');
+              }
+
+              setSubmitting(true, 'Payment verified');
+              setMessage(
+                `Enrollment confirmed. Your ID is ${result.enrollment_id}. A confirmation email will arrive shortly.`,
+                'success',
+              );
+            } catch (error) {
+              setSubmitting(false, 'Retry verification');
+              setMessage(
+                `${error.message} Please contact support before attempting another payment.`,
+                'error',
+              );
+            }
+          },
+        });
+
+        checkout.on('payment.failed', (failure) => {
+          checkoutOpen = false;
+          setSubmitting(false);
+          const description = failure.error?.description || 'The payment could not be completed.';
+          setMessage(`${description} Please try again or use another payment method.`, 'error');
+        });
+
+        checkoutOpen = true;
+        setSubmitting(false);
+        checkout.open();
+      } catch (error) {
+        checkoutOpen = false;
+        setSubmitting(false);
+        setMessage(error.message || 'Unable to start payment. Please try again.', 'error');
+      }
     });
+
   }
 
 })();

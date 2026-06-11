@@ -15,10 +15,10 @@ const order = {
   student_name: 'Test Student',
   email: 'test@example.com',
   phone: '9876543210',
-  base_amount: '1999.00',
-  gst_amount: '359.82',
+  base_amount: '2541.53',
+  gst_amount: '457.47',
   gst_rate: '18',
-  amount: '2358.82',
+  amount: '2999.00',
   currency: 'INR',
   payment_mode: 'Credit Card',
   bank_ref_no: 'BANK-1',
@@ -74,7 +74,38 @@ test('EmailOctopus explains automation authorization failures', async () => {
       EMAILOCTOPUS_AUTOMATION_ID: 'automation-id',
     }, fetchImpl),
     /Started via API/,
-  );
+);
+});
+
+test('EmailOctopus reports when a contact already started the automation', async () => {
+  let requests = 0;
+  const originalWarn = console.warn;
+  const warnings = [];
+  console.warn = (message) => warnings.push(message);
+  const fetchImpl = async () => {
+    requests += 1;
+    if (requests === 1) return Response.json({ id: 'contact-1' });
+    if (requests === 2) return Response.json({ id: 'contact-1' });
+    return Response.json({
+      error: {
+        code: 'ALREADY_STARTED',
+        message: 'This automation has already been started for this contact.',
+      },
+    }, { status: 409 });
+  };
+
+  try {
+    const result = await sendEnrollmentEmail(order, {
+      EMAILOCTOPUS_API_KEY: 'api-key',
+      EMAILOCTOPUS_LIST_ID: 'list-id',
+      EMAILOCTOPUS_AUTOMATION_ID: 'automation-id',
+    }, fetchImpl);
+
+    assert.equal(result.automationAlreadyStarted, true);
+    assert.match(warnings[0], /no new welcome email was queued/i);
+  } finally {
+    console.warn = originalWarn;
+  }
 });
 
 test('Google Sheets receives an enrollment row', async () => {

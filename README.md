@@ -9,7 +9,7 @@ Rather than teaching students to fear AI, this camp focuses on empowering them t
 - **Domain:** [codju.com](https://codju.com)
 - **Target Audience:** Students in Grades 6–10 (ages 11–16)
 - **Format:** Live Online (Zoom), 45-minute daily sessions
-- **Dates:** June 22 – 28, 2025
+- **Dates:** June 22 – 28, 2026
 
 ## 🚀 Key Outcomes & Deliverables
 
@@ -86,16 +86,16 @@ Edit `wrangler.jsonc`:
 ```jsonc
 "vars": {
   "CCAVENUE_ENVIRONMENT": "production",
-  "CAMP_PRICE_INR": "1999.00",
+  "CAMP_PRICE_INR": "2999.00",
   "GST_RATE_PERCENT": "18",
   "PUBLIC_SITE_URL": "https://your-camp-domain.example"
 }
 ```
 
-`CAMP_PRICE_INR` is the fee before tax. The Worker calculates GST in paise,
-adds it to the fee, and sends only the final total to CCAvenue. For a base fee
-of INR 1,999, the total is INR 1,999 + INR 359.82 GST = INR 2,358.82.
-Browser-supplied prices are ignored.
+`CAMP_PRICE_INR` is the final tax-inclusive amount. The Worker extracts the
+taxable value and GST in paise while preserving the configured total exactly.
+For INR 2,999 inclusive of 18% GST, the taxable value is INR 2,541.53 and GST
+is INR 457.47. Browser-supplied prices are ignored.
 
 The CCAvenue endpoint and credentials must belong to the same environment:
 
@@ -114,7 +114,7 @@ For local development, create `.dev.vars`:
 CCAVENUE_MERCHANT_ID=your_merchant_id
 CCAVENUE_ACCESS_CODE=your_access_code
 CCAVENUE_WORKING_KEY=your_working_key
-CAMP_PRICE_INR=1999.00
+CAMP_PRICE_INR=2999.00
 GST_RATE_PERCENT=18
 PUBLIC_SITE_URL=http://localhost:8787
 CCAVENUE_ENVIRONMENT=production
@@ -291,6 +291,47 @@ API key come from the same EmailOctopus account/workspace. Correct the setting
 and rerun `npm run test:email:live`; the existing contact will be updated
 rather than duplicated.
 
+If the Google Sheets row appears but no welcome email is received, inspect the
+EmailOctopus contact and automation history. The Worker treats
+`ALREADY_STARTED` as a successful, idempotent response because EmailOctopus
+has already enrolled that contact in the automation. Enable repeat entry on
+the automation when the same parent email may purchase more than once, remove
+the test contact from EmailOctopus before retesting, or use a new email alias.
+Deleting the D1 order does not clear EmailOctopus automation history.
+
+### Reset payment data for another manual test
+
+Delete order rows while keeping the D1 schema:
+
+```bash
+# Local development database
+npx wrangler d1 execute codju-camp-payments --local \
+  --command "DELETE FROM payment_orders;"
+
+# Deployed production database - destructive
+npx wrangler d1 execute codju-camp-payments --remote \
+  --command "DELETE FROM payment_orders;"
+```
+
+Confirm the table is empty:
+
+```bash
+npx wrangler d1 execute codju-camp-payments --local \
+  --command "SELECT COUNT(*) AS orders FROM payment_orders;"
+```
+
+For a complete end-to-end repeat using the same email address:
+
+1. Delete the D1 rows using the appropriate command above.
+2. Delete that test contact from the dedicated EmailOctopus list, or enable
+   repeat entry for the API-started automation.
+3. Delete the previous test row from Google Sheets if a clean sheet matters.
+4. Start the site with `npm run dev` and complete another Razorpay Test Mode
+   payment.
+
+Using a fresh email alias, such as `name+razorpay2@example.com`, is usually the
+quickest way to test the welcome automation without changing its settings.
+
 ### 9. Test before going live
 
 If CCAvenue supplied test credentials:
@@ -325,6 +366,39 @@ If you only have live credentials:
 CCAvenue may require the live site to expose business contact details,
 privacy policy, terms, cancellation/refund policy, and pricing before final
 approval. Those policies should be reviewed by Codju before publishing.
+
+## Razorpay Standard Checkout
+
+The active enrollment flow uses Razorpay Standard Web Checkout:
+
+- `POST /api/create-order` validates enrollment details, calculates the final
+  amount on the server, creates a Razorpay order, and stores it in D1.
+- The browser opens Razorpay Checkout using the returned public Key ID and
+  order ID.
+- `POST /api/verify-payment` loads the order from D1 and verifies the
+  `order_id|payment_id` HMAC-SHA256 signature before marking it paid.
+- EmailOctopus and Google Sheets fulfillment starts only after verification.
+
+For local development, `.env` and `.dev.vars` must contain:
+
+```text
+RAZORPAY_KEY_ID=your_test_or_live_key_id
+RAZORPAY_KEY_SECRET=your_test_or_live_key_secret
+```
+
+Both files are ignored by Git. The secret is used only by the Worker and must
+never be added to `index.html`, `index.js`, or another public asset.
+
+Before production deployment, configure the Worker secrets:
+
+```bash
+npx wrangler secret put RAZORPAY_KEY_ID
+npx wrangler secret put RAZORPAY_KEY_SECRET
+```
+
+Use matching test credentials while testing. Replace both secrets with live
+credentials only after Razorpay activates the account and the checkout flow
+has been verified in Test Mode.
 
 ## 📞 Contact
 

@@ -1,9 +1,74 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+        xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">
   <url>
     <loc>https://codju.com/</loc>
-    <lastmod>2026-06-07</lastmod>
-    <changefreq>monthly</changefreq>
+    <lastmod>2026-06-10</lastmod>
+    <changefreq>weekly</changefreq>
     <priority>1.0</priority>
+    <image:image>
+      <image:loc>https://codju.com/assets/logo.png</image:loc>
+      <image:title>Codju AI Creator Camp Official Logo</image:title>
+      <image:caption>The official brand logo for Codju AI Creator Camp.</image:caption>
+    </image:image>
+    <image:image>
+      <image:loc>https://codju.com/assets/DP%20panda.png</image:loc>
+      <image:title>Codju Mascot Panda Display Picture</image:title>
+      <image:caption>The official mascot panda character representing the AI Creator Camp.</image:caption>
+    </image:image>
+    <image:image>
+      <image:loc>https://codju.com/assets/codju_certificate.png</image:loc>
+      <image:title>Verified Certificate of Completion</image:title>
+      <image:caption>An example of the official verified certificate awarded to students completing the camp.</image:caption>
+    </image:image>
+    <image:image>
+      <image:loc>https://codju.com/assets/rohit_profile.jpeg</image:loc>
+      <image:title>Rohit K Bishnoi - Lead Mentor</image:title>
+      <image:caption>Lead mentor Rohit K Bishnoi, an alumnus of IIT Kanpur and IIM Kozhikode.</image:caption>
+    </image:image>
+    <image:image>
+      <image:loc>https://codju.com/assets/day1.png</image:loc>
+      <image:title>Day 1 Curriculum: Prompt Engineering</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://codju.com/assets/day2.png</image:loc>
+      <image:title>Day 2 Curriculum: Creativity with AI</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://codju.com/assets/image.png</image:loc>
+      <image:title>Day 3 Curriculum: AI-Assisted Learning</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://codju.com/assets/day4.png</image:loc>
+      <image:title>Day 4 Curriculum: Build a Website</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://codju.com/assets/day5.png</image:loc>
+      <image:title>Day 5 Curriculum: Build an App</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://codju.com/assets/day6.png</image:loc>
+      <image:title>Day 6 Curriculum: AI Agents and Automation</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://codju.com/assets/day7.png</image:loc>
+      <image:title>Day 7 Curriculum: Hackathon and Demo Day</image:title>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://codju.com/refund-cancellation-policy.html</loc>
+    <lastmod>2026-06-10</lastmod>
+  </url>
+  <url>
+    <loc>https://codju.com/terms-and-conditions.html</loc>
+    <lastmod>2026-06-10</lastmod>
+  </url>
+  <url>
+    <loc>https://codju.com/privacy-policy.html</loc>
+    <lastmod>2026-06-10</lastmod>
+  </url>
+  <url>
+    <loc>https://codju.com/contact.html</loc>
+    <lastmod>2026-06-10</lastmod>
   </url>
 </urlset>

@@ -13,6 +13,13 @@ const files = [
   'robots.txt',
   'sitemap.xml',
   'llm.txt',
+  'favicon.ico',
+  'favicon-16x16.png',
+  'favicon-32x32.png',
+  'apple-touch-icon.png',
+  'site.webmanifest',
+  'android-chrome-192x192.png',
+  'android-chrome-512x512.png',
 ];
 const directories = ['assets', 'logos'];
 

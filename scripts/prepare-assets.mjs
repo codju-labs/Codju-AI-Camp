@@ -1,4 +1,6 @@
 import { cp, mkdir, rm } from 'node:fs/promises';
+import { execSync } from 'node:child_process';
+import { fileURLToPath } from 'node:url';
 
 const outputDirectory = new URL('../.site/', import.meta.url);
 const projectDirectory = new URL('../', import.meta.url);
@@ -39,3 +41,22 @@ await Promise.all([
 ]);
 
 console.log('Prepared Cloudflare static assets in .site/');
+
+// Minify assets in-place inside .site/
+const outputDirPath = fileURLToPath(outputDirectory);
+try {
+  console.log('Minifying CSS...');
+  execSync(`npx clean-css-cli -o "${outputDirPath}index.css" "${outputDirPath}index.css"`, { stdio: 'inherit' });
+
+  console.log('Minifying JS...');
+  execSync(`npx terser "${outputDirPath}index.js" -o "${outputDirPath}index.js"`, { stdio: 'inherit' });
+
+  console.log('Minifying HTML files...');
+  const htmlFiles = files.filter(f => f.endsWith('.html'));
+  for (const htmlFile of htmlFiles) {
+    execSync(`npx html-minifier --collapse-whitespace --remove-comments --minify-css true --minify-js true -o "${outputDirPath}${htmlFile}" "${outputDirPath}${htmlFile}"`, { stdio: 'inherit' });
+  }
+  console.log('Minification complete!');
+} catch (err) {
+  console.error('Minification failed:', err.message);
+}

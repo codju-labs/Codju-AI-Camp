@@ -10,4 +10,4 @@ Disallow: /*.json$
 Disallow: /*.webmanifest$
 
 # Sitemap Location
-Sitemap: https://codju.com/sitemap.xml
+Sitemap: https://summercamp.codju.com/sitemap.xml

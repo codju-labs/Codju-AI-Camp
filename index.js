@@ -15,7 +15,7 @@
     }
   };
   window.addEventListener('scroll', handleNavScroll, { passive: true });
-  handleNavScroll();
+  requestAnimationFrame(handleNavScroll);
 
 
 

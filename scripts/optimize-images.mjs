@@ -47,7 +47,7 @@ const CONFIGS = {
   'codju_support_mentor.png':  { maxWidth: 600, maxWidthSm: 350, quality: 75 },
 
   // Logo and profile
-  'logo.png':             { maxWidth: 200, quality: 80 },
+  'logo.png':             { maxWidth: 164, quality: 80 },
   'rohit_profile.jpeg':   { maxWidth: 400, maxWidthSm: 300, quality: 75 },
 
   // Video Facade Thumbnail

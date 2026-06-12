@@ -324,15 +324,14 @@
   <!-- Preload primary font file -->
   <link rel="preload" href="assets/fonts/plus-jakarta-sans-latin.woff2" as="font" type="font/woff2" crossorigin>
 
-  <!-- Preload LCP hero video thumbnail facade -->
-  <link rel="preload" href="assets/hero_video_thumbnail-sm.avif" as="image" type="image/avif" media="(max-width: 640px)" fetchpriority="high">
-  <link rel="preload" href="assets/hero_video_thumbnail.avif" as="image" type="image/avif" media="(min-width: 641px)" fetchpriority="high">
+  <!-- Preload LCP hero video thumbnail facade (aligned with picture source to prevent double-downloading) -->
+  <link rel="preload" href="assets/hero_video_thumbnail.avif" as="image" type="image/avif" 
+        imagesrcset="assets/hero_video_thumbnail-sm.avif 350w, assets/hero_video_thumbnail.avif 640w" 
+        imagesizes="(max-width: 640px) 350px, 640px" fetchpriority="high">
 
-  <!-- Synchronous stylesheet loading to prevent FOUC and late-loading CSS layout shifts -->
-  <link rel="stylesheet" href="index.css">
-
-  <!-- Preconnect for YouTube thumbnails (lite facade) -->
-  <link rel="preconnect" href="https://i.ytimg.com">
+  <!-- Defer non-critical CSS (critical CSS is inlined above) -->
+  <link rel="stylesheet" href="index.css" media="print" onload="this.media='all'">
+  <noscript><link rel="stylesheet" href="index.css"></noscript>
 
   <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png?v=2">
   <link rel="icon" type="image/png" sizes="32x32" href="favicon-32x32.png?v=2">
@@ -583,8 +582,8 @@
             <div class="session-card">
               <div class="session-card__visual">
                 <picture>
-                  <source srcset="assets/day1-sm.avif 350w, assets/day1.avif 512w" sizes="(max-width: 640px) 350px, 512px" type="image/avif">
-                  <source srcset="assets/day1-sm.webp 350w, assets/day1.webp 512w" sizes="(max-width: 640px) 350px, 512px" type="image/webp">
+                  <source srcset="assets/day1-sm.avif 350w, assets/day1.avif 512w" sizes="(max-width: 640px) 110px, 200px" type="image/avif">
+                  <source srcset="assets/day1-sm.webp 350w, assets/day1.webp 512w" sizes="(max-width: 640px) 110px, 200px" type="image/webp">
                   <img src="assets/day1.webp" width="512" height="512" loading="lazy" decoding="async" alt="Day 1 Curriculum: Prompt Engineering" />
                 </picture>
               </div>
@@ -610,8 +609,8 @@
             <div class="session-card">
               <div class="session-card__visual session-card__visual--padded">
                 <picture>
-                  <source srcset="assets/day2-sm.avif 350w, assets/day2.avif 512w" sizes="(max-width: 640px) 350px, 512px" type="image/avif">
-                  <source srcset="assets/day2-sm.webp 350w, assets/day2.webp 512w" sizes="(max-width: 640px) 350px, 512px" type="image/webp">
+                  <source srcset="assets/day2-sm.avif 350w, assets/day2.avif 512w" sizes="(max-width: 640px) 110px, 200px" type="image/avif">
+                  <source srcset="assets/day2-sm.webp 350w, assets/day2.webp 512w" sizes="(max-width: 640px) 110px, 200px" type="image/webp">
                   <img src="assets/day2.webp" width="512" height="512" loading="lazy" decoding="async" alt="Day 2 Curriculum: Creativity with AI" />
                 </picture>
               </div>
@@ -634,8 +633,8 @@
             <div class="session-card">
               <div class="session-card__visual session-card__visual--padded">
                 <picture>
-                  <source srcset="assets/image-sm.avif 350w, assets/image.avif 512w" sizes="(max-width: 640px) 350px, 512px" type="image/avif">
-                  <source srcset="assets/image-sm.webp 350w, assets/image.webp 512w" sizes="(max-width: 640px) 350px, 512px" type="image/webp">
+                  <source srcset="assets/image-sm.avif 350w, assets/image.avif 512w" sizes="(max-width: 640px) 110px, 200px" type="image/avif">
+                  <source srcset="assets/image-sm.webp 350w, assets/image.webp 512w" sizes="(max-width: 640px) 110px, 200px" type="image/webp">
                   <img src="assets/image.webp" width="512" height="512" loading="lazy" decoding="async" alt="Day 3 Curriculum: AI-Assisted Learning" />
                 </picture>
               </div>
@@ -660,8 +659,8 @@
             <div class="session-card">
               <div class="session-card__visual session-card__visual--padded">
                 <picture>
-                  <source srcset="assets/day4-sm.avif 350w, assets/day4.avif 512w" sizes="(max-width: 640px) 350px, 512px" type="image/avif">
-                  <source srcset="assets/day4-sm.webp 350w, assets/day4.webp 512w" sizes="(max-width: 640px) 350px, 512px" type="image/webp">
+                  <source srcset="assets/day4-sm.avif 350w, assets/day4.avif 512w" sizes="(max-width: 640px) 110px, 200px" type="image/avif">
+                  <source srcset="assets/day4-sm.webp 350w, assets/day4.webp 512w" sizes="(max-width: 640px) 110px, 200px" type="image/webp">
                   <img src="assets/day4.webp" width="512" height="512" loading="lazy" decoding="async" alt="Day 4 Curriculum: Computational Thinking + Build a Website" />
                 </picture>
               </div>
@@ -683,8 +682,8 @@
             <div class="session-card">
               <div class="session-card__visual session-card__visual--padded">
                 <picture>
-                  <source srcset="assets/day5-sm.avif 350w, assets/day5.avif 512w" sizes="(max-width: 640px) 350px, 512px" type="image/avif">
-                  <source srcset="assets/day5-sm.webp 350w, assets/day5.webp 512w" sizes="(max-width: 640px) 350px, 512px" type="image/webp">
+                  <source srcset="assets/day5-sm.avif 350w, assets/day5.avif 512w" sizes="(max-width: 640px) 110px, 200px" type="image/avif">
+                  <source srcset="assets/day5-sm.webp 350w, assets/day5.webp 512w" sizes="(max-width: 640px) 110px, 200px" type="image/webp">
                   <img src="assets/day5.webp" width="512" height="512" loading="lazy" decoding="async" alt="Day 5 Curriculum: Entrepreneurial Thinking + Build an App" />
                 </picture>
               </div>
@@ -706,8 +705,8 @@
             <div class="session-card">
               <div class="session-card__visual session-card__visual--padded">
                 <picture>
-                  <source srcset="assets/day6-sm.avif 350w, assets/day6.avif 512w" sizes="(max-width: 640px) 350px, 512px" type="image/avif">
-                  <source srcset="assets/day6-sm.webp 350w, assets/day6.webp 512w" sizes="(max-width: 640px) 350px, 512px" type="image/webp">
+                  <source srcset="assets/day6-sm.avif 350w, assets/day6.avif 512w" sizes="(max-width: 640px) 110px, 200px" type="image/avif">
+                  <source srcset="assets/day6-sm.webp 350w, assets/day6.webp 512w" sizes="(max-width: 640px) 110px, 200px" type="image/webp">
                   <img src="assets/day6.webp" width="512" height="512" loading="lazy" decoding="async" alt="Day 6 Curriculum: AI Agents & Automation" />
                 </picture>
               </div>
@@ -732,8 +731,8 @@
             <div class="session-card">
               <div class="session-card__visual session-card__visual--padded">
                 <picture>
-                  <source srcset="assets/day7-sm.avif 350w, assets/day7.avif 512w" sizes="(max-width: 640px) 350px, 512px" type="image/avif">
-                  <source srcset="assets/day7-sm.webp 350w, assets/day7.webp 512w" sizes="(max-width: 640px) 350px, 512px" type="image/webp">
+                  <source srcset="assets/day7-sm.avif 350w, assets/day7.avif 512w" sizes="(max-width: 640px) 110px, 200px" type="image/avif">
+                  <source srcset="assets/day7-sm.webp 350w, assets/day7.webp 512w" sizes="(max-width: 640px) 110px, 200px" type="image/webp">
                   <img src="assets/day7.webp" width="512" height="512" loading="lazy" decoding="async" alt="Day 7 Curriculum: Hackathon + Demo Day" />
                 </picture>
               </div>

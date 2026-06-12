@@ -2800,6 +2800,12 @@ body.payment-modal-open {
     margin-left: auto;
     margin-right: auto;
   }
+  .final-cta__deliverables {
+    width: fit-content;
+    margin-left: auto;
+    margin-right: auto;
+    text-align: left;
+  }
   .final-cta__buttons {
     justify-content: center;
   }
@@ -3609,12 +3615,21 @@ body.payment-modal-open {
   }
 
   .final-cta__title {
-    font-size: 1.5rem;
+    font-size: 1.4rem;
   }
 
   .final-cta__subtitle {
-    font-size: 1rem;
-    margin-bottom: 24px;
+    font-size: 0.95rem;
+    margin-bottom: 20px;
+  }
+
+  .final-cta__price {
+    font-size: 1.8rem;
+  }
+
+  .final-cta__deliverables {
+    font-size: 0.9rem;
+    gap: 8px;
   }
 
   .final-cta__buttons {
@@ -3872,11 +3887,23 @@ body.payment-modal-open {
 
   /* Final CTA */
   .final-cta__title {
-    font-size: 1.3rem;
+    font-size: 1.25rem;
   }
 
   .final-cta__subtitle {
-    font-size: 0.9rem;
+    font-size: 0.88rem;
+  }
+
+  .final-cta__price {
+    font-size: 1.6rem;
+  }
+
+  .final-cta__deliverables {
+    font-size: 0.85rem;
+  }
+
+  .final-cta__deliverables li {
+    padding-left: 20px;
   }
 
   .final-cta__buttons {

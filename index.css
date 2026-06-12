@@ -2339,6 +2339,34 @@ button {
   border-radius: 24px;
 }
 
+.payment-modal__dialog::-webkit-scrollbar {
+  width: 8px;
+}
+
+.payment-modal__dialog::-webkit-scrollbar-track {
+  background: transparent;
+  border-left: none;
+}
+
+.payment-modal__dialog::-webkit-scrollbar-thumb {
+  background: rgba(124, 58, 237, 0.12);
+  border-radius: 8px;
+  border-left: 2px solid transparent;
+  border-right: 2px solid transparent;
+  border-top: 16px solid transparent;
+  border-bottom: 16px solid transparent;
+  background-clip: padding-box;
+}
+
+.payment-modal__dialog::-webkit-scrollbar-thumb:hover {
+  background: rgba(124, 58, 237, 0.3);
+  border-left: 2px solid transparent;
+  border-right: 2px solid transparent;
+  border-top: 16px solid transparent;
+  border-bottom: 16px solid transparent;
+  background-clip: padding-box;
+}
+
 .payment-modal__dialog .payment-card {
   max-width: none;
 }
@@ -4425,5 +4453,156 @@ body.payment-modal-open {
   .video-audio-toggle svg {
     width: 16px;
     height: 16px;
+  }
+}
+
+/* ==========================================================================
+   MOBILE-ONLY UX & PERFORMANCE OVERRIDES (APPROVED LAYOUT ADJUSTMENTS)
+   ========================================================================== */
+@media (max-width: 768px) {
+  /* Prevent horizontal scroll globally on all mobile devices */
+  html, body {
+    width: 100% !important;
+    max-width: 100% !important;
+    overflow-x: hidden !important;
+  }
+
+  /* ISSUE 1: Footer Logo distortion fix */
+  .footer__logo img {
+    width: auto !important;
+    height: auto !important;
+    max-height: 32px !important;
+    object-fit: contain !important;
+    display: inline-block !important;
+  }
+
+  /* ISSUE 3: Calendar / Schedule Table columns and alignment fix */
+  .schedule-list {
+    border: 1px solid var(--gray-200) !important;
+    background: var(--white) !important;
+    border-radius: 20px !important;
+    padding: 0 !important;
+    overflow: hidden !important;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.02) !important;
+  }
+  
+  .schedule-row {
+    display: grid !important;
+    grid-template-columns: 1.2fr 0.8fr 1.2fr !important;
+    align-items: center !important;
+    padding: 14px 16px !important;
+    gap: 8px !important;
+    border-bottom: 1px solid var(--gray-100) !important;
+    background: transparent !important;
+    border-radius: 0 !important;
+    transform: none !important;
+    transition: none !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+  }
+
+  .schedule-row:last-child {
+    border-bottom: none !important;
+  }
+
+  .schedule-row:hover {
+    background: #f8fafc !important;
+    transform: none !important;
+  }
+
+  .schedule-row__day {
+    display: flex !important;
+    align-items: center !important;
+    gap: 8px !important;
+    justify-content: flex-start !important;
+    width: auto !important;
+    flex: none !important;
+    white-space: nowrap !important;
+  }
+
+  .schedule-row__day strong {
+    font-size: 0.88rem !important;
+  }
+
+  .schedule-row__date {
+    display: inline-flex !important;
+    align-items: center !important;
+    text-align: left !important;
+    font-size: 0.82rem !important;
+    font-weight: 600 !important;
+    color: var(--gray-600) !important;
+    width: auto !important;
+    flex: none !important;
+    white-space: nowrap !important;
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+
+  /* Force the vertical | separator to align beautifully across all rows */
+  .schedule-row__date::before {
+    content: "|" !important;
+    color: var(--gray-300) !important;
+    margin-right: 10px !important;
+    font-weight: 400 !important;
+  }
+
+  .schedule-row__slots {
+    display: flex !important;
+    justify-content: flex-end !important;
+    align-items: center !important;
+    width: auto !important;
+    flex: none !important;
+    white-space: nowrap !important;
+    margin: 0 !important;
+  }
+
+  .slot-badge {
+    font-size: 0.82rem !important;
+  }
+
+  /* ISSUES 4, 5, 6: Learning Path Image Container (White Frame) */
+  .session-card {
+    flex-direction: column !important;
+    min-height: auto !important;
+    background: var(--white) !important;
+    border-radius: 16px !important;
+    border: 1px solid var(--gray-100) !important;
+    overflow: hidden !important;
+  }
+
+  .session-card__visual {
+    width: calc(100% - 32px) !important; /* 16px margins left and right */
+    height: 130px !important; /* constrained height (~25-35% of total card) */
+    margin: 16px 16px 0 16px !important; /* proper margins */
+    padding: 12px !important; /* consistent padding */
+    background: #ffffff !important; /* white background container */
+    border-radius: 12px !important; /* rounded corners */
+    border: 1px solid rgba(124, 58, 237, 0.1) !important; /* subtle border frame */
+    box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.01) !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    flex-shrink: 0 !important;
+  }
+
+  .session-card__visual picture {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    width: 100% !important;
+    height: 100% !important;
+  }
+
+  .session-card__visual img {
+    max-width: 100% !important;
+    max-height: 100% !important;
+    width: auto !important;
+    height: auto !important;
+    object-fit: contain !important; /* show entire image: no crop, clip, or zoom */
+    display: block !important;
+  }
+  
+  .session-card__visual--padded {
+    padding: 12px !important;
   }
 }

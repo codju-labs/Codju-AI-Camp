@@ -272,163 +272,81 @@
     });
   });
 
-  // --- YouTube background autoplay loop player with interactive toggle controls ---
-  let player = null;
-  let playerReady = false;
+  // --- Click-to-load YouTube Player ---
+  const container = document.getElementById('yt-lite-container');
+  const playBtn = document.getElementById('hero-play-btn');
+  const audioToggle = document.getElementById('video-audio-toggle');
+  let youtubeLoaded = false;
 
-  const initPlayer = () => {
-    const playerEl = document.getElementById('hero-player');
-    if (!playerEl) return;
+  const loadAndPlayVideo = () => {
+    if (youtubeLoaded) return;
+    youtubeLoaded = true;
 
-    player = new window.YT.Player('hero-player', {
-      host: 'https://www.youtube-nocookie.com',
-      videoId: 'xoCqW-ngJDQ',
-      playerVars: {
-        autoplay: 1,
-        mute: 1,
-        loop: 1,
-        playlist: 'xoCqW-ngJDQ',
-        controls: 0,
-        rel: 0,
-        showinfo: 0,
-        modestbranding: 1,
-        playsinline: 1,
-        enablejsapi: 1,
-        vq: 'hd1080'
-      },
-      events: {
-        onReady: (event) => {
-          playerReady = true;
-          event.target.mute();
-          event.target.playVideo();
-          setupObserversAndControls();
+    // Hide play button and audio toggle instantly
+    if (playBtn) playBtn.style.display = 'none';
+    if (audioToggle) audioToggle.style.display = 'none';
+
+    const loadAPI = () => {
+      if (window.YT && window.YT.Player) {
+        initActualPlayer();
+      } else {
+        const tag = document.createElement('script');
+        tag.src = 'https://www.youtube.com/iframe_api';
+        document.head.appendChild(tag);
+      }
+    };
+
+    window.onYouTubeIframeAPIReady = () => {
+      initActualPlayer();
+    };
+
+    const initActualPlayer = () => {
+      new window.YT.Player('hero-player', {
+        host: 'https://www.youtube-nocookie.com',
+        videoId: 'xoCqW-ngJDQ',
+        playerVars: {
+          autoplay: 1,
+          mute: 0, // start with sound since the user explicitly clicked play
+          controls: 1, // show native controls
+          rel: 0,
+          modestbranding: 1,
+          playsinline: 1
         },
-        onStateChange: (event) => {
-          // Loop video explicitly if it ends (0)
-          if (event.data === 0) {
+        events: {
+          onReady: (event) => {
             event.target.playVideo();
-          }
-          // Fade out visual facade when video starts playing (1 is PLAYING)
-          if (event.data === 1) {
-            const facade = document.getElementById('video-facade');
-            if (facade) {
-              facade.style.opacity = '0';
-              setTimeout(() => {
-                if (facade.parentNode) {
-                  facade.parentNode.removeChild(facade);
-                }
-              }, 500);
+          },
+          onStateChange: (event) => {
+            if (event.data === 1) { // PLAYING
+              const facade = document.getElementById('video-facade');
+              if (facade) {
+                facade.style.opacity = '0';
+                setTimeout(() => {
+                  if (facade.parentNode) facade.parentNode.removeChild(facade);
+                }, 500);
+              }
             }
           }
         }
+      });
+    };
+
+    loadAPI();
+  };
+
+  if (container) {
+    container.addEventListener('click', loadAndPlayVideo);
+    // Allow keyboard activation if focused
+    container.setAttribute('tabindex', '0');
+    container.setAttribute('role', 'button');
+    container.setAttribute('aria-label', 'Play promo video');
+    container.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        loadAndPlayVideo();
       }
     });
-  };
-
-  const setupObserversAndControls = () => {
-    const audioToggle = document.getElementById('video-audio-toggle');
-    const overlay = document.getElementById('video-interaction-overlay');
-    const container = document.getElementById('yt-lite-container');
-    const mutedIcon = document.getElementById('audio-muted-icon');
-    const unmutedIcon = document.getElementById('audio-unmuted-icon');
-
-    if (audioToggle && player) {
-      audioToggle.addEventListener('click', (e) => {
-        e.stopPropagation(); // Prevent triggering manual play/pause on overlay
-        if (!playerReady) return;
-
-        if (player.isMuted()) {
-          player.unMute();
-          if (mutedIcon) mutedIcon.style.display = 'none';
-          if (unmutedIcon) unmutedIcon.style.display = 'block';
-          audioToggle.setAttribute('aria-label', 'Mute video');
-        } else {
-          player.mute();
-          if (mutedIcon) mutedIcon.style.display = 'block';
-          if (unmutedIcon) unmutedIcon.style.display = 'none';
-          audioToggle.setAttribute('aria-label', 'Unmute video');
-        }
-      });
-    }
-
-    if (overlay && player) {
-      overlay.addEventListener('click', () => {
-        if (!playerReady) return;
-        const state = player.getPlayerState();
-        // YT.PlayerState.PLAYING is 1
-        if (state === 1) {
-          player.pauseVideo();
-        } else {
-          player.playVideo();
-        }
-      });
-    }
-
-    // Pause video when out of viewport, play when in view
-    if ('IntersectionObserver' in window && container && player) {
-      const videoObserver = new IntersectionObserver((entries) => {
-        entries.forEach((entry) => {
-          if (!playerReady) return;
-          if (entry.isIntersecting) {
-            player.playVideo();
-          } else {
-            player.pauseVideo();
-          }
-        });
-      }, {
-        threshold: 0.1 // Trigger when less than 10% visible
-      });
-      videoObserver.observe(container);
-    }
-  };
-
-  const loadYouTubeAPI = () => {
-    if (window.YT && window.YT.Player) {
-      initPlayer();
-      return;
-    }
-    const tag = document.createElement('script');
-    tag.src = 'https://www.youtube.com/iframe_api';
-    const firstScriptTag = document.getElementsByTagName('script')[0];
-    if (firstScriptTag && firstScriptTag.parentNode) {
-      firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
-    } else {
-      document.head.appendChild(tag);
-    }
-  };
-
-  // Bind to window ready safely to preserve other callbacks
-  const previousAPIReady = window.onYouTubeIframeAPIReady;
-  window.onYouTubeIframeAPIReady = () => {
-    if (previousAPIReady) previousAPIReady();
-    initPlayer();
-  };
-
-  // Load YouTube API deferred to prevent blocking critical path
-  let youtubeApiLoaded = false;
-  const triggerYouTubeLoad = () => {
-    if (youtubeApiLoaded) return;
-    youtubeApiLoaded = true;
-
-    // Clean up event listeners and timeout
-    window.removeEventListener('scroll', triggerYouTubeLoad);
-    window.removeEventListener('mousemove', triggerYouTubeLoad);
-    window.removeEventListener('touchstart', triggerYouTubeLoad);
-    window.removeEventListener('click', triggerYouTubeLoad);
-    clearTimeout(youtubeTimeout);
-
-    loadYouTubeAPI();
-  };
-
-  // Defer YouTube load: trigger 5s after window load or on first user interaction
-  let youtubeTimeout;
-  window.addEventListener('load', () => {
-    youtubeTimeout = setTimeout(triggerYouTubeLoad, 5000);
-  }, { once: true });
-  window.addEventListener('scroll', triggerYouTubeLoad, { passive: true });
-  window.addEventListener('mousemove', triggerYouTubeLoad, { passive: true });
-  window.addEventListener('touchstart', triggerYouTubeLoad, { passive: true });
-  window.addEventListener('click', triggerYouTubeLoad, { passive: true });
+  }
 
   // --- Razorpay enrollment checkout ---
   const paymentModal = document.getElementById('payment-modal');

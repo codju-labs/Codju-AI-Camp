@@ -34,5 +34,5 @@ Allow: /
 
 # Sitemap & LLM Location
 Sitemap: https://summercamp.codju.com/sitemap.xml
-Link: https://summercamp.codju.com/llms.txt; rel="llms-txt"
+# Link: https://summercamp.codju.com/llms.txt; rel="llms-txt"
 

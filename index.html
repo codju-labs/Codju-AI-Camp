@@ -346,7 +346,7 @@
   <nav class="nav" id="nav">
     <div class="nav__inner">
       <a href="#" class="nav__logo">
-        <img src="assets/logo.webp" width="82" height="32" loading="eager" alt="Codju AI Creator Camp Official Logo" class="nav__logo-img" style="height: 32px;" />
+        <img src="assets/logo.webp" width="82" height="32" loading="eager" decoding="async" alt="Codju AI Creator Camp Official Logo" class="nav__logo-img" style="height: 32px;" />
       </a>
 
       <ul class="nav__links">
@@ -439,20 +439,16 @@
             <picture id="video-facade" style="position:absolute;top:0;left:0;width:100%;height:100%;z-index:1;border-radius:24px;overflow:hidden;pointer-events:none;transition:opacity 0.5s;">
               <source srcset="assets/hero_video_thumbnail-sm.avif 350w, assets/hero_video_thumbnail.avif 640w" sizes="(max-width: 640px) 350px, 640px" type="image/avif">
               <source srcset="assets/hero_video_thumbnail-sm.webp 350w, assets/hero_video_thumbnail.webp 640w" sizes="(max-width: 640px) 350px, 640px" type="image/webp">
-              <img src="assets/hero_video_thumbnail.webp" width="640" height="360" fetchpriority="high" alt="AI Creator Camp Promo Video Preview" style="width:100%;height:100%;object-fit:cover;border-radius:24px;" />
+              <img src="assets/hero_video_thumbnail.webp" width="640" height="360" fetchpriority="high" decoding="async" alt="AI Creator Camp Promo Video Preview" style="width:100%;height:100%;object-fit:cover;border-radius:24px;" />
             </picture>
+
+            <!-- Play Button Overlay -->
+            <button type="button" class="hero__play-btn" id="hero-play-btn" aria-label="Play video" style="z-index:2;">
+              <svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-play"><polygon points="6 3 20 12 6 21 6 3"/></svg>
+            </button>
 
             <!-- YouTube player placeholder (16:9 aspect ratio matches container exactly) -->
             <div id="hero-player" style="position:absolute;top:0;left:0;width:100%;height:100%;border-radius:24px;overflow:hidden;"></div>
-            
-            
-            <!-- Custom mute/unmute control (glassmorphism overlay) -->
-            <button type="button" class="video-audio-toggle" id="video-audio-toggle" aria-label="Unmute video" title="Toggle Audio" style="z-index:3;">
-              <!-- Muted Icon (Default) -->
-              <svg id="audio-muted-icon" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-volume-x"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><line x1="22" x2="16" y1="9" y2="15"/><line x1="16" x2="22" y1="9" y2="15"/></svg>
-              <!-- Unmuted Icon (Hidden initially) -->
-              <svg id="audio-unmuted-icon" style="display:none;" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-volume-2"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14"/></svg>
-            </button>
           </div>
         </div>
 
@@ -589,7 +585,7 @@
                 <picture>
                   <source srcset="assets/day1-sm.avif 350w, assets/day1.avif 512w" sizes="(max-width: 640px) 350px, 512px" type="image/avif">
                   <source srcset="assets/day1-sm.webp 350w, assets/day1.webp 512w" sizes="(max-width: 640px) 350px, 512px" type="image/webp">
-                  <img src="assets/day1.webp" width="512" height="512" loading="lazy" alt="Day 1 Curriculum: Prompt Engineering" />
+                  <img src="assets/day1.webp" width="512" height="512" loading="lazy" decoding="async" alt="Day 1 Curriculum: Prompt Engineering" />
                 </picture>
               </div>
               <div class="session-card__content">
@@ -616,7 +612,7 @@
                 <picture>
                   <source srcset="assets/day2-sm.avif 350w, assets/day2.avif 512w" sizes="(max-width: 640px) 350px, 512px" type="image/avif">
                   <source srcset="assets/day2-sm.webp 350w, assets/day2.webp 512w" sizes="(max-width: 640px) 350px, 512px" type="image/webp">
-                  <img src="assets/day2.webp" width="512" height="512" loading="lazy" alt="Day 2 Curriculum: Creativity with AI" />
+                  <img src="assets/day2.webp" width="512" height="512" loading="lazy" decoding="async" alt="Day 2 Curriculum: Creativity with AI" />
                 </picture>
               </div>
               <div class="session-card__content">
@@ -640,7 +636,7 @@
                 <picture>
                   <source srcset="assets/image-sm.avif 350w, assets/image.avif 512w" sizes="(max-width: 640px) 350px, 512px" type="image/avif">
                   <source srcset="assets/image-sm.webp 350w, assets/image.webp 512w" sizes="(max-width: 640px) 350px, 512px" type="image/webp">
-                  <img src="assets/image.webp" width="512" height="512" loading="lazy" alt="Day 3 Curriculum: AI-Assisted Learning" />
+                  <img src="assets/image.webp" width="512" height="512" loading="lazy" decoding="async" alt="Day 3 Curriculum: AI-Assisted Learning" />
                 </picture>
               </div>
               <div class="session-card__content">
@@ -666,7 +662,7 @@
                 <picture>
                   <source srcset="assets/day4-sm.avif 350w, assets/day4.avif 512w" sizes="(max-width: 640px) 350px, 512px" type="image/avif">
                   <source srcset="assets/day4-sm.webp 350w, assets/day4.webp 512w" sizes="(max-width: 640px) 350px, 512px" type="image/webp">
-                  <img src="assets/day4.webp" width="512" height="512" loading="lazy" alt="Day 4 Curriculum: Computational Thinking + Build a Website" />
+                  <img src="assets/day4.webp" width="512" height="512" loading="lazy" decoding="async" alt="Day 4 Curriculum: Computational Thinking + Build a Website" />
                 </picture>
               </div>
               <div class="session-card__content">
@@ -689,7 +685,7 @@
                 <picture>
                   <source srcset="assets/day5-sm.avif 350w, assets/day5.avif 512w" sizes="(max-width: 640px) 350px, 512px" type="image/avif">
                   <source srcset="assets/day5-sm.webp 350w, assets/day5.webp 512w" sizes="(max-width: 640px) 350px, 512px" type="image/webp">
-                  <img src="assets/day5.webp" width="512" height="512" loading="lazy" alt="Day 5 Curriculum: Entrepreneurial Thinking + Build an App" />
+                  <img src="assets/day5.webp" width="512" height="512" loading="lazy" decoding="async" alt="Day 5 Curriculum: Entrepreneurial Thinking + Build an App" />
                 </picture>
               </div>
               <div class="session-card__content">
@@ -712,7 +708,7 @@
                 <picture>
                   <source srcset="assets/day6-sm.avif 350w, assets/day6.avif 512w" sizes="(max-width: 640px) 350px, 512px" type="image/avif">
                   <source srcset="assets/day6-sm.webp 350w, assets/day6.webp 512w" sizes="(max-width: 640px) 350px, 512px" type="image/webp">
-                  <img src="assets/day6.webp" width="512" height="512" loading="lazy" alt="Day 6 Curriculum: AI Agents & Automation" />
+                  <img src="assets/day6.webp" width="512" height="512" loading="lazy" decoding="async" alt="Day 6 Curriculum: AI Agents & Automation" />
                 </picture>
               </div>
               <div class="session-card__content">
@@ -738,7 +734,7 @@
                 <picture>
                   <source srcset="assets/day7-sm.avif 350w, assets/day7.avif 512w" sizes="(max-width: 640px) 350px, 512px" type="image/avif">
                   <source srcset="assets/day7-sm.webp 350w, assets/day7.webp 512w" sizes="(max-width: 640px) 350px, 512px" type="image/webp">
-                  <img src="assets/day7.webp" width="512" height="512" loading="lazy" alt="Day 7 Curriculum: Hackathon + Demo Day" />
+                  <img src="assets/day7.webp" width="512" height="512" loading="lazy" decoding="async" alt="Day 7 Curriculum: Hackathon + Demo Day" />
                 </picture>
               </div>
               <div class="session-card__content">
@@ -960,7 +956,7 @@
           <picture>
             <source srcset="assets/codju_certificate-sm.avif 350w, assets/codju_certificate.avif 600w" sizes="(max-width: 640px) 350px, 600px" type="image/avif">
             <source srcset="assets/codju_certificate-sm.webp 350w, assets/codju_certificate.webp 600w" sizes="(max-width: 640px) 350px, 600px" type="image/webp">
-            <img src="assets/codju_certificate.webp" width="600" height="600" loading="lazy" alt="Official Codju AI Creator Camp Certificate of Completion" />
+            <img src="assets/codju_certificate.webp" width="600" height="600" loading="lazy" decoding="async" alt="Official Codju AI Creator Camp Certificate of Completion" />
           </picture>
         </div>
         <div class="feature-split-card__content">
@@ -1125,7 +1121,7 @@
           <picture>
             <source srcset="assets/rohit_profile-sm.avif 300w, assets/rohit_profile.avif 400w" sizes="(max-width: 640px) 300px, 400px" type="image/avif">
             <source srcset="assets/rohit_profile-sm.webp 300w, assets/rohit_profile.webp 400w" sizes="(max-width: 640px) 300px, 400px" type="image/webp">
-            <img src="assets/rohit_profile.webp" width="400" height="552" loading="lazy" alt="Rohit K Bishnoi - Lead Mentor at Codju AI Creator Camp" class="founder__portrait-img" />
+            <img src="assets/rohit_profile.webp" width="400" height="552" loading="lazy" decoding="async" alt="Rohit K Bishnoi - Lead Mentor at Codju AI Creator Camp" class="founder__portrait-img" />
           </picture>
         </div>
 
@@ -1523,7 +1519,7 @@
       <div class="footer__inner">
         <div class="footer__brand">
           <a href="https://codju.com/" class="footer__logo">
-            <img src="assets/logo.webp" width="82" height="32" loading="eager" alt="Codju AI Creator Camp Official Logo" class="nav__logo-img" style="height: 32px;" />
+            <img src="assets/logo.webp" width="82" height="32" loading="eager" decoding="async" alt="Codju AI Creator Camp Official Logo" class="nav__logo-img" style="height: 32px;" />
           </a>
           <div class="footer__copy">© 2026 Codju. All rights reserved.</div>
         </div>

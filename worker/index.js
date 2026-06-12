@@ -174,6 +174,7 @@ function validateEnrollment(data) {
   const enrollment = {
     parentName: normalizeText(data.get('parent_name'), 80),
     studentName: normalizeText(data.get('student_name'), 80),
+    schoolName: normalizeText(data.get('school_name'), 120) || '',
     email: normalizeText(data.get('email'), 120).toLowerCase(),
     phone: normalizeText(data.get('phone'), 20).replace(/[^\d+]/g, ''),
   };
@@ -209,8 +210,8 @@ async function storeOrder(env, order) {
   await env.PAYMENTS.prepare(`
     INSERT INTO payment_orders (
       order_id, base_amount, gst_amount, gst_rate, amount, currency, status,
-      parent_name, student_name, email, phone, created_at, updated_at
-    ) VALUES (?, ?, ?, ?, ?, 'INR', 'Initiated', ?, ?, ?, ?, datetime('now'), datetime('now'))
+      parent_name, student_name, school_name, email, phone, created_at, updated_at
+    ) VALUES (?, ?, ?, ?, ?, 'INR', 'Initiated', ?, ?, ?, ?, ?, datetime('now'), datetime('now'))
   `).bind(
     order.orderId,
     order.base,
@@ -219,6 +220,7 @@ async function storeOrder(env, order) {
     order.amount,
     order.parentName,
     order.studentName,
+    order.schoolName,
     order.email,
     order.phone,
   ).run();
@@ -394,6 +396,7 @@ async function createRazorpayOrder(request, env) {
   const formData = new FormData();
   formData.set('parent_name', payload.parent_name || '');
   formData.set('student_name', payload.student_name || '');
+  formData.set('school_name', payload.school_name || '');
   formData.set('email', payload.email || '');
   formData.set('phone', payload.phone || '');
   let enrollment;

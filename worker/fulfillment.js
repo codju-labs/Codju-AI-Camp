@@ -181,7 +181,7 @@ async function getGoogleAccessToken(env, fetchImpl) {
 
 export async function appendEnrollmentSheet(order, env, fetchImpl = fetch) {
   const accessToken = await getGoogleAccessToken(env, fetchImpl);
-  const range = env.GOOGLE_SHEETS_RANGE || 'Enrollments!A:Q';
+  const range = env.GOOGLE_SHEETS_RANGE || 'Enrollments!A:R';
   const sheetName = range.split('!')[0];
   const lookupUrl = new URL(
     `https://sheets.googleapis.com/v4/spreadsheets/${encodeURIComponent(env.GOOGLE_SHEETS_SPREADSHEET_ID)}/values/${encodeURIComponent(`${sheetName}!A:A`)}`,
@@ -196,7 +196,7 @@ export async function appendEnrollmentSheet(order, env, fetchImpl = fetch) {
     (row) => String(row[0] || '') === order.enrollment_id,
   );
   if (existingRow >= 0) {
-    return { updatedRange: `${sheetName}!A${existingRow + 1}:Q${existingRow + 1}` };
+    return { updatedRange: `${sheetName}!A${existingRow + 1}:R${existingRow + 1}` };
   }
 
   const url = new URL(
@@ -231,6 +231,7 @@ export async function appendEnrollmentSheet(order, env, fetchImpl = fetch) {
         order.status,
         order.created_at,
         new Date().toISOString(),
+        order.school_name || '',
       ]],
     }),
   });

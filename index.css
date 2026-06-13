@@ -2436,6 +2436,16 @@ body.payment-modal-open {
   gap: 16px;
 }
 
+.payment-form__grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+.payment-form__grid .payment-form__field--full {
+  grid-column: 1 / -1;
+}
+
 .payment-form__row {
   display: grid;
   grid-template-columns: 1fr 110px;
@@ -4008,6 +4018,10 @@ body.payment-modal-open {
   }
 
   .payment-form__row {
+    grid-template-columns: 1fr;
+  }
+
+  .payment-form__grid {
     grid-template-columns: 1fr;
   }
 }

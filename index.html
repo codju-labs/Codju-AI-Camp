@@ -1584,24 +1584,31 @@
         </div>
 
         <form class="payment-form" data-payment-form>
-          <div class="payment-form__field">
-            <label for="parent-name">Parent or guardian name</label>
-            <input id="parent-name" name="parent_name" type="text" maxlength="80" autocomplete="name" required>
-          </div>
+          <div class="payment-form__grid">
+            <div class="payment-form__field">
+              <label for="parent-name">Parent or guardian name</label>
+              <input id="parent-name" name="parent_name" type="text" maxlength="80" autocomplete="name" required>
+            </div>
 
-          <div class="payment-form__field">
-            <label for="student-name">Student name</label>
-            <input id="student-name" name="student_name" type="text" maxlength="80" required>
-          </div>
+            <div class="payment-form__field">
+              <label for="student-name">Student name</label>
+              <input id="student-name" name="student_name" type="text" maxlength="80" required>
+            </div>
 
-          <div class="payment-form__field">
-            <label for="parent-email">Email address</label>
-            <input id="parent-email" name="email" type="email" maxlength="120" autocomplete="email" required>
-          </div>
+            <div class="payment-form__field">
+              <label for="parent-email">Email address</label>
+              <input id="parent-email" name="email" type="email" maxlength="120" autocomplete="email" required>
+            </div>
 
-          <div class="payment-form__field">
-            <label for="parent-phone">Mobile number</label>
-            <input id="parent-phone" name="phone" type="tel" maxlength="16" inputmode="tel" autocomplete="tel" placeholder="+91 98765 43210" required>
+            <div class="payment-form__field">
+              <label for="parent-phone">Mobile number</label>
+              <input id="parent-phone" name="phone" type="tel" maxlength="16" inputmode="tel" autocomplete="tel" placeholder="+91 98765 43210" required>
+            </div>
+
+            <div class="payment-form__field payment-form__field--full">
+              <label for="school-name">School name</label>
+              <input id="school-name" name="school_name" type="text" maxlength="120">
+            </div>
           </div>
 
           <div class="payment-quote" aria-label="Payment amount">

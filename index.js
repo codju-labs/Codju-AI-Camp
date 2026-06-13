@@ -494,7 +494,7 @@
           amount: order.amount,
           currency: order.currency,
           name: 'M/s CODJU TECHNOLOGIES',
-          description: 'AI Creator Camp | June 22–28, 2026',
+          description: 'AI Creator Camp | June 22–29, 2026',
           image: `${window.location.origin}/assets/logo.png`,
           order_id: order.order_id,
           prefill: {

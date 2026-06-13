@@ -1,7 +1,7 @@
 # AI Creator Camp by Codju
 **Domain:** summercamp.codju.com
 **Target Audience:** Students in Grades 6–10 (ages 11–16)
-**Dates:** June 22 – 28, 2026
+**Dates:** June 22 – 29, 2026
 **Format:** Live Online (Zoom), 45-minute daily sessions
 **Cost:** ₹2,999 total, inclusive of 18% GST (taxable value ₹2,541.53 and GST ₹457.47)
 **Refund:** Refund requests must be raised on or before June 21, 2026. Once the course starts on June 22, registration fees are non-refundable. Approved refunds are processed within 7–10 business days.
@@ -23,6 +23,7 @@ AI Creator Camp by Codju is an immersive 7-day online program designed to teach 
 - **Day 4: Build a Website:** Learn computational thinking and build a real website from scratch using Canva Websites, Wix AI, and Scratch.
 - **Day 5: Build an App:** Turn ideas into a working mini app using AI-assisted development tools like Lovable, Glide, Replit AI, and Miro AI.
 - **Day 6: AI Agents & Automation:** Learn automation fundamentals, custom GPTs, and connect tools to build workflows using Make.com, ChatGPT, and ElevenLabs.
+- **Project Prep Day (June 28 Sunday):** Self-paced project preparation and capstone building.
 - **Day 7: Hackathon + Demo Day:** Collaborate in teams, present projects, and showcase the final outcomes to mentors and parents.
 
 ## Mentor Information

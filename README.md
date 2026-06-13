@@ -9,7 +9,7 @@ Rather than teaching students to fear AI, this camp focuses on empowering them t
 - **Domain:** [codju.com](https://codju.com)
 - **Target Audience:** Students in Grades 6–10 (ages 11–16)
 - **Format:** Live Online (Zoom), 45-minute daily sessions
-- **Dates:** June 22 – 28, 2026
+- **Dates:** June 22 – 29, 2026
 
 ## 🚀 Key Outcomes & Deliverables
 

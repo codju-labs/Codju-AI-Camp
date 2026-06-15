@@ -1,0 +1,139 @@
+---
+title: "Prompting in Action"
+sectionCount: 5
+---
+
+import { PromptArena } from "../../components/ui/PromptArena";
+import { SectionWrapper } from "../../components/learning/SectionWrapper";
+import { RevealButton } from "../../components/ui/RevealButton";
+import { ConceptCard } from "../../components/ui/ConceptCard";
+
+{/* -- Section 0: Hero -- */}
+<SectionWrapper index={0} client:load>
+  <style>{`
+    @keyframes heroSlideUp { from { opacity: 0; transform: translateY(40px); } to { opacity: 1; transform: translateY(0); } }
+    @keyframes bob { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-8px); } }
+    .hero-e1 { animation: heroSlideUp 0.7s cubic-bezier(0.16,1,0.3,1) both; }
+    .hero-e2 { animation: heroSlideUp 0.7s cubic-bezier(0.16,1,0.3,1) 0.12s both; }
+    .hero-e3 { animation: heroSlideUp 0.7s cubic-bezier(0.16,1,0.3,1) 0.24s both; }
+    .hero-e4 { animation: heroSlideUp 0.7s cubic-bezier(0.16,1,0.3,1) 0.36s both; }
+    .b1 { animation: bob 2.2s ease-in-out infinite; }
+    .b2 { animation: bob 2.2s ease-in-out 0.3s infinite; }
+    .b3 { animation: bob 2.2s ease-in-out 0.6s infinite; }
+    @media (prefers-reduced-motion: reduce) { .hero-e1,.hero-e2,.hero-e3,.hero-e4 { animation-duration: 0.01s; } .b1,.b2,.b3 { animation: none; } }
+  `}</style>
+  <div className="text-center py-14 min-h-[60vh] flex flex-col items-center justify-center">
+    <div className="hero-e1 mb-8 flex items-center gap-4">
+      <span className="b1 rounded-2xl bg-emerald-100 px-6 py-5 text-xl font-black text-emerald-700">Create</span>
+      <span className="b2 rounded-2xl bg-blue-100 px-6 py-5 text-xl font-black text-blue-700">Study</span>
+      <span className="b3 rounded-2xl bg-violet-100 px-6 py-5 text-xl font-black text-violet-700">Prove</span>
+    </div>
+    <h1 className="hero-e2 text-5xl font-black text-slate-900 mb-4">Prompting in Action</h1>
+    <p className="hero-e3 text-xl text-slate-500 font-bold mb-9 max-w-md mx-auto leading-relaxed">
+      One craft, three arenas. Create. Study. Prove. Time to use R-C-T-F for real.
+    </p>
+    <div className="hero-e4">
+      <RevealButton sectionIndex={0} text="Enter the arenas" client:load />
+    </div>
+  </div>
+</SectionWrapper>
+
+{/* -- Section 1: Arena 1 — Creative -- */}
+<SectionWrapper index={1} client:load>
+  <style>{`
+    @keyframes scaleIn { from { opacity: 0; transform: scale(0.92) translateY(12px); } to { opacity: 1; transform: scale(1) translateY(0); } }
+    .scale-in { animation: scaleIn 0.5s cubic-bezier(0.175,0.885,0.32,1.275) both; }
+    @media (prefers-reduced-motion: reduce) { .scale-in { animation: none; } }
+  `}</style>
+  <div className="text-center mb-7 scale-in">
+    <p className="text-base font-black text-slate-400 uppercase tracking-widest mb-3">Arena 1: Creative</p>
+    <h2 className="text-4xl font-black text-slate-800 mb-3 tracking-tight">The Story Forge</h2>
+    <p className="text-xl text-slate-500 font-bold max-w-md mx-auto">
+      Build a prompt that makes AI tell an epic story.
+    </p>
+  </div>
+  <div className="scale-in">
+    <PromptArena
+      client:only="react"
+      sectionIndex={1}
+      arena="creative"
+      explanation="A creative prompt shines when you give the AI a role, a reader, a clear story, and a shape. Vague in, generic out. Specific in, epic out."
+    />
+  </div>
+</SectionWrapper>
+
+{/* -- Section 2: Arena 2 — Productivity -- */}
+<SectionWrapper index={2} client:load>
+  <style>{`
+    @keyframes scaleIn { from { opacity: 0; transform: scale(0.92) translateY(12px); } to { opacity: 1; transform: scale(1) translateY(0); } }
+    .scale-in { animation: scaleIn 0.5s cubic-bezier(0.175,0.885,0.32,1.275) both; }
+    @media (prefers-reduced-motion: reduce) { .scale-in { animation: none; } }
+  `}</style>
+  <div className="text-center mb-7 scale-in">
+    <p className="text-base font-black text-slate-400 uppercase tracking-widest mb-3">Arena 2: School</p>
+    <h2 className="text-4xl font-black text-slate-800 mb-3 tracking-tight">The Study Machine</h2>
+    <p className="text-xl text-slate-500 font-bold max-w-md mx-auto">
+      Make AI do the boring setup so you can do the learning.
+    </p>
+  </div>
+  <div className="scale-in">
+    <PromptArena
+      client:only="react"
+      sectionIndex={2}
+      arena="productivity"
+      explanation="A study prompt works when the AI knows your real situation and the exact format you need. The AI organises. You still do the learning."
+    />
+  </div>
+</SectionWrapper>
+
+{/* -- Section 3: Arena 3 — Research -- */}
+<SectionWrapper index={3} client:load>
+  <style>{`
+    @keyframes scaleIn { from { opacity: 0; transform: scale(0.92) translateY(12px); } to { opacity: 1; transform: scale(1) translateY(0); } }
+    .scale-in { animation: scaleIn 0.5s cubic-bezier(0.175,0.885,0.32,1.275) both; }
+    @media (prefers-reduced-motion: reduce) { .scale-in { animation: none; } }
+  `}</style>
+  <div className="text-center mb-7 scale-in">
+    <p className="text-base font-black text-slate-400 uppercase tracking-widest mb-3">Arena 3: Research</p>
+    <h2 className="text-4xl font-black text-slate-800 mb-3 tracking-tight">The Truth Detective</h2>
+    <p className="text-xl text-slate-500 font-bold max-w-md mx-auto">
+      Facts need proof. Build a prompt that demands sources.
+    </p>
+  </div>
+  <div className="scale-in">
+    <PromptArena
+      client:only="react"
+      sectionIndex={3}
+      arena="research"
+      explanation="The golden rule of research: never accept facts without proof. Ask for sources so you can check the answer yourself."
+    />
+  </div>
+</SectionWrapper>
+
+{/* -- Section 4: Wrap -- */}
+<SectionWrapper index={4} client:load>
+  <style>{`
+    @keyframes fadeUp { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
+    .fade-up { animation: fadeUp 0.6s cubic-bezier(0.16,1,0.3,1) both; }
+    @media (prefers-reduced-motion: reduce) { .fade-up { animation: none; } }
+  `}</style>
+  <div className="text-center mb-7 fade-up">
+    <p className="text-base font-black text-slate-400 uppercase tracking-widest mb-3">Lock it in</p>
+    <h2 className="text-4xl font-black text-slate-800 mb-2 tracking-tight">Three Arenas, One Craft</h2>
+  </div>
+  <div className="fade-up">
+    <ConceptCard icon="P" title="Same R-C-T-F. Three different jobs.">
+      <p className="mb-3 text-lg">
+        You just made AI <strong>create</strong> (ChatGPT), <strong>organise</strong> (Gemini), and
+        <strong> prove</strong> (Perplexity) — with the same four ingredients each time.
+      </p>
+      <div className="rounded-2xl bg-[#fff7ed] border-2 border-[#fed7aa] px-5 py-4 text-center">
+        <p className="font-black text-lg text-[#b45309]">A pro picks the right tool AND the right words.</p>
+      </div>
+    </ConceptCard>
+    <p className="text-center text-xl text-slate-500 font-bold mt-6">
+      Final level: the quiz, a real AI debate, and your own AI Superhero.
+    </p>
+  </div>
+  <RevealButton sectionIndex={4} text="Finish Level 5" client:load />
+</SectionWrapper>

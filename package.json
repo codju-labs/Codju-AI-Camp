@@ -3,9 +3,13 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "build:assets": "node scripts/prepare-assets.mjs",
-    "dev": "npm run build:assets && wrangler dev",
-    "deploy": "npm run build:assets && wrangler deploy",
+    "prepare:public": "node scripts/prepare-assets.mjs",
+    "build": "npm run prepare:public && astro build",
+    "dev": "npm run build && wrangler dev",
+    "dev:portal": "npm run prepare:public && astro dev",
+    "db:migrate": "wrangler d1 migrations apply codju-camp-payments --remote",
+    "db:migrate:local": "wrangler d1 migrations apply codju-camp-payments",
+    "deploy": "npm run build && wrangler deploy",
     "test": "node --test",
     "test:email": "node scripts/smoke-fulfillment.mjs email",
     "test:email:live": "node scripts/smoke-fulfillment.mjs email --live",
@@ -13,9 +17,21 @@
     "test:sheet:live": "node scripts/smoke-fulfillment.mjs sheet --live"
   },
   "devDependencies": {
+    "@astrojs/mdx": "5.0.0",
+    "@astrojs/react": "5.0.0",
+    "@tailwindcss/vite": "4.2.1",
+    "@types/canvas-confetti": "1.9.0",
+    "@types/react": "19.2.14",
+    "@types/react-dom": "19.2.3",
+    "astro": "6.0.3",
     "wrangler": "^4.20.0"
   },
   "dependencies": {
-    "razorpay": "^2.9.6"
+    "@nanostores/react": "1.0.0",
+    "canvas-confetti": "1.9.4",
+    "nanostores": "1.1.1",
+    "react": "19.2.4",
+    "react-dom": "19.2.4",
+    "tailwindcss": "4.2.1"
   }
 }

@@ -117,7 +117,7 @@ test('Google Sheets receives an enrollment row', async () => {
       return Response.json({ access_token: 'google-token' });
     }
     if (requests.length === 2) return Response.json({ values: [['Enrollment ID']] });
-    return Response.json({ updates: { updatedRange: 'Enrollments!A2:Q2' } });
+    return Response.json({ updates: { updatedRange: 'Enrollments!A2:R2' } });
   };
 
   const result = await appendEnrollmentSheet(order, {
@@ -127,10 +127,10 @@ test('Google Sheets receives an enrollment row', async () => {
       format: 'pem',
     }),
     GOOGLE_SHEETS_SPREADSHEET_ID: 'sheet-id',
-    GOOGLE_SHEETS_RANGE: 'Enrollments!A:Q',
+    GOOGLE_SHEETS_RANGE: 'Enrollments!A:R',
   }, fetchImpl);
 
-  assert.equal(result.updatedRange, 'Enrollments!A2:Q2');
+  assert.equal(result.updatedRange, 'Enrollments!A2:R2');
   assert.match(requests[2].url, /sheets\.googleapis\.com/);
   const sheetBody = JSON.parse(requests[2].options.body);
   assert.equal(sheetBody.values[0][0], order.enrollment_id);
@@ -153,9 +153,9 @@ test('Google Sheets skips an enrollment that already exists', async () => {
       format: 'pem',
     }),
     GOOGLE_SHEETS_SPREADSHEET_ID: 'sheet-id',
-    GOOGLE_SHEETS_RANGE: 'Enrollments!A:Q',
+    GOOGLE_SHEETS_RANGE: 'Enrollments!A:R',
   }, fetchImpl);
 
-  assert.equal(result.updatedRange, 'Enrollments!A2:Q2');
+  assert.equal(result.updatedRange, 'Enrollments!A2:R2');
   assert.equal(requests, 2);
 });

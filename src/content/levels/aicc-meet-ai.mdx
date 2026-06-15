@@ -1,0 +1,228 @@
+---
+title: "About AI"
+sectionCount: 8
+---
+
+import { AiOrNot } from "../../components/ui/AiOrNot";
+import { WhereIsAI } from "../../components/ui/WhereIsAI";
+import { HowAiLearns } from "../../components/ui/HowAiLearns";
+import { NextWordDemo } from "../../components/ui/NextWordDemo";
+import { SectionWrapper } from "../../components/learning/SectionWrapper";
+import { RevealButton } from "../../components/ui/RevealButton";
+import { ConceptCard } from "../../components/ui/ConceptCard";
+
+{/* Section 0: Hero */}
+<SectionWrapper index={0} client:load>
+  <style>{`
+    @keyframes heroSlideUp { from { opacity: 0; transform: translateY(40px); } to { opacity: 1; transform: translateY(0); } }
+    @keyframes bob { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-8px); } }
+    .hero-e1 { animation: heroSlideUp 0.7s cubic-bezier(0.16,1,0.3,1) both; }
+    .hero-e2 { animation: heroSlideUp 0.7s cubic-bezier(0.16,1,0.3,1) 0.12s both; }
+    .hero-e3 { animation: heroSlideUp 0.7s cubic-bezier(0.16,1,0.3,1) 0.24s both; }
+    .hero-e4 { animation: heroSlideUp 0.7s cubic-bezier(0.16,1,0.3,1) 0.36s both; }
+    .b1 { animation: bob 2.2s ease-in-out infinite; }
+    .b2 { animation: bob 2.2s ease-in-out 0.3s infinite; }
+    .b3 { animation: bob 2.2s ease-in-out 0.6s infinite; }
+    @media (prefers-reduced-motion: reduce) { .hero-e1,.hero-e2,.hero-e3,.hero-e4 { animation-duration: 0.01s; } .b1,.b2,.b3 { animation: none; } }
+  `}</style>
+  <div className="text-center py-14 min-h-[60vh] flex flex-col items-center justify-center">
+    <div className="hero-e1 mb-8 flex items-center gap-5">
+      <div className="b1 flex h-20 w-20 items-center justify-center rounded-3xl bg-purple-100 text-purple-700">
+        <span className="text-2xl font-black">AI</span>
+      </div>
+      <div className="b2 flex h-20 w-20 items-center justify-center rounded-3xl bg-blue-100 text-blue-700">
+        <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+          <rect x="7" y="3" width="10" height="18" rx="2.5" />
+          <line x1="10.5" y1="18" x2="13.5" y2="18" />
+        </svg>
+      </div>
+      <div className="b3 flex h-20 w-20 items-center justify-center rounded-3xl bg-amber-100 text-amber-700">
+        <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+          <circle cx="10.5" cy="10.5" r="6" />
+          <line x1="15" y1="15" x2="20" y2="20" />
+        </svg>
+      </div>
+    </div>
+    <h1 className="hero-e2 text-5xl font-black text-slate-900 mb-4">About AI</h1>
+    <p className="hero-e3 text-xl md:text-2xl text-slate-500 font-bold mb-9 max-w-xl mx-auto leading-relaxed">
+      What is AI, really?<br />And how does it work?
+    </p>
+    <div className="hero-e4">
+      <RevealButton sectionIndex={0} text="Let's find out" client:load />
+    </div>
+  </div>
+</SectionWrapper>
+
+{/* Section 1: Discovery — AI is hiding everywhere */}
+<SectionWrapper index={1} client:load>
+  <style>{`
+    @keyframes scaleIn { from { opacity: 0; transform: scale(0.92) translateY(12px); } to { opacity: 1; transform: scale(1) translateY(0); } }
+    .scale-in { animation: scaleIn 0.5s cubic-bezier(0.175,0.885,0.32,1.275) both; }
+    @media (prefers-reduced-motion: reduce) { .scale-in { animation: none; } }
+  `}</style>
+  <div className="text-center mb-7 scale-in">
+    <p className="text-sm font-black text-slate-400 uppercase tracking-widest mb-3">First, a discovery</p>
+    <h2 className="text-4xl font-black text-slate-800 mb-2 tracking-tight">You Already Use AI</h2>
+    <p className="text-xl md:text-2xl text-slate-500 font-bold max-w-xl mx-auto">
+      Tap each card to find the AI inside.
+    </p>
+  </div>
+  <div className="scale-in">
+    <WhereIsAI
+      client:only="react"
+      sectionIndex={1}
+      explanation="Every one of these learns from your patterns. You never opened an 'AI app' today — AI was already inside the apps you use. This week, you stop just using it. You start directing it."
+    />
+  </div>
+</SectionWrapper>
+
+{/* Section 2: Concept — what IS AI? */}
+<SectionWrapper index={2} client:load>
+  <style>{`
+    @keyframes fadeUp { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
+    .fade-up { animation: fadeUp 0.6s cubic-bezier(0.16,1,0.3,1) both; }
+    @media (prefers-reduced-motion: reduce) { .fade-up { animation: none; } }
+  `}</style>
+  <div className="text-center mb-7 fade-up">
+    <p className="text-sm font-black text-slate-400 uppercase tracking-widest mb-3">The big idea</p>
+    <h2 className="text-4xl font-black text-slate-800 mb-2 tracking-tight">So What IS AI?</h2>
+    <p className="text-xl md:text-2xl text-slate-500 font-bold max-w-xl mx-auto">
+      All those apps share one secret.
+    </p>
+  </div>
+  <div className="fade-up">
+    <ConceptCard icon="AI" title="AI learns from examples">
+      <div className="rounded-2xl bg-[#faf5ff] border-2 border-[#e9d5ff] px-4 py-4 text-center mb-4">
+        <p className="font-black text-[#6b21a8] text-xl">"AI learns from examples instead of following rules for everything."</p>
+      </div>
+      <p className="text-lg mb-2">A <strong>calculator</strong> follows fixed rules. It never learns.</p>
+      <p className="text-lg mb-2">A <strong>cat-spotter</strong> studies a million cat photos and learns the pattern.</p>
+      <p className="text-lg">Then it spots a cat it has never seen. That is AI.</p>
+    </ConceptCard>
+  </div>
+  <RevealButton sectionIndex={2} text="Got it — test me" client:load />
+</SectionWrapper>
+
+{/* Section 3: Game — AI or Not? */}
+<SectionWrapper index={3} client:load>
+  <style>{`
+    @keyframes fadeUp { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
+    .fade-up { animation: fadeUp 0.6s cubic-bezier(0.16,1,0.3,1) both; }
+    .fade-up-d1 { animation: fadeUp 0.6s cubic-bezier(0.16,1,0.3,1) 0.1s both; }
+    @media (prefers-reduced-motion: reduce) { .fade-up,.fade-up-d1 { animation: none; } }
+  `}</style>
+  <div className="text-center mb-7 fade-up">
+    <p className="text-sm font-black text-slate-400 uppercase tracking-widest mb-3">Your turn</p>
+    <h2 className="text-4xl font-black text-slate-800 mb-2 tracking-tight">AI or Not?</h2>
+    <p className="text-xl md:text-2xl text-slate-500 font-bold max-w-xl mx-auto">
+      Fixed rules, or learns from examples? You decide.
+    </p>
+  </div>
+  <div className="fade-up-d1">
+    <AiOrNot
+      client:only="react"
+      sectionIndex={3}
+      explanation="One test works every time. Does it follow rules a human wrote? Or did it learn from examples? If it learns, it's AI."
+    />
+  </div>
+</SectionWrapper>
+
+{/* Section 4: How AI learns (interactive) */}
+<SectionWrapper index={4} client:load>
+  <style>{`
+    @keyframes scaleIn { from { opacity: 0; transform: scale(0.92) translateY(12px); } to { opacity: 1; transform: scale(1) translateY(0); } }
+    .scale-in { animation: scaleIn 0.5s cubic-bezier(0.175,0.885,0.32,1.275) both; }
+    @media (prefers-reduced-motion: reduce) { .scale-in { animation: none; } }
+  `}</style>
+  <div className="text-center mb-7 scale-in">
+    <p className="text-sm font-black text-slate-400 uppercase tracking-widest mb-3">How it works</p>
+    <h2 className="text-4xl font-black text-slate-800 mb-2 tracking-tight">How Does AI Learn?</h2>
+    <p className="text-xl md:text-2xl text-slate-500 font-bold max-w-xl mx-auto">
+      It doesn't get rules. It gets examples. Be the AI.
+    </p>
+  </div>
+  <div className="scale-in">
+    <HowAiLearns
+      client:only="react"
+      sectionIndex={4}
+      explanation="This is the heart of AI. Show it enough labelled examples and it works out the pattern on its own — which feature matters and which is just noise. No human writes the rule."
+    />
+  </div>
+</SectionWrapper>
+
+{/* Section 5: Concept — Generative AI */}
+<SectionWrapper index={5} client:load>
+  <style>{`
+    @keyframes fadeUp { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
+    .fade-up { animation: fadeUp 0.6s cubic-bezier(0.16,1,0.3,1) both; }
+    @media (prefers-reduced-motion: reduce) { .fade-up { animation: none; } }
+  `}</style>
+  <div className="text-center mb-7 fade-up">
+    <p className="text-sm font-black text-slate-400 uppercase tracking-widest mb-3">A special kind</p>
+    <h2 className="text-4xl font-black text-slate-800 mb-2 tracking-tight">Generative AI</h2>
+    <p className="text-xl md:text-2xl text-slate-500 font-bold max-w-xl mx-auto">
+      The kind we use all week.
+    </p>
+  </div>
+  <div className="fade-up">
+    <ConceptCard icon="G" title="It doesn't just sort. It creates.">
+      <p className="text-lg mb-4">
+        Some AI only recognises and sorts. <strong>Generative AI</strong> makes brand-new things:
+      </p>
+      <div className="grid grid-cols-1 gap-2 mb-4">
+        <div className="rounded-2xl bg-slate-50 border-2 border-slate-100 px-4 py-3 text-lg font-bold text-slate-700">ChatGPT writes stories, answers and code.</div>
+        <div className="rounded-2xl bg-slate-50 border-2 border-slate-100 px-4 py-3 text-lg font-bold text-slate-700">Image AI draws a picture from your words.</div>
+        <div className="rounded-2xl bg-slate-50 border-2 border-slate-100 px-4 py-3 text-lg font-bold text-slate-700">Music AI writes a brand-new song.</div>
+      </div>
+      <p className="text-lg">It had never seen your exact request before. It builds the answer fresh.</p>
+    </ConceptCard>
+  </div>
+  <RevealButton sectionIndex={5} text="But how does it create?" client:load />
+</SectionWrapper>
+
+{/* Section 6: How Gen AI creates — next-word demo (interactive) */}
+<SectionWrapper index={6} client:load>
+  <style>{`
+    @keyframes scaleIn { from { opacity: 0; transform: scale(0.92) translateY(12px); } to { opacity: 1; transform: scale(1) translateY(0); } }
+    .scale-in { animation: scaleIn 0.5s cubic-bezier(0.175,0.885,0.32,1.275) both; }
+    @media (prefers-reduced-motion: reduce) { .scale-in { animation: none; } }
+  `}</style>
+  <div className="text-center mb-7 scale-in">
+    <p className="text-sm font-black text-slate-400 uppercase tracking-widest mb-3">The big secret</p>
+    <h2 className="text-4xl font-black text-slate-800 mb-2 tracking-tight">It Guesses the Next Word</h2>
+    <p className="text-xl md:text-2xl text-slate-500 font-bold max-w-xl mx-auto">
+      Autocomplete with superpowers.
+    </p>
+  </div>
+  <div className="scale-in">
+    <NextWordDemo
+      client:only="react"
+      sectionIndex={6}
+      explanation="This is the whole trick behind ChatGPT. It predicts the most likely next word, adds it, then predicts again. It learned those odds from a huge amount of text. Change the words you give it and you change every guess that follows."
+    />
+  </div>
+</SectionWrapper>
+
+{/* Section 7: Wrap — bridge to prompts */}
+<SectionWrapper index={7} client:load>
+  <style>{`
+    @keyframes fadeUp { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
+    .fade-up { animation: fadeUp 0.6s cubic-bezier(0.16,1,0.3,1) both; }
+    @media (prefers-reduced-motion: reduce) { .fade-up { animation: none; } }
+  `}</style>
+  <div className="text-center mb-7 fade-up">
+    <p className="text-sm font-black text-slate-400 uppercase tracking-widest mb-3">Lock it in</p>
+    <h2 className="text-4xl font-black text-slate-800 mb-2 tracking-tight">From AI User to AI Creator</h2>
+  </div>
+  <div className="fade-up">
+    <ConceptCard icon="GO" title="Your words are the steering wheel">
+      <p className="text-lg mb-2">AI learns from examples.</p>
+      <p className="text-lg mb-2">Generative AI creates by guessing the next word.</p>
+      <p className="text-lg mb-4">And the words you give it steer every single guess.</p>
+      <div className="rounded-2xl bg-[#fff7ed] border-2 border-[#fed7aa] px-4 py-4 text-center">
+        <p className="font-black text-[#b45309] text-xl">Those words are called a prompt. Learning to write them is your new superpower.</p>
+      </div>
+    </ConceptCard>
+  </div>
+  <RevealButton sectionIndex={7} text="Finish Lesson 1" client:load />
+</SectionWrapper>

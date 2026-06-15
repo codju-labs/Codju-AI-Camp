@@ -1,0 +1,184 @@
+---
+title: "The Prompt Craft"
+sectionCount: 6
+---
+
+import { PromptDoctor } from "../../components/ui/PromptDoctor";
+import { PromptBuilder } from "../../components/ui/PromptBuilder";
+import { TrickCards } from "../../components/ui/TrickCards";
+import { SectionWrapper } from "../../components/learning/SectionWrapper";
+import { RevealButton } from "../../components/ui/RevealButton";
+import { ConceptCard } from "../../components/ui/ConceptCard";
+
+{/* -- Section 0: Hero -- */}
+<SectionWrapper index={0} client:load>
+  <style>{`
+    @keyframes heroSlideUp { from { opacity: 0; transform: translateY(40px); } to { opacity: 1; transform: translateY(0); } }
+    @keyframes bob { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-8px); } }
+    .hero-e1 { animation: heroSlideUp 0.7s cubic-bezier(0.16,1,0.3,1) both; }
+    .hero-e2 { animation: heroSlideUp 0.7s cubic-bezier(0.16,1,0.3,1) 0.12s both; }
+    .hero-e3 { animation: heroSlideUp 0.7s cubic-bezier(0.16,1,0.3,1) 0.24s both; }
+    .hero-e4 { animation: heroSlideUp 0.7s cubic-bezier(0.16,1,0.3,1) 0.36s both; }
+    .b1 { animation: bob 2.2s ease-in-out infinite; }
+    .b2 { animation: bob 2.2s ease-in-out 0.3s infinite; }
+    .b3 { animation: bob 2.2s ease-in-out 0.6s infinite; }
+    .b4 { animation: bob 2.2s ease-in-out 0.9s infinite; }
+    @media (prefers-reduced-motion: reduce) { .hero-e1,.hero-e2,.hero-e3,.hero-e4 { animation-duration: 0.01s; } .b1,.b2,.b3,.b4 { animation: none; } }
+  `}</style>
+  <div className="text-center py-14 min-h-[60vh] flex flex-col items-center justify-center">
+    <div className="hero-e1 mb-8 flex items-center gap-4">
+      <span className="b1 flex h-16 w-16 items-center justify-center rounded-2xl bg-[#8B4EC4] text-3xl font-black text-white shadow-md">R</span>
+      <span className="b2 flex h-16 w-16 items-center justify-center rounded-2xl bg-blue-500 text-3xl font-black text-white shadow-md">C</span>
+      <span className="b3 flex h-16 w-16 items-center justify-center rounded-2xl bg-emerald-500 text-3xl font-black text-white shadow-md">T</span>
+      <span className="b4 flex h-16 w-16 items-center justify-center rounded-2xl bg-amber-500 text-3xl font-black text-white shadow-md">F</span>
+    </div>
+    <h1 className="hero-e2 text-5xl font-black text-slate-900 mb-4">The Prompt Craft</h1>
+    <p className="hero-e3 text-xl md:text-2xl text-slate-500 font-bold mb-9 max-w-md mx-auto leading-relaxed">
+      Great prompts are not luck. They follow a recipe with four parts.
+    </p>
+    <div className="hero-e4">
+      <RevealButton sectionIndex={0} text="Show me the recipe" client:load />
+    </div>
+  </div>
+</SectionWrapper>
+
+{/* -- Section 1: The R-C-T-F recipe -- */}
+<SectionWrapper index={1} client:load>
+  <style>{`
+    @keyframes fadeUp { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
+    .fade-up { animation: fadeUp 0.6s cubic-bezier(0.16,1,0.3,1) both; }
+    @media (prefers-reduced-motion: reduce) { .fade-up { animation: none; } }
+  `}</style>
+  <div className="text-center mb-7 fade-up">
+    <p className="text-sm font-black text-slate-400 uppercase tracking-widest mb-3">The recipe</p>
+    <h2 className="text-4xl font-black text-slate-800 mb-2 tracking-tight">The 4 Ingredients</h2>
+    <p className="text-xl text-slate-500 font-bold max-w-md mx-auto">
+      Every great prompt, for any AI, has the same four parts.
+    </p>
+  </div>
+  <div className="fade-up">
+    <ConceptCard icon="RC" title="R · C · T · F">
+      <div className="space-y-2.5 mb-4">
+        <div className="rounded-2xl bg-[#faf5ff] border-2 border-[#e9d5ff] px-4 py-3 flex items-center gap-3">
+          <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[#8B4EC4] text-lg font-black text-white">R</span>
+          <p className="text-lg font-black text-[#6b21a8]">Role <span className="font-bold text-slate-500">— Who should the AI be?</span></p>
+        </div>
+        <div className="rounded-2xl bg-blue-50 border-2 border-blue-200 px-4 py-3 flex items-center gap-3">
+          <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-blue-500 text-lg font-black text-white">C</span>
+          <p className="text-lg font-black text-blue-700">Context <span className="font-bold text-slate-500">— What does the AI need to know?</span></p>
+        </div>
+        <div className="rounded-2xl bg-emerald-50 border-2 border-emerald-200 px-4 py-3 flex items-center gap-3">
+          <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-emerald-500 text-lg font-black text-white">T</span>
+          <p className="text-lg font-black text-emerald-700">Task <span className="font-bold text-slate-500">— What is the job?</span></p>
+        </div>
+        <div className="rounded-2xl bg-amber-50 border-2 border-amber-200 px-4 py-3 flex items-center gap-3">
+          <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-amber-500 text-lg font-black text-white">F</span>
+          <p className="text-lg font-black text-amber-700">Format <span className="font-bold text-slate-500">— What shape should the answer be?</span></p>
+        </div>
+      </div>
+      <div className="rounded-2xl bg-[#fff7ed] border-2 border-[#fed7aa] px-4 py-3 text-center">
+        <p className="text-lg font-black text-[#b45309]">Think of it as your CRAFT. R-C-T-F, every time.</p>
+      </div>
+    </ConceptCard>
+  </div>
+  <RevealButton sectionIndex={1} text="Let's fix a sick prompt" client:load />
+</SectionWrapper>
+
+{/* -- Section 2: Prompt Doctor -- */}
+<SectionWrapper index={2} client:load>
+  <style>{`
+    @keyframes fadeUp { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
+    .fade-up { animation: fadeUp 0.6s cubic-bezier(0.16,1,0.3,1) both; }
+    .fade-up-d1 { animation: fadeUp 0.6s cubic-bezier(0.16,1,0.3,1) 0.1s both; }
+    @media (prefers-reduced-motion: reduce) { .fade-up,.fade-up-d1 { animation: none; } }
+  `}</style>
+  <div className="text-center mb-7 fade-up">
+    <p className="text-sm font-black text-slate-400 uppercase tracking-widest mb-3">Warm-up round</p>
+    <h2 className="text-4xl font-black text-slate-800 mb-2 tracking-tight">Prompt Doctor</h2>
+    <p className="text-xl text-slate-500 font-bold max-w-md mx-auto">
+      Three sick prompts. Find what each one is missing.
+    </p>
+  </div>
+  <div className="fade-up-d1">
+    <PromptDoctor
+      client:only="react"
+      sectionIndex={2}
+      explanation="'Tell me about dogs' has a Task, but only just. There is no Role, no Context, and no Format. Add those three and the same request becomes a clear, pro prompt the AI can get right on the first try."
+    />
+  </div>
+</SectionWrapper>
+
+{/* -- Section 3: Prompt Builder -- */}
+<SectionWrapper index={3} client:load>
+  <style>{`
+    @keyframes scaleIn { from { opacity: 0; transform: scale(0.92) translateY(12px); } to { opacity: 1; transform: scale(1) translateY(0); } }
+    .scale-in { animation: scaleIn 0.5s cubic-bezier(0.175,0.885,0.32,1.275) both; }
+    @media (prefers-reduced-motion: reduce) { .scale-in { animation: none; } }
+  `}</style>
+  <div className="text-center mb-7 scale-in">
+    <p className="text-sm font-black text-slate-400 uppercase tracking-widest mb-3">The main event</p>
+    <h2 className="text-4xl font-black text-slate-800 mb-2 tracking-tight">Build Your First Pro Prompt</h2>
+    <p className="text-xl text-slate-500 font-bold max-w-md mx-auto">
+      Fill in the four parts. Watch your prompt build itself below.
+    </p>
+  </div>
+  <div className="scale-in">
+    <PromptBuilder
+      client:only="react"
+      sectionIndex={3}
+      explanation="Role tells the AI who to be. Context gives it the background. Task says exactly what you want. Format shapes the answer. Put all four together and you get a great answer on the first try."
+    />
+  </div>
+</SectionWrapper>
+
+{/* -- Section 4: Trick Cards -- */}
+<SectionWrapper index={4} client:load>
+  <style>{`
+    @keyframes fadeUp { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
+    .fade-up { animation: fadeUp 0.6s cubic-bezier(0.16,1,0.3,1) both; }
+    .fade-up-d1 { animation: fadeUp 0.6s cubic-bezier(0.16,1,0.3,1) 0.1s both; }
+    @media (prefers-reduced-motion: reduce) { .fade-up,.fade-up-d1 { animation: none; } }
+  `}</style>
+  <div className="text-center mb-7 fade-up">
+    <p className="text-sm font-black text-slate-400 uppercase tracking-widest mb-3">Bonus round</p>
+    <h2 className="text-4xl font-black text-slate-800 mb-2 tracking-tight">5 Pro Tricks</h2>
+    <p className="text-xl text-slate-500 font-bold max-w-md mx-auto">
+      These work in every AI tool. Tap each card to collect it.
+    </p>
+  </div>
+  <div className="fade-up-d1">
+    <TrickCards
+      client:only="react"
+      sectionIndex={4}
+      explanation="These five tricks are shortcuts into R-C-T-F. The Role Trick is R. Explain-Like-I'm-Ten is C. The Format Trick is F. And Make-It-Better works because the AI remembers your whole conversation, so you can keep improving instead of starting over."
+    />
+  </div>
+</SectionWrapper>
+
+{/* -- Section 5: Wrap -- */}
+<SectionWrapper index={5} client:load>
+  <style>{`
+    @keyframes fadeUp { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
+    .fade-up { animation: fadeUp 0.6s cubic-bezier(0.16,1,0.3,1) both; }
+    @media (prefers-reduced-motion: reduce) { .fade-up { animation: none; } }
+  `}</style>
+  <div className="text-center mb-7 fade-up">
+    <p className="text-sm font-black text-slate-400 uppercase tracking-widest mb-3">Lock it in</p>
+    <h2 className="text-4xl font-black text-slate-800 mb-2 tracking-tight">You Know the Craft</h2>
+  </div>
+  <div className="fade-up">
+    <ConceptCard icon="M" title="The prompt engineer's mantra">
+      <p className="text-lg mb-3">
+        R-C-T-F is not a one-time trick. It is how pros talk to AI <strong>every single time</strong>.
+        When the answer disappoints, remember:
+      </p>
+      <div className="rounded-2xl bg-[#fff7ed] border-2 border-[#fed7aa] px-4 py-3 text-center">
+        <p className="text-lg font-black text-[#b45309]">"If the answer isn't great, your prompt wasn't great. Fix the prompt, not the AI."</p>
+      </div>
+    </ConceptCard>
+    <p className="text-center text-lg text-slate-500 font-bold mt-6">
+      Next: take your craft into three arenas — creative, school, and research prompting.
+    </p>
+  </div>
+  <RevealButton sectionIndex={5} text="Finish Level 4" client:load />
+</SectionWrapper>

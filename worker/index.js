@@ -1,5 +1,13 @@
 import { decrypt, encrypt } from './ccavenue.js';
 import {
+  beginGoogleAuth,
+  completeGoogleAuth,
+  getSession,
+  hasPortalAccess,
+  sessionResponse,
+  signOut,
+} from './auth.js';
+import {
   appendEnrollmentSheet,
   createEnrollmentId,
   sendEnrollmentEmail,
@@ -64,6 +72,74 @@ function jsonResponse(data, status = 200) {
       'X-Content-Type-Options': 'nosniff',
     },
   });
+}
+
+const DAY_ONE_LEVELS = new Set([
+  'aicc-meet-ai',
+  'aicc-magic-words',
+  'aicc-meet-tools',
+  'aicc-rctf',
+  'aicc-prompting-in-action',
+  'aicc-prompt-master',
+]);
+
+async function requirePortalSession(request, env) {
+  const session = await getSession(request, env);
+  if (!session) {
+    return {
+      response: Response.redirect(
+        new URL('/sign-in', env.PUBLIC_SITE_URL),
+        302,
+      ),
+    };
+  }
+  if (!await hasPortalAccess(env, session.email)) {
+    return {
+      response: Response.redirect(
+        new URL('/access-required', env.PUBLIC_SITE_URL),
+        302,
+      ),
+    };
+  }
+  return { session };
+}
+
+async function handleProgress(request, env) {
+  const session = await getSession(request, env);
+  if (!session || !await hasPortalAccess(env, session.email)) {
+    return jsonResponse({ error: 'Unauthorized' }, 401);
+  }
+
+  if (request.method === 'GET') {
+    const result = await env.PAYMENTS.prepare(`
+      SELECT level_id
+      FROM user_progress
+      WHERE lower(email) = ?
+      ORDER BY completed_at
+    `).bind(session.email).all();
+    return jsonResponse({
+      completedLevels: (result.results || []).map((row) => row.level_id),
+    });
+  }
+
+  let payload;
+  try {
+    payload = await request.json();
+  } catch {
+    return jsonResponse({ error: 'Invalid JSON body.' }, 400);
+  }
+
+  const levelId = normalizeText(payload.levelId, 80);
+  if (!DAY_ONE_LEVELS.has(levelId)) {
+    return jsonResponse({ error: 'Unknown level.' }, 400);
+  }
+
+  await env.PAYMENTS.prepare(`
+    INSERT OR IGNORE INTO user_progress (
+      email, level_id, course_id, completed_at
+    ) VALUES (?, ?, 'aicc-day1-prompting', datetime('now'))
+  `).bind(session.email, levelId).run();
+  return jsonResponse({ success: true });
 }
 
 function requireConfiguration(env) {
@@ -747,6 +823,37 @@ async function handleCallback(request, env, ctx) {
 export default {
   async fetch(request, env, ctx) {
     const url = new URL(request.url);
+
+    if (request.method === 'GET' && url.pathname === '/api/auth/signin') {
+      return beginGoogleAuth(env);
+    }
+
+    if (request.method === 'GET' && url.pathname === '/api/auth/callback') {
+      return completeGoogleAuth(request, env);
+    }
+
+    if (request.method === 'GET' && url.pathname === '/api/auth/signout') {
+      return signOut(env);
+    }
+
+    if (request.method === 'GET' && url.pathname === '/api/auth/me') {
+      const session = await getSession(request, env);
+      return session
+        ? sessionResponse(session)
+        : jsonResponse({ error: 'Unauthorized' }, 401);
+    }
+
+    if (
+      url.pathname === '/api/progress'
+      && (request.method === 'GET' || request.method === 'POST')
+    ) {
+      return handleProgress(request, env);
+    }
+
+    if (url.pathname === '/learn' || url.pathname.startsWith('/learn/')) {
+      const auth = await requirePortalSession(request, env);
+      if (auth.response) return auth.response;
+    }
 
     if (request.method === 'POST' && url.pathname === '/api/create-order') {
       if (env.REGISTRATION_STATUS !== 'open') {

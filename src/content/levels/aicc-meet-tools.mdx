@@ -1,0 +1,177 @@
+---
+title: "Meet the Tools"
+sectionCount: 6
+---
+
+import { ToolCards } from "../../components/ui/ToolCards";
+import { ToolPicker } from "../../components/ui/ToolPicker";
+import { TryTools } from "../../components/ui/TryTools";
+import { SectionWrapper } from "../../components/learning/SectionWrapper";
+import { RevealButton } from "../../components/ui/RevealButton";
+import { ConceptCard } from "../../components/ui/ConceptCard";
+
+{/* -- Section 0: Hero -- */}
+<SectionWrapper index={0} client:load>
+  <style>{`
+    @keyframes heroSlideUp { from { opacity: 0; transform: translateY(40px); } to { opacity: 1; transform: translateY(0); } }
+    @keyframes bob { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-8px); } }
+    .hero-e1 { animation: heroSlideUp 0.7s cubic-bezier(0.16,1,0.3,1) both; }
+    .hero-e2 { animation: heroSlideUp 0.7s cubic-bezier(0.16,1,0.3,1) 0.12s both; }
+    .hero-e3 { animation: heroSlideUp 0.7s cubic-bezier(0.16,1,0.3,1) 0.24s both; }
+    .hero-e4 { animation: heroSlideUp 0.7s cubic-bezier(0.16,1,0.3,1) 0.36s both; }
+    .b1 { animation: bob 2.2s ease-in-out infinite; }
+    .b2 { animation: bob 2.2s ease-in-out 0.3s infinite; }
+    .b3 { animation: bob 2.2s ease-in-out 0.6s infinite; }
+    .b4 { animation: bob 2.2s ease-in-out 0.9s infinite; }
+    @media (prefers-reduced-motion: reduce) { .hero-e1,.hero-e2,.hero-e3,.hero-e4 { animation-duration: 0.01s; } .b1,.b2,.b3,.b4 { animation: none; } }
+  `}</style>
+  <div className="text-center py-14 min-h-[60vh] flex flex-col items-center justify-center">
+    <div className="hero-e1 mb-8 flex items-center gap-4">
+      <span className="b1 flex h-16 w-16 items-center justify-center rounded-full bg-emerald-500 text-3xl font-black text-white shadow-md">C</span>
+      <span className="b2 flex h-16 w-16 items-center justify-center rounded-full bg-amber-500 text-2xl font-black text-white shadow-md">Cl</span>
+      <span className="b3 flex h-16 w-16 items-center justify-center rounded-full bg-blue-500 text-3xl font-black text-white shadow-md">G</span>
+      <span className="b4 flex h-16 w-16 items-center justify-center rounded-full bg-purple-500 text-3xl font-black text-white shadow-md">P</span>
+    </div>
+    <h1 className="hero-e2 text-5xl font-black text-slate-900 mb-4">Meet the Tools</h1>
+    <p className="hero-e3 text-xl md:text-2xl text-slate-500 font-bold mb-9 max-w-xl mx-auto leading-relaxed">
+      Four AI superheroes. Each one has a different superpower.
+    </p>
+    <div className="hero-e4">
+      <RevealButton sectionIndex={0} text="Meet the team" client:load />
+    </div>
+  </div>
+</SectionWrapper>
+
+{/* -- Section 1: Flip the cards — meet the team -- */}
+<SectionWrapper index={1} client:load>
+  <style>{`
+    @keyframes fadeUp { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
+    .fade-up { animation: fadeUp 0.6s cubic-bezier(0.16,1,0.3,1) both; }
+    .fade-up-d1 { animation: fadeUp 0.6s cubic-bezier(0.16,1,0.3,1) 0.1s both; }
+    @media (prefers-reduced-motion: reduce) { .fade-up,.fade-up-d1 { animation: none; } }
+  `}</style>
+  <div className="text-center mb-7 fade-up">
+    <p className="text-sm font-black text-slate-400 uppercase tracking-widest mb-3">Roll call</p>
+    <h2 className="text-4xl font-black text-slate-800 mb-2 tracking-tight">Your AI Team</h2>
+    <p className="text-xl md:text-2xl text-slate-500 font-bold max-w-xl mx-auto">
+      Tap each card. See what it's best at — and why.
+    </p>
+  </div>
+  <div className="fade-up-d1">
+    <ToolCards
+      client:only="react"
+      sectionIndex={1}
+      explanation="ChatGPT is the Creative Brain — fast and great at writing and ideas. Claude is the Careful Thinker — best at long writing, coding and big documents. Gemini is the All-Rounder — the one that makes images and video. Perplexity is the Research Detective — it answers with sources from the live internet."
+    />
+  </div>
+</SectionWrapper>
+
+{/* -- Section 2: Which tool when? -- */}
+<SectionWrapper index={2} client:load>
+  <style>{`
+    @keyframes fadeUp { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
+    .fade-up { animation: fadeUp 0.6s cubic-bezier(0.16,1,0.3,1) both; }
+    @media (prefers-reduced-motion: reduce) { .fade-up { animation: none; } }
+  `}</style>
+  <div className="text-center mb-7 fade-up">
+    <p className="text-sm font-black text-slate-400 uppercase tracking-widest mb-3">The cheat sheet</p>
+    <h2 className="text-4xl font-black text-slate-800 mb-2 tracking-tight">Which Tool When?</h2>
+    <p className="text-xl md:text-2xl text-slate-500 font-bold max-w-xl mx-auto">
+      Match the job to the hero.
+    </p>
+  </div>
+  <div className="fade-up">
+    <ConceptCard icon="AI" title="Match the job to the hero">
+      <div className="space-y-2 mb-3">
+        <div className="rounded-2xl bg-emerald-50 border-2 border-emerald-100 px-4 py-3">
+          <p className="font-black text-emerald-800 text-lg">Stories, ideas, everyday chat → ChatGPT</p>
+        </div>
+        <div className="rounded-2xl bg-amber-50 border-2 border-amber-100 px-4 py-3">
+          <p className="font-black text-amber-800 text-lg">Long writing, coding, big documents → Claude</p>
+        </div>
+        <div className="rounded-2xl bg-blue-50 border-2 border-blue-100 px-4 py-3">
+          <p className="font-black text-blue-800 text-lg">Images and video → Gemini</p>
+        </div>
+        <div className="rounded-2xl bg-purple-50 border-2 border-purple-100 px-4 py-3">
+          <p className="font-black text-[#5b2d86] text-lg">True facts with proof → Perplexity</p>
+        </div>
+      </div>
+      <div className="rounded-2xl bg-[#fff7ed] border-2 border-[#fed7aa] px-4 py-3 text-center">
+        <p className="font-black text-[#b45309] text-lg">"A pro picks the RIGHT tool for the job."</p>
+      </div>
+    </ConceptCard>
+  </div>
+  <RevealButton sectionIndex={2} text="Test me!" client:load />
+</SectionWrapper>
+
+{/* -- Section 3: Right tool for the job game -- */}
+<SectionWrapper index={3} client:load>
+  <style>{`
+    @keyframes scaleIn { from { opacity: 0; transform: scale(0.92) translateY(12px); } to { opacity: 1; transform: scale(1) translateY(0); } }
+    .scale-in { animation: scaleIn 0.5s cubic-bezier(0.175,0.885,0.32,1.275) both; }
+    @media (prefers-reduced-motion: reduce) { .scale-in { animation: none; } }
+  `}</style>
+  <div className="text-center mb-7 scale-in">
+    <p className="text-sm font-black text-slate-400 uppercase tracking-widest mb-3">Mission time</p>
+    <h2 className="text-4xl font-black text-slate-800 mb-2 tracking-tight">Pick the Right Tool</h2>
+    <p className="text-xl md:text-2xl text-slate-500 font-bold max-w-xl mx-auto">
+      Six missions. Pick your hero wisely.
+    </p>
+  </div>
+  <div className="scale-in">
+    <ToolPicker
+      client:only="react"
+      sectionIndex={3}
+      explanation="Quick creative jobs go to ChatGPT. Long writing and coding go to Claude. Pictures and video go to Gemini. Anything that needs true, fresh facts with sources goes to Perplexity."
+    />
+  </div>
+</SectionWrapper>
+
+{/* -- Section 4: Try it live -- */}
+<SectionWrapper index={4} client:load>
+  <style>{`
+    @keyframes fadeUp { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
+    .fade-up { animation: fadeUp 0.6s cubic-bezier(0.16,1,0.3,1) both; }
+    .fade-up-d1 { animation: fadeUp 0.6s cubic-bezier(0.16,1,0.3,1) 0.1s both; }
+    @media (prefers-reduced-motion: reduce) { .fade-up,.fade-up-d1 { animation: none; } }
+  `}</style>
+  <div className="text-center mb-7 fade-up">
+    <p className="text-sm font-black text-slate-400 uppercase tracking-widest mb-3">See it for real</p>
+    <h2 className="text-4xl font-black text-slate-800 mb-2 tracking-tight">Try It Live</h2>
+    <p className="text-xl md:text-2xl text-slate-500 font-bold max-w-xl mx-auto">
+      Open a tool, paste the prompt, and watch the magic.
+    </p>
+  </div>
+  <div className="fade-up-d1">
+    <TryTools client:only="react" />
+  </div>
+  <RevealButton sectionIndex={4} text="Done trying — continue" client:load />
+</SectionWrapper>
+
+{/* -- Section 5: Wrap + teaser -- */}
+<SectionWrapper index={5} client:load>
+  <style>{`
+    @keyframes fadeUp { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
+    .fade-up { animation: fadeUp 0.6s cubic-bezier(0.16,1,0.3,1) both; }
+    @media (prefers-reduced-motion: reduce) { .fade-up { animation: none; } }
+  `}</style>
+  <div className="text-center mb-7 fade-up">
+    <p className="text-sm font-black text-slate-400 uppercase tracking-widest mb-3">Level complete</p>
+    <h2 className="text-4xl font-black text-slate-800 mb-2 tracking-tight">Team Unlocked</h2>
+  </div>
+  <div className="fade-up">
+    <ConceptCard icon="T" title="You now know your AI team">
+      <p className="mb-2 text-lg"><strong>ChatGPT</strong> writes and imagines.</p>
+      <p className="mb-2 text-lg"><strong>Claude</strong> handles long writing and code.</p>
+      <p className="mb-2 text-lg"><strong>Gemini</strong> makes images and video.</p>
+      <p className="mb-4 text-lg"><strong>Perplexity</strong> finds true facts with proof.</p>
+      <div className="rounded-2xl bg-[#faf5ff] border-2 border-[#e9d5ff] px-4 py-3 text-center">
+        <p className="font-black text-[#6b21a8] text-lg">Right tool + right prompt = unstoppable.</p>
+      </div>
+    </ConceptCard>
+    <p className="text-center text-xl md:text-2xl text-slate-500 font-bold mt-6">
+      Next: the secret recipe that makes ANY tool work better — the R-C-T-F framework.
+    </p>
+  </div>
+  <RevealButton sectionIndex={5} text="Finish Level 3" client:load />
+</SectionWrapper>

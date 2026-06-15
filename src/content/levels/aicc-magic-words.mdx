@@ -1,0 +1,141 @@
+---
+title: "The Magic Words"
+sectionCount: 5
+---
+
+import { MagicWordsDemo } from "../../components/ui/MagicWordsDemo";
+import { GenieStory } from "../../components/ui/GenieStory";
+import { SectionWrapper } from "../../components/learning/SectionWrapper";
+import { RevealButton } from "../../components/ui/RevealButton";
+import { ConceptCard } from "../../components/ui/ConceptCard";
+
+{/* -- Section 0: Hero -- */}
+<SectionWrapper index={0} client:load>
+  <style>{`
+    @keyframes heroSlideUp { from { opacity: 0; transform: translateY(40px); } to { opacity: 1; transform: translateY(0); } }
+    @keyframes bob { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-8px); } }
+    .hero-e1 { animation: heroSlideUp 0.7s cubic-bezier(0.16,1,0.3,1) both; }
+    .hero-e2 { animation: heroSlideUp 0.7s cubic-bezier(0.16,1,0.3,1) 0.12s both; }
+    .hero-e3 { animation: heroSlideUp 0.7s cubic-bezier(0.16,1,0.3,1) 0.24s both; }
+    .hero-e4 { animation: heroSlideUp 0.7s cubic-bezier(0.16,1,0.3,1) 0.36s both; }
+    .b1 { animation: bob 2.2s ease-in-out infinite; }
+    .b2 { animation: bob 2.2s ease-in-out 0.3s infinite; }
+    .b3 { animation: bob 2.2s ease-in-out 0.6s infinite; }
+    @media (prefers-reduced-motion: reduce) { .hero-e1,.hero-e2,.hero-e3,.hero-e4 { animation-duration: 0.01s; } .b1,.b2,.b3 { animation: none; } }
+  `}</style>
+  <div className="text-center py-14 min-h-[60vh] flex flex-col items-center justify-center">
+    <div className="hero-e1 mb-8 flex items-center gap-5">
+      <span className="b1 flex h-16 w-16 items-center justify-center rounded-2xl bg-[#8B4EC4] text-xl font-black text-white shadow-md">ASK</span>
+      <span className="b2 flex h-16 w-16 items-center justify-center rounded-2xl bg-blue-500 text-xl font-black text-white shadow-md">AI</span>
+      <span className="b3 flex h-16 w-16 items-center justify-center rounded-2xl bg-amber-400 text-xl font-black text-amber-900 shadow-md">WOW</span>
+    </div>
+    <h1 className="hero-e2 text-5xl font-black text-slate-900 mb-4">The Magic Words</h1>
+    <p className="hero-e3 text-xl md:text-2xl text-slate-500 font-bold mb-9 max-w-lg mx-auto leading-relaxed">
+      You talk, the AI builds.<br />Learn the words that make it work.
+    </p>
+    <div className="hero-e4">
+      <RevealButton sectionIndex={0} text="Unlock the magic" client:load />
+    </div>
+  </div>
+</SectionWrapper>
+
+{/* -- Section 1: The hook — boring vs magic prompt -- */}
+<SectionWrapper index={1} client:load>
+  <style>{`
+    @keyframes fadeUp { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
+    .fade-up { animation: fadeUp 0.6s cubic-bezier(0.16,1,0.3,1) both; }
+    .fade-up-d1 { animation: fadeUp 0.6s cubic-bezier(0.16,1,0.3,1) 0.1s both; }
+    @media (prefers-reduced-motion: reduce) { .fade-up,.fade-up-d1 { animation: none; } }
+  `}</style>
+  <div className="text-center mb-7 fade-up">
+    <p className="text-sm font-black text-slate-400 uppercase tracking-widest mb-3">Try it yourself</p>
+    <h2 className="text-4xl font-black text-slate-800 mb-2 tracking-tight">Same AI, Two Prompts</h2>
+    <p className="text-xl md:text-2xl text-slate-500 font-bold max-w-xl mx-auto">
+      Run both prompts on the same AI and watch what happens.
+    </p>
+  </div>
+  <div className="fade-up-d1">
+    <MagicWordsDemo
+      client:only="react"
+      sectionIndex={1}
+      explanation="The AI did not change. The prompt did. Prompt 2 gave the AI a role, a clear task, and a format. Better prompt in, better answer out."
+    />
+  </div>
+</SectionWrapper>
+
+{/* -- Section 2: Name the magic — prompts -- */}
+<SectionWrapper index={2} client:load>
+  <style>{`
+    @keyframes fadeUp { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
+    .fade-up { animation: fadeUp 0.6s cubic-bezier(0.16,1,0.3,1) both; }
+    @media (prefers-reduced-motion: reduce) { .fade-up { animation: none; } }
+  `}</style>
+  <div className="text-center mb-7 fade-up">
+    <p className="text-sm font-black text-slate-400 uppercase tracking-widest mb-3">The big reveal</p>
+    <h2 className="text-4xl font-black text-slate-800 mb-2 tracking-tight">The Magic Words Have a Name</h2>
+  </div>
+  <div className="fade-up">
+    <ConceptCard icon="PR" title="They're called PROMPTS">
+      <p className="mb-3 text-lg">
+        A <strong>prompt</strong> is the instruction you give an AI.
+      </p>
+      <div className="rounded-2xl bg-[#faf5ff] border-2 border-[#e9d5ff] px-4 py-3 text-center mb-3">
+        <p className="font-black text-[#6b21a8] text-lg">Prompt = your wish. Output = the genie's answer.</p>
+      </div>
+      <p className="text-lg">
+        <strong>Better prompt, better answer.</strong> That is the whole game.
+      </p>
+    </ConceptCard>
+  </div>
+  <RevealButton sectionIndex={2} text="Wait — a genie?" client:load />
+</SectionWrapper>
+
+{/* -- Section 3: Story — Aarav & the Genie -- */}
+<SectionWrapper index={3} client:load>
+  <style>{`
+    @keyframes scaleIn { from { opacity: 0; transform: scale(0.92) translateY(12px); } to { opacity: 1; transform: scale(1) translateY(0); } }
+    .scale-in { animation: scaleIn 0.5s cubic-bezier(0.175,0.885,0.32,1.275) both; }
+    @media (prefers-reduced-motion: reduce) { .scale-in { animation: none; } }
+  `}</style>
+  <div className="text-center mb-7 scale-in">
+    <p className="text-sm font-black text-slate-400 uppercase tracking-widest mb-3">Story time</p>
+    <h2 className="text-4xl font-black text-slate-800 mb-2 tracking-tight">Aarav &amp; the Genie</h2>
+    <p className="text-xl md:text-2xl text-slate-500 font-bold max-w-xl mx-auto">
+      This genie grants any wish — exactly as you word it.
+    </p>
+  </div>
+  <div className="scale-in">
+    <GenieStory
+      client:only="react"
+      sectionIndex={3}
+      explanation="The genie granted every wish word for word. 'Make me rich' just made a man named Rich. Only the exact wish — what, how much, when — got Aarav what he wanted. AI works the same way."
+    />
+  </div>
+</SectionWrapper>
+
+{/* -- Section 4: Lock it in + teaser -- */}
+<SectionWrapper index={4} client:load>
+  <style>{`
+    @keyframes fadeUp { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
+    .fade-up { animation: fadeUp 0.6s cubic-bezier(0.16,1,0.3,1) both; }
+    @media (prefers-reduced-motion: reduce) { .fade-up { animation: none; } }
+  `}</style>
+  <div className="text-center mb-7 fade-up">
+    <p className="text-sm font-black text-slate-400 uppercase tracking-widest mb-3">Rule #1 of AI</p>
+    <h2 className="text-4xl font-black text-slate-800 mb-2 tracking-tight">Say It Like You Mean It</h2>
+  </div>
+  <div className="fade-up">
+    <ConceptCard icon="G" title="AI does what you SAY, not what you MEAN">
+      <p className="mb-3 text-lg">
+        AI is powerful, but it cannot read your mind. Asking clearly is called <strong>prompt engineering</strong>.
+      </p>
+      <div className="rounded-2xl bg-[#fff7ed] border-2 border-[#fed7aa] px-4 py-3 text-center">
+        <p className="font-black text-[#b45309] text-lg">"If the answer is weak, fix the prompt — not the AI."</p>
+      </div>
+    </ConceptCard>
+    <p className="text-center text-xl md:text-2xl text-slate-500 font-bold mt-6">
+      Next: meet your three AI teammates — ChatGPT, Gemini &amp; Perplexity.
+    </p>
+  </div>
+  <RevealButton sectionIndex={4} text="Finish Level 2" client:load />
+</SectionWrapper>

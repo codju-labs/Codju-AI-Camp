@@ -8,17 +8,20 @@
 	],
 	"assets": {
 		"directory": ".site",
-		"binding": "ASSETS",
-		"run_worker_first": [
-			"/api/*",
-			"/payment/*"
-		]
+			"binding": "ASSETS",
+			"run_worker_first": [
+				"/api/*",
+				"/payment/*",
+				"/learn",
+				"/learn/*"
+			]
 	},
-	"vars": {
-		"CCAVENUE_ENVIRONMENT": "production",
-		"REGISTRATION_STATUS": "open",
-		"PUBLIC_SITE_URL": "https://summercamp.codju.com/"
-	},
+		"vars": {
+			"CCAVENUE_ENVIRONMENT": "production",
+			"REGISTRATION_STATUS": "open",
+			"PUBLIC_SITE_URL": "https://summercamp.codju.com/",
+			"ACCESS_TEST_EMAILS": "devashishpuri@gmail.com, rkbish@gmail.com"
+		},
 	"d1_databases": [
 		{
 			"binding": "PAYMENTS",

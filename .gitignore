@@ -1,5 +1,7 @@
 node_modules/
 .wrangler/
+.astro/
+.public/
 .dev.vars
 .env
 .DS_Store

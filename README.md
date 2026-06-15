@@ -21,10 +21,10 @@ Rather than teaching students to fear AI, this camp focuses on empowering them t
 
 ## 🛠 Tech Stack
 
-This landing page is built with a focus on fast loading times, responsive design, and solid SEO:
-- **HTML5:** Semantic structure and built-in SEO (Open Graph, JSON-LD schema, canonical URLs).
-- **CSS3:** Vanilla CSS for maximum performance and flexible styling, utilizing modern CSS variables for a cohesive design system.
-- **JavaScript (Vanilla):** For interactive components like smooth scrolling, mobile navigation, and active states.
+The public landing page remains lightweight HTML, CSS, and JavaScript. The
+paid student portal is generated with Astro, MDX, React, Tailwind CSS, and
+Nanostores. A Cloudflare Worker handles payments, Google authentication,
+entitlement checks, and D1-backed progress.
 
 ## 📂 Project Structure
 
@@ -50,12 +50,51 @@ This website has been optimized for Search Engines:
 1. Clone this repository or download the source code.
 2. Install the Cloudflare development dependency with `npm install`.
 3. Create a local `.dev.vars` file using the payment configuration below.
-4. Start the site and Worker with `npm run dev`.
-5. Open the local URL printed by Wrangler.
+4. Apply all local D1 migrations.
+5. Start the site and Worker with `npm run dev`.
+6. Open the local URL printed by Wrangler.
 
-`npm run dev` and `npm run deploy` first copy only the public site files into
-the generated `.site/` directory. This prevents Worker source, credentials,
-and project metadata from being published as static assets.
+`npm run build` copies the public landing assets into `.public/`, generates the
+Astro portal into `.site/`, and keeps Worker source, credentials, and project
+metadata out of the static asset bundle.
+
+## Student Portal Authentication
+
+The portal is available at `/learn`. Google OAuth creates a signed, HTTP-only
+session cookie. The Worker allows access when the Google email:
+
+- has a `Success` payment in `payment_orders`;
+- appears in the `portal_access` support table; or
+- appears in the comma-separated `ACCESS_TEST_EMAILS` Worker variable.
+
+Apply the portal migration locally and remotely:
+
+```bash
+npx wrangler d1 migrations apply codju-camp-payments --local
+npx wrangler d1 migrations apply codju-camp-payments --remote
+```
+
+Configure these Worker secrets:
+
+```bash
+npx wrangler secret put GOOGLE_CLIENT_ID
+npx wrangler secret put GOOGLE_CLIENT_SECRET
+npx wrangler secret put AUTH_SECRET
+```
+
+`AUTH_SECRET` should be a long random value. In Google Cloud, allow this OAuth
+redirect URI:
+
+```text
+https://summercamp.codju.com/api/auth/callback
+```
+
+To connect a student's login to a payment made with a parent's email:
+
+```sql
+INSERT INTO portal_access (email, order_id, source)
+VALUES ('student@example.com', 'order_example', 'support');
+```
 
 ## CCAvenue Payment Integration
 

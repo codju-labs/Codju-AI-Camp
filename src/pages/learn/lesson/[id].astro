@@ -1,0 +1,49 @@
+---
+import { getCollection, render } from "astro:content";
+import PortalLayout from "../../../layouts/PortalLayout.astro";
+import { LessonContainer } from "../../../components/learning/LessonContainer";
+
+const dayOneLevelIds = [
+  "aicc-meet-ai",
+  "aicc-magic-words",
+  "aicc-meet-tools",
+  "aicc-rctf",
+  "aicc-prompting-in-action",
+  "aicc-prompt-master",
+];
+
+export async function getStaticPaths() {
+  const dayOneLevelIds = [
+    "aicc-meet-ai",
+    "aicc-magic-words",
+    "aicc-meet-tools",
+    "aicc-rctf",
+    "aicc-prompting-in-action",
+    "aicc-prompt-master",
+  ];
+  const levels = await getCollection("levels");
+  return levels
+    .filter((level) => dayOneLevelIds.includes(level.id))
+    .map((level) => ({
+      params: { id: level.id },
+      props: { level },
+    }));
+}
+
+const { level } = Astro.props;
+const currentIndex = dayOneLevelIds.indexOf(level.id);
+const nextLevelId = dayOneLevelIds[currentIndex + 1] ?? null;
+const { Content } = await render(level);
+---
+
+<PortalLayout title={level.data.title} showHeader={false}>
+  <LessonContainer
+    client:load
+    levelId={level.id}
+    levelTitle={level.data.title}
+    sectionCount={level.data.sectionCount}
+    nextLevelId={nextLevelId}
+  >
+    <Content />
+  </LessonContainer>
+</PortalLayout>

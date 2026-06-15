@@ -1,0 +1,79 @@
+---
+import "../styles/global.css";
+
+interface Props {
+  title: string;
+  description?: string;
+  showHeader?: boolean;
+}
+
+const {
+  title,
+  description = "Learn, experiment, and build with AI at Codju AI Creator Camp.",
+  showHeader = true,
+} = Astro.props;
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width" />
+    <meta name="robots" content="noindex, nofollow" />
+    <meta name="description" content={description} />
+    <link rel="icon" href="/favicon.ico" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@500;700;800&family=Nunito:wght@400;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+    <title>{title} | Codju AI Creator Camp</title>
+  </head>
+  <body>
+    {
+      showHeader && (
+        <header class="sticky top-0 z-50 border-b border-purple-100 bg-white/95 backdrop-blur">
+          <div class="w-lim flex h-18 items-center justify-between px-4 sm:px-5 lg:px-12">
+            <a href="/learn" class="flex items-center gap-3 no-underline">
+              <img src="/assets/logo.webp" alt="Codju" class="h-10 w-auto" />
+              <span class="hidden font-heading text-sm font-extrabold text-gray-800 sm:block">
+                AI Creator Camp
+              </span>
+            </a>
+            <div class="flex items-center gap-3">
+              <span
+                id="portal-user"
+                class="hidden text-sm font-bold text-gray-600 sm:block"
+              >
+                Creator
+              </span>
+              <a
+                href="/api/auth/signout"
+                class="rounded-full border-2 border-purple-200 px-4 py-2 text-xs font-bold text-purple-700 no-underline transition hover:border-purple-400 hover:bg-purple-50"
+              >
+                Sign out
+              </a>
+            </div>
+          </div>
+        </header>
+      )
+    }
+    <slot />
+    {
+      showHeader && (
+        <script>
+          fetch("/api/auth/me")
+            .then((response) => response.ok ? response.json() : null)
+            .then((data) => {
+              const element = document.getElementById("portal-user");
+              if (element && data?.user?.name) {
+                element.textContent = data.user.name.split(" ")[0];
+              }
+            })
+            .catch(() => {});
+        </script>
+      )
+    }
+  </body>
+</html>

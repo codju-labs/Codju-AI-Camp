@@ -351,6 +351,7 @@
   // --- Razorpay enrollment checkout ---
   const paymentModal = document.getElementById('payment-modal');
   const paymentForm = document.querySelector('[data-payment-form]');
+  const verifiedPayments = new Set();
   if (paymentModal && paymentForm) {
     const reserveLinks = document.querySelectorAll('a[href="#reserve"]');
     const closeButton = paymentModal.querySelector('.payment-modal__close');
@@ -540,6 +541,15 @@
                 `Enrollment confirmed. Your ID is ${result.enrollment_id}. A confirmation email will arrive shortly.`,
                 'success',
               );
+
+              // Fire Purchase event (avoiding duplicates)
+              if (typeof window.fbq === 'function' && !verifiedPayments.has(payment.razorpay_payment_id)) {
+                verifiedPayments.add(payment.razorpay_payment_id);
+                window.fbq('track', 'Purchase', {
+                  value: 2999,
+                  currency: 'INR'
+                });
+              }
             } catch (error) {
               setSubmitting(false, 'Retry verification');
               setMessage(
@@ -559,6 +569,12 @@
 
         checkoutOpen = true;
         setSubmitting(false);
+
+        // Fire InitiateCheckout event
+        if (typeof window.fbq === 'function') {
+          window.fbq('track', 'InitiateCheckout');
+        }
+
         checkout.open();
       } catch (error) {
         checkoutOpen = false;

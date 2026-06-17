@@ -1,4 +1,5 @@
 import { atom } from "nanostores";
+import { getCourseIdForLevel } from "../../lib/campContent";
 
 interface ProgressData {
   completedLevels: string[];
@@ -38,6 +39,9 @@ export async function loadProgress() {
 }
 
 export async function completeLevel(levelId: string) {
+  const courseId = getCourseIdForLevel(levelId);
+  if (!courseId) return;
+
   const current = progressStore.get();
   if (!current.completedLevels.includes(levelId)) {
     const next = {
@@ -50,6 +54,6 @@ export async function completeLevel(levelId: string) {
   await fetch("/api/progress", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ levelId, courseId: "aicc-day1-prompting" }),
+    body: JSON.stringify({ levelId, courseId }),
   }).catch(() => {});
 }

@@ -2,28 +2,15 @@
 import { getCollection, render } from "astro:content";
 import PortalLayout from "../../../layouts/PortalLayout.astro";
 import { LessonContainer } from "../../../components/learning/LessonContainer";
+import { allOpenLevels } from "../../../lib/campContent";
 
-const dayOneLevelIds = [
-  "aicc-meet-ai",
-  "aicc-magic-words",
-  "aicc-meet-tools",
-  "aicc-rctf",
-  "aicc-prompting-in-action",
-  "aicc-prompt-master",
-];
+const openLevelIds = allOpenLevels.map((level) => level.id);
 
 export async function getStaticPaths() {
-  const dayOneLevelIds = [
-    "aicc-meet-ai",
-    "aicc-magic-words",
-    "aicc-meet-tools",
-    "aicc-rctf",
-    "aicc-prompting-in-action",
-    "aicc-prompt-master",
-  ];
+  const openLevelIds = allOpenLevels.map((level) => level.id);
   const levels = await getCollection("levels");
   return levels
-    .filter((level) => dayOneLevelIds.includes(level.id))
+    .filter((level) => openLevelIds.includes(level.id))
     .map((level) => ({
       params: { id: level.id },
       props: { level },
@@ -31,8 +18,8 @@ export async function getStaticPaths() {
 }
 
 const { level } = Astro.props;
-const currentIndex = dayOneLevelIds.indexOf(level.id);
-const nextLevelId = dayOneLevelIds[currentIndex + 1] ?? null;
+const currentIndex = openLevelIds.indexOf(level.id);
+const nextLevelId = openLevelIds[currentIndex + 1] ?? null;
 const { Content } = await render(level);
 ---
 

@@ -1,0 +1,141 @@
+---
+title: "Present & Showcase"
+sectionCount: 5
+---
+
+import { ProjectDeck } from "../../components/ui/ProjectDeck";
+import { StudyKitProject } from "../../components/ui/StudyKitProject";
+import { SectionWrapper } from "../../components/learning/SectionWrapper";
+import { RevealButton } from "../../components/ui/RevealButton";
+import { ConceptCard } from "../../components/ui/ConceptCard";
+
+{/* -- Section 0: Hero -- */}
+<SectionWrapper index={0} client:load>
+  <style>{`
+    @keyframes heroSlideUp { from { opacity: 0; transform: translateY(40px); } to { opacity: 1; transform: translateY(0); } }
+    @keyframes bob { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-8px); } }
+    .hero-e1 { animation: heroSlideUp 0.7s cubic-bezier(0.16,1,0.3,1) both; }
+    .hero-e2 { animation: heroSlideUp 0.7s cubic-bezier(0.16,1,0.3,1) 0.12s both; }
+    .hero-e3 { animation: heroSlideUp 0.7s cubic-bezier(0.16,1,0.3,1) 0.24s both; }
+    .hero-e4 { animation: heroSlideUp 0.7s cubic-bezier(0.16,1,0.3,1) 0.36s both; }
+    .b1 { animation: bob 2.2s ease-in-out infinite; }
+    @media (prefers-reduced-motion: reduce) { .hero-e1,.hero-e2,.hero-e3,.hero-e4 { animation-duration: 0.01s; } .b1 { animation: none; } }
+  `}</style>
+  <div className="text-center py-14 min-h-[60vh] flex flex-col items-center justify-center">
+    <div className="hero-e1 mb-8 flex items-center justify-center">
+      <span className="b1 flex h-20 w-20 items-center justify-center rounded-3xl bg-fuchsia-500 text-2xl font-black text-white shadow-md">Ga</span>
+    </div>
+    <h1 className="hero-e2 text-5xl font-black text-slate-900 mb-4">Present &amp; Showcase</h1>
+    <p className="hero-e3 text-xl md:text-2xl text-slate-500 font-bold mb-9 max-w-xl mx-auto leading-relaxed">
+      Build a slide deck in minutes with Gamma, then pack it all into your Study Kit.
+    </p>
+    <div className="hero-e4">
+      <RevealButton sectionIndex={0} text="Make a deck" client:load />
+    </div>
+  </div>
+</SectionWrapper>
+
+{/* -- Section 1: The presentation project deck -- */}
+<SectionWrapper index={1} client:load>
+  <style>{`
+    @keyframes fadeUp { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
+    .fade-up { animation: fadeUp 0.6s cubic-bezier(0.16,1,0.3,1) both; }
+    @media (prefers-reduced-motion: reduce) { .fade-up { animation: none; } }
+  `}</style>
+  <div className="text-center mb-7 fade-up">
+    <p className="text-sm font-black text-slate-400 uppercase tracking-widest mb-3">Make this on Gamma</p>
+    <h2 className="text-4xl font-black text-slate-800 mb-2 tracking-tight">A Deck in Minutes</h2>
+    <p className="text-xl md:text-2xl text-slate-500 font-bold max-w-xl mx-auto">
+      Type a topic, and Gamma designs the whole presentation.
+    </p>
+  </div>
+  <div className="fade-up">
+    <ProjectDeck
+      client:only="react"
+      sectionIndex={1}
+      deck="present"
+      explanation="Gamma turns a topic into a designed slide deck instantly. You still choose the topic and edit the slides, so it's your work, made faster."
+    />
+  </div>
+</SectionWrapper>
+
+{/* -- Section 2: Study Smart Code -- */}
+<SectionWrapper index={2} client:load>
+  <style>{`
+    @keyframes fadeUp { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
+    .fade-up { animation: fadeUp 0.6s cubic-bezier(0.16,1,0.3,1) both; }
+    @media (prefers-reduced-motion: reduce) { .fade-up { animation: none; } }
+  `}</style>
+  <div className="text-center mb-7 fade-up">
+    <p className="text-sm font-black text-slate-400 uppercase tracking-widest mb-3">The smart way</p>
+    <h2 className="text-4xl font-black text-slate-800 mb-2 tracking-tight">Study Smart Code</h2>
+    <p className="text-xl md:text-2xl text-slate-500 font-bold max-w-xl mx-auto">
+      Three rules so AI makes you smarter, not lazier.
+    </p>
+  </div>
+  <div className="fade-up space-y-3">
+    <div className="rounded-2xl bg-indigo-50 border-2 border-indigo-100 px-5 py-4">
+      <p className="font-black text-indigo-800 text-lg">1. Understand it, don't just copy it.</p>
+      <p className="text-slate-600 font-bold">If you can't explain it, you haven't learned it yet.</p>
+    </div>
+    <div className="rounded-2xl bg-indigo-50 border-2 border-indigo-100 px-5 py-4">
+      <p className="font-black text-indigo-800 text-lg">2. Check the facts.</p>
+      <p className="text-slate-600 font-bold">AI can be wrong. Match it against your notes or a trusted source.</p>
+    </div>
+    <div className="rounded-2xl bg-indigo-50 border-2 border-indigo-100 px-5 py-4">
+      <p className="font-black text-indigo-800 text-lg">3. AI helps you think, it shouldn't think for you.</p>
+      <p className="text-slate-600 font-bold">Use it to learn faster, then do the work yourself.</p>
+    </div>
+  </div>
+  <RevealButton sectionIndex={2} text="I'll study smart" client:load />
+</SectionWrapper>
+
+{/* -- Section 3: Capstone — Study Kit -- */}
+<SectionWrapper index={3} client:load>
+  <style>{`
+    @keyframes scaleIn { from { opacity: 0; transform: scale(0.92) translateY(12px); } to { opacity: 1; transform: scale(1) translateY(0); } }
+    .scale-in { animation: scaleIn 0.5s cubic-bezier(0.175,0.885,0.32,1.275) both; }
+    @media (prefers-reduced-motion: reduce) { .scale-in { animation: none; } }
+  `}</style>
+  <div className="text-center mb-7 scale-in">
+    <p className="text-sm font-black text-slate-400 uppercase tracking-widest mb-3">The big one</p>
+    <h2 className="text-4xl font-black text-slate-800 mb-2 tracking-tight">Build Your Study Kit</h2>
+    <p className="text-xl md:text-2xl text-slate-500 font-bold max-w-xl mx-auto">
+      Pull it together and earn the Smart Learner badge.
+    </p>
+  </div>
+  <div className="scale-in">
+    <StudyKitProject
+      client:only="react"
+      sectionIndex={3}
+      explanation="A study kit is everything you made today in one place — a summary, a quiz, and a presentation. That is a real revision pack you can reuse."
+    />
+  </div>
+</SectionWrapper>
+
+{/* -- Section 4: Outro -- */}
+<SectionWrapper index={4} client:load>
+  <style>{`
+    @keyframes fadeUp { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
+    .fade-up { animation: fadeUp 0.6s cubic-bezier(0.16,1,0.3,1) both; }
+    @media (prefers-reduced-motion: reduce) { .fade-up { animation: none; } }
+  `}</style>
+  <div className="text-center mb-7 fade-up">
+    <p className="text-sm font-black text-slate-400 uppercase tracking-widest mb-3">Day 3 complete</p>
+    <h2 className="text-4xl font-black text-slate-800 mb-2 tracking-tight">You Study Like a Pro</h2>
+  </div>
+  <div className="fade-up">
+    <ConceptCard icon="GO" title="You can now learn anything faster">
+      <p className="text-lg mb-3">
+        Summaries with NotebookLM. Quizzes and plans with Gemini. Presentations with Gamma. That is a full study toolkit.
+      </p>
+      <div className="rounded-2xl bg-[#faf5ff] border-2 border-[#e9d5ff] px-4 py-3 text-center">
+        <p className="font-black text-[#6b21a8] text-lg">Homework: use your Study Kit before your next class test.</p>
+      </div>
+    </ConceptCard>
+    <p className="text-center text-xl md:text-2xl text-slate-500 font-bold mt-6">
+      Tomorrow: think like a founder and turn an idea into a real mini-business.
+    </p>
+  </div>
+  <RevealButton sectionIndex={4} text="Claim Day 3" client:load />
+</SectionWrapper>

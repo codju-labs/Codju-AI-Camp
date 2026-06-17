@@ -1,0 +1,86 @@
+---
+title: "Design Projects"
+sectionCount: 3
+---
+
+import { ProjectDeck } from "../../components/ui/ProjectDeck";
+import { SectionWrapper } from "../../components/learning/SectionWrapper";
+import { RevealButton } from "../../components/ui/RevealButton";
+import { ConceptCard } from "../../components/ui/ConceptCard";
+
+{/* -- Section 0: Hero -- */}
+<SectionWrapper index={0} client:load>
+  <style>{`
+    @keyframes heroSlideUp { from { opacity: 0; transform: translateY(40px); } to { opacity: 1; transform: translateY(0); } }
+    @keyframes bob { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-8px); } }
+    .hero-e1 { animation: heroSlideUp 0.7s cubic-bezier(0.16,1,0.3,1) both; }
+    .hero-e2 { animation: heroSlideUp 0.7s cubic-bezier(0.16,1,0.3,1) 0.12s both; }
+    .hero-e3 { animation: heroSlideUp 0.7s cubic-bezier(0.16,1,0.3,1) 0.24s both; }
+    .hero-e4 { animation: heroSlideUp 0.7s cubic-bezier(0.16,1,0.3,1) 0.36s both; }
+    .b1 { animation: bob 2.2s ease-in-out infinite; }
+    @media (prefers-reduced-motion: reduce) { .hero-e1,.hero-e2,.hero-e3,.hero-e4 { animation-duration: 0.01s; } .b1 { animation: none; } }
+  `}</style>
+  <div className="text-center py-14 min-h-[60vh] flex flex-col items-center justify-center">
+    <div className="hero-e1 mb-8 flex items-center justify-center">
+      <span className="b1 flex h-20 w-20 items-center justify-center rounded-3xl bg-cyan-500 text-2xl font-black text-white shadow-md">Cv</span>
+    </div>
+    <h1 className="hero-e2 text-5xl font-black text-slate-900 mb-4">Design Projects</h1>
+    <p className="hero-e3 text-xl md:text-2xl text-slate-500 font-bold mb-9 max-w-xl mx-auto leading-relaxed">
+      Three designs to make on Canva. Turn your art into the real thing.
+    </p>
+    <div className="hero-e4">
+      <RevealButton sectionIndex={0} text="Start designing" client:load />
+    </div>
+  </div>
+</SectionWrapper>
+
+{/* -- Section 1: The design project deck -- */}
+<SectionWrapper index={1} client:load>
+  <style>{`
+    @keyframes fadeUp { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
+    .fade-up { animation: fadeUp 0.6s cubic-bezier(0.16,1,0.3,1) both; }
+    @media (prefers-reduced-motion: reduce) { .fade-up { animation: none; } }
+  `}</style>
+  <div className="text-center mb-7 fade-up">
+    <p className="text-sm font-black text-slate-400 uppercase tracking-widest mb-3">Make these on Canva</p>
+    <h2 className="text-4xl font-black text-slate-800 mb-2 tracking-tight">Design It Properly</h2>
+    <p className="text-xl md:text-2xl text-slate-500 font-bold max-w-xl mx-auto">
+      Open Canva, use a template, and lay it out.
+    </p>
+  </div>
+  <div className="fade-up">
+    <ProjectDeck
+      client:only="react"
+      sectionIndex={1}
+      deck="design"
+      explanation="Canva does the layout for you. Start from a template, drop in your art, add text, and download. Three finished pieces for your hero."
+    />
+  </div>
+</SectionWrapper>
+
+{/* -- Section 2: Wrap -- */}
+<SectionWrapper index={2} client:load>
+  <style>{`
+    @keyframes fadeUp { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
+    .fade-up { animation: fadeUp 0.6s cubic-bezier(0.16,1,0.3,1) both; }
+    @media (prefers-reduced-motion: reduce) { .fade-up { animation: none; } }
+  `}</style>
+  <div className="text-center mb-7 fade-up">
+    <p className="text-sm font-black text-slate-400 uppercase tracking-widest mb-3">Looking sharp</p>
+    <h2 className="text-4xl font-black text-slate-800 mb-2 tracking-tight">Your Hero Has a Brand</h2>
+  </div>
+  <div className="fade-up">
+    <ConceptCard icon="Cv" title="A designer's secret">
+      <p className="text-lg mb-3">
+        You did not start from a blank page. You used a <strong>template</strong> and changed it. That is how pros work fast.
+      </p>
+      <div className="rounded-2xl bg-[#fff7ed] border-2 border-[#fed7aa] px-4 py-3 text-center">
+        <p className="font-black text-[#b45309] text-lg">Pictures from Gemini + layout from Canva = a finished design.</p>
+      </div>
+    </ConceptCard>
+    <p className="text-center text-xl md:text-2xl text-slate-500 font-bold mt-6">
+      Last one: give your hero a theme song in Suno.
+    </p>
+  </div>
+  <RevealButton sectionIndex={2} text="Finish Lesson 4" client:load />
+</SectionWrapper>

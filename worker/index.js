@@ -74,13 +74,21 @@ function jsonResponse(data, status = 200) {
   });
 }
 
-const DAY_ONE_LEVELS = new Set([
-  'aicc-meet-ai',
-  'aicc-magic-words',
-  'aicc-meet-tools',
-  'aicc-rctf',
-  'aicc-prompting-in-action',
-  'aicc-prompt-master',
+const OPEN_LEVEL_COURSES = new Map([
+  ['aicc-meet-ai', 'aicc-day1-prompting'],
+  ['aicc-magic-words', 'aicc-day1-prompting'],
+  ['aicc-meet-tools', 'aicc-day1-prompting'],
+  ['aicc-rctf', 'aicc-day1-prompting'],
+  ['aicc-prompting-in-action', 'aicc-day1-prompting'],
+  ['aicc-prompt-master', 'aicc-day1-prompting'],
+  ['aicc-creating-with-ai', 'aicc-day2-creativity'],
+  ['aicc-creative-toolkit', 'aicc-day2-creativity'],
+  ['aicc-picture-recipe', 'aicc-day2-creativity'],
+  ['aicc-creating-in-action', 'aicc-day2-creativity'],
+  ['aicc-ai-artist', 'aicc-day2-creativity'],
+  ['aicc-learn-notes', 'aicc-day3-research'],
+  ['aicc-learn-quiz', 'aicc-day3-research'],
+  ['aicc-learn-present', 'aicc-day3-research'],
 ]);
 
 async function requirePortalSession(request, env) {
@@ -130,15 +138,16 @@ async function handleProgress(request, env) {
   }
 
   const levelId = normalizeText(payload.levelId, 80);
-  if (!DAY_ONE_LEVELS.has(levelId)) {
+  const courseId = OPEN_LEVEL_COURSES.get(levelId);
+  if (!courseId) {
     return jsonResponse({ error: 'Unknown level.' }, 400);
   }
 
   await env.PAYMENTS.prepare(`
     INSERT OR IGNORE INTO user_progress (
       email, level_id, course_id, completed_at
-    ) VALUES (?, ?, 'aicc-day1-prompting', datetime('now'))
-  `).bind(session.email, levelId).run();
+    ) VALUES (?, ?, ?, datetime('now'))
+  `).bind(session.email, levelId, courseId).run();
   return jsonResponse({ success: true });
 }
 

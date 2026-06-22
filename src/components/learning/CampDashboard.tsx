@@ -1,17 +1,30 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { useStore } from "@nanostores/react";
-import { getLockedCampDays, getOpenCampDays, getOpenLevels } from "../../lib/campContent";
+import {
+  getLockedCampDays,
+  getOpenCampDays,
+  getOpenLevels,
+  hasFullCampAccess,
+} from "../../lib/campContent";
 import { loadProgress, progressStore } from "./progressStore";
 
 export function CampDashboard() {
   const progress = useStore(progressStore);
-  const openCampDays = getOpenCampDays();
-  const lockedDays = getLockedCampDays();
-  const allOpenLevels = getOpenLevels();
+  const [userEmail, setUserEmail] = useState<string | null>(null);
+  const accessOptions = { unlockAllAvailableDays: hasFullCampAccess(userEmail) };
+  const openCampDays = getOpenCampDays(new Date(), accessOptions);
+  const lockedDays = getLockedCampDays(new Date(), accessOptions);
+  const allOpenLevels = getOpenLevels(new Date(), accessOptions);
   const openDayLabels = openCampDays.map((day) => day.label.toUpperCase());
 
   useEffect(() => {
     void loadProgress();
+    fetch("/api/auth/me")
+      .then((response) => response.ok ? response.json() : null)
+      .then((data) => {
+        setUserEmail(data?.user?.email ?? null);
+      })
+      .catch(() => {});
   }, []);
 
   const completed = progress.completedLevels.filter((id) =>

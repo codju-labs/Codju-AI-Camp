@@ -14,7 +14,8 @@
     "test:email": "node scripts/smoke-fulfillment.mjs email",
     "test:email:live": "node scripts/smoke-fulfillment.mjs email --live",
     "test:sheet": "node scripts/smoke-fulfillment.mjs sheet",
-    "test:sheet:live": "node scripts/smoke-fulfillment.mjs sheet --live"
+    "test:sheet:live": "node scripts/smoke-fulfillment.mjs sheet --live",
+    "payments:reconcile": "node scripts/reconcile-pending-razorpay.mjs"
   },
   "devDependencies": {
     "@astrojs/mdx": "5.0.0",

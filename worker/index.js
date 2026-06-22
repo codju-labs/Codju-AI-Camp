@@ -931,7 +931,6 @@ export default {
   },
 
   async scheduled(_controller, env, ctx) {
-    if (env.REGISTRATION_STATUS !== 'open') return;
     ctx.waitUntil(retryPendingFulfillments(env));
   },
 };

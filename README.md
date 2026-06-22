@@ -418,6 +418,32 @@ The active enrollment flow uses Razorpay Standard Web Checkout:
   `order_id|payment_id` HMAC-SHA256 signature before marking it paid.
 - EmailOctopus and Google Sheets fulfillment starts only after verification.
 
+### Reconcile pending Razorpay orders
+
+If Razorpay captured a payment but the browser did not reach
+`/api/verify-payment`, the D1 row can remain `Initiated`. Check pending remote
+orders without changing the database:
+
+```bash
+npm run payments:reconcile
+```
+
+To reconcile one confirmed order:
+
+```bash
+npm run payments:reconcile -- --order-id order_xxxxx --apply
+```
+
+To apply reconciliation for all pending Razorpay orders found in D1:
+
+```bash
+npm run payments:reconcile -- --apply
+```
+
+The script reads `RAZORPAY_KEY_ID` and `RAZORPAY_KEY_SECRET` from the shell or
+`.dev.vars`, checks Razorpay's order payments API, and only marks D1 rows
+`Success` when it finds a `captured` payment. It is dry-run by default.
+
 For local development, `.env` and `.dev.vars` must contain:
 
 ```text

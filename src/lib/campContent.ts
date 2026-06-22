@@ -17,8 +17,13 @@ export interface CampDay {
   levels: CampLevel[];
 }
 
+interface CampAccessOptions {
+  unlockAllAvailableDays?: boolean;
+}
+
 const COHORT_START_IST = Date.UTC(2026, 5, 21, 18, 30);
 const DAY_MS = 24 * 60 * 60 * 1000;
+const FULL_CAMP_ACCESS_EMAILS = new Set(["rkbish@gmail.com"]);
 
 const campDayContent: CampDay[] = [
   {
@@ -108,30 +113,39 @@ const campDayContent: CampDay[] = [
   },
 ];
 
-function getDayStatus(day: CampDay, now = new Date()): CampDay["status"] {
+export function hasFullCampAccess(email: string | null | undefined) {
+  return FULL_CAMP_ACCESS_EMAILS.has(String(email || "").trim().toLowerCase());
+}
+
+function getDayStatus(
+  day: CampDay,
+  now = new Date(),
+  options: CampAccessOptions = {},
+): CampDay["status"] {
   if (!day.levels.length || day.unlockOffsetDays === null) return "locked";
+  if (options.unlockAllAvailableDays) return "open";
 
   const elapsedDays = Math.floor((now.getTime() - COHORT_START_IST) / DAY_MS);
   return elapsedDays >= day.unlockOffsetDays ? "open" : "locked";
 }
 
-export function getCampDays(now = new Date()): CampDay[] {
+export function getCampDays(now = new Date(), options: CampAccessOptions = {}): CampDay[] {
   return campDayContent.map((day) => ({
     ...day,
-    status: getDayStatus(day, now),
+    status: getDayStatus(day, now, options),
   }));
 }
 
-export function getOpenCampDays(now = new Date()) {
-  return getCampDays(now).filter((day) => day.status === "open");
+export function getOpenCampDays(now = new Date(), options: CampAccessOptions = {}) {
+  return getCampDays(now, options).filter((day) => day.status === "open");
 }
 
-export function getLockedCampDays(now = new Date()) {
-  return getCampDays(now).filter((day) => day.status === "locked");
+export function getLockedCampDays(now = new Date(), options: CampAccessOptions = {}) {
+  return getCampDays(now, options).filter((day) => day.status === "locked");
 }
 
-export function getOpenLevels(now = new Date()) {
-  return getOpenCampDays(now).flatMap((day) => day.levels);
+export function getOpenLevels(now = new Date(), options: CampAccessOptions = {}) {
+  return getOpenCampDays(now, options).flatMap((day) => day.levels);
 }
 
 export const campDays = getCampDays();
@@ -140,5 +154,5 @@ export const allOpenLevels = getOpenLevels();
 export const allCampLevels = campDayContent.flatMap((day) => day.levels);
 
 export function getCourseIdForLevel(levelId: string) {
-  return allOpenLevels.find((level) => level.id === levelId)?.dayId ?? null;
+  return allCampLevels.find((level) => level.id === levelId)?.dayId ?? null;
 }

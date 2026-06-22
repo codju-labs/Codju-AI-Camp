@@ -1,7 +1,11 @@
 import { existsSync, readFileSync } from 'node:fs';
 import { execFile } from 'node:child_process';
 import { promisify } from 'node:util';
-import { createEnrollmentId } from '../worker/fulfillment.js';
+import {
+  appendEnrollmentSheet,
+  createEnrollmentId,
+  sendEnrollmentEmail,
+} from '../worker/fulfillment.js';
 
 const execFileAsync = promisify(execFile);
 const DATABASE_NAME = 'codju-camp-payments';
@@ -36,6 +40,7 @@ function parseArgs(argv) {
     local: false,
     limit: 100,
     orderId: null,
+    paymentId: null,
   };
 
   for (let index = 0; index < argv.length; index += 1) {
@@ -49,6 +54,9 @@ function parseArgs(argv) {
       index += 1;
     } else if (arg === '--order-id') {
       options.orderId = argv[index + 1];
+      index += 1;
+    } else if (arg === '--payment-id') {
+      options.paymentId = argv[index + 1];
       index += 1;
     } else if (arg === '--help' || arg === '-h') {
       options.help = true;
@@ -67,9 +75,11 @@ function parseArgs(argv) {
 function usage() {
   return [
     'Usage: npm run payments:reconcile -- [--apply] [--local] [--limit 100] [--order-id order_xxx]',
+    '       npm run payments:reconcile -- --order-id order_xxx --payment-id pay_xxx [--apply]',
     '',
-    'Dry-run by default. Add --apply to mark captured Razorpay payments as Success in D1.',
-    'Reads RAZORPAY_KEY_ID and RAZORPAY_KEY_SECRET from the environment or .dev.vars.',
+    'Dry-run by default. Add --apply to mark captured Razorpay payments as Success in D1',
+    'and immediately run EmailOctopus/Google Sheets fulfillment.',
+    'Reads Razorpay and fulfillment secrets from the environment or .dev.vars.',
   ].join('\n');
 }
 
@@ -118,6 +128,14 @@ function pendingOrdersQuery(options) {
   `;
 }
 
+function orderByIdQuery(orderId) {
+  return `
+    SELECT *
+    FROM payment_orders
+    WHERE order_id = ${sqlString(orderId)}
+  `;
+}
+
 async function fetchRazorpayPayments(orderId, env) {
   const credentials = Buffer.from(`${env.RAZORPAY_KEY_ID}:${env.RAZORPAY_KEY_SECRET}`).toString('base64');
   const response = await fetch(`https://api.razorpay.com/v1/orders/${encodeURIComponent(orderId)}/payments`, {
@@ -130,6 +148,34 @@ async function fetchRazorpayPayments(orderId, env) {
     throw new Error(`Razorpay returned ${response.status}: ${body.error?.description || body.error?.code || 'Unknown error'}`);
   }
   return body.items || [];
+}
+
+async function fetchRazorpayOrder(orderId, env) {
+  const credentials = Buffer.from(`${env.RAZORPAY_KEY_ID}:${env.RAZORPAY_KEY_SECRET}`).toString('base64');
+  const response = await fetch(`https://api.razorpay.com/v1/orders/${encodeURIComponent(orderId)}`, {
+    headers: {
+      Authorization: `Basic ${credentials}`,
+    },
+  });
+  const body = await response.json().catch(() => ({}));
+  if (!response.ok) {
+    throw new Error(`Razorpay order lookup returned ${response.status}: ${body.error?.description || body.error?.code || 'Unknown error'}`);
+  }
+  return body;
+}
+
+async function fetchRazorpayPayment(paymentId, env) {
+  const credentials = Buffer.from(`${env.RAZORPAY_KEY_ID}:${env.RAZORPAY_KEY_SECRET}`).toString('base64');
+  const response = await fetch(`https://api.razorpay.com/v1/payments/${encodeURIComponent(paymentId)}`, {
+    headers: {
+      Authorization: `Basic ${credentials}`,
+    },
+  });
+  const body = await response.json().catch(() => ({}));
+  if (!response.ok) {
+    throw new Error(`Razorpay payment lookup returned ${response.status}: ${body.error?.description || body.error?.code || 'Unknown error'}`);
+  }
+  return body;
 }
 
 function pickCapturedPayment(payments) {
@@ -153,10 +199,118 @@ function updateOrderCommand(order, payment) {
   `;
 }
 
+function updateFieldsCommand(orderId, fields) {
+  const assignments = Object.entries(fields)
+    .map(([key, value]) => `${key} = ${sqlString(value)}`)
+    .join(', ');
+  return `
+    UPDATE payment_orders
+    SET ${assignments}, updated_at = datetime('now')
+    WHERE order_id = ${sqlString(orderId)}
+  `;
+}
+
+function fulfillmentCompleteCommand(orderId) {
+  return `
+    UPDATE payment_orders
+    SET fulfillment_status = 'Complete',
+        fulfillment_error = NULL,
+        fulfilled_at = datetime('now'),
+        updated_at = datetime('now')
+    WHERE order_id = ${sqlString(orderId)}
+  `;
+}
+
+function requireFulfillmentVars(env) {
+  const required = [
+    'EMAILOCTOPUS_API_KEY',
+    'EMAILOCTOPUS_LIST_ID',
+    'EMAILOCTOPUS_AUTOMATION_ID',
+    'GOOGLE_SERVICE_ACCOUNT_EMAIL',
+    'GOOGLE_SERVICE_ACCOUNT_PRIVATE_KEY',
+    'GOOGLE_SHEETS_SPREADSHEET_ID',
+  ];
+  const missing = required.filter((key) => !env[key]);
+  if (missing.length > 0) {
+    throw new Error(`Missing fulfillment values in environment or .dev.vars: ${missing.join(', ')}`);
+  }
+}
+
+async function fulfillOrderNow(orderId, options, env) {
+  requireFulfillmentVars(env);
+
+  const [order] = await runD1(orderByIdQuery(orderId), options);
+  if (!order || order.status !== 'Success' || !order.enrollment_id) {
+    throw new Error(`${orderId} is not ready for fulfillment.`);
+  }
+
+  await runD1(updateFieldsCommand(orderId, {
+    fulfillment_status: 'Processing',
+    fulfillment_error: null,
+  }), options);
+
+  const failures = [];
+
+  if (order.email_status !== 'Complete') {
+    try {
+      const result = await sendEnrollmentEmail(order, env);
+      await runD1(updateFieldsCommand(orderId, {
+        email_status: 'Complete',
+        email_contact_id: result.contactId,
+      }), options);
+      console.log(`  EmailOctopus automation ${result.automationAlreadyStarted ? 'was already started' : 'queued'}.`);
+    } catch (error) {
+      await runD1(updateFieldsCommand(orderId, {
+        email_status: 'Failed',
+      }), options);
+      failures.push(error);
+    }
+  } else {
+    console.log('  EmailOctopus already complete; skipped.');
+  }
+
+  if (order.sheet_status !== 'Complete') {
+    try {
+      const result = await appendEnrollmentSheet(order, env);
+      await runD1(updateFieldsCommand(orderId, {
+        sheet_status: 'Complete',
+        sheet_range: result.updatedRange,
+      }), options);
+      console.log(`  Google Sheets updated: ${result.updatedRange || 'range unavailable'}.`);
+    } catch (error) {
+      await runD1(updateFieldsCommand(orderId, {
+        sheet_status: 'Failed',
+      }), options);
+      failures.push(error);
+    }
+  } else {
+    console.log('  Google Sheets already complete; skipped.');
+  }
+
+  if (failures.length > 0) {
+    const message = failures.map((error) => error.message || String(error)).join('; ');
+    await runD1(updateFieldsCommand(orderId, {
+      fulfillment_status: 'Failed',
+      fulfillment_error: message.slice(0, 1000),
+    }), options);
+    throw new Error(message);
+  }
+
+  await runD1(fulfillmentCompleteCommand(orderId), options);
+  console.log('  Fulfillment marked Complete.');
+}
+
 function formatPayment(payment) {
   if (!payment) return 'no completed payment';
   const amount = Number.isFinite(payment.amount) ? `INR ${(payment.amount / 100).toFixed(2)}` : 'amount unknown';
   return `${payment.id} ${payment.status} ${amount}`;
+}
+
+function formatOrder(order) {
+  if (!order) return 'unavailable';
+  const amount = Number.isFinite(order.amount) ? `INR ${(order.amount / 100).toFixed(2)}` : 'amount unknown';
+  const paid = Number.isFinite(order.amount_paid) ? `paid INR ${(order.amount_paid / 100).toFixed(2)}` : 'paid amount unknown';
+  return `${order.status || 'unknown'} ${amount}, ${paid}, attempts ${order.attempts ?? 'unknown'}`;
 }
 
 async function main() {
@@ -184,10 +338,18 @@ async function main() {
 
   let reconciled = 0;
   for (const order of orders) {
+    const razorpayOrder = await fetchRazorpayOrder(order.order_id, env);
     const payments = await fetchRazorpayPayments(order.order_id, env);
-    const capturedPayment = pickCapturedPayment(payments);
+    const directPayment = options.paymentId ? await fetchRazorpayPayment(options.paymentId, env) : null;
+    if (directPayment && directPayment.order_id !== order.order_id) {
+      throw new Error(`${directPayment.id} belongs to ${directPayment.order_id || 'no order'}, not ${order.order_id}.`);
+    }
+    const capturedPayment = directPayment?.status === 'captured'
+      ? directPayment
+      : pickCapturedPayment(payments);
     console.log(`\n${order.order_id}`);
     console.log(`  D1: ${order.status} | ${order.email} | INR ${order.amount}`);
+    console.log(`  Razorpay order: ${formatOrder(razorpayOrder)}`);
     console.log(`  Razorpay: ${formatPayment(capturedPayment)} (${payments.length} payment record${payments.length === 1 ? '' : 's'})`);
 
     if (!capturedPayment) continue;
@@ -196,6 +358,7 @@ async function main() {
       await runD1(updateOrderCommand(order, capturedPayment), options);
       reconciled += 1;
       console.log('  Updated D1 to Success.');
+      await fulfillOrderNow(order.order_id, options, env);
     } else {
       console.log('  Would update D1 to Success. Re-run with --apply to commit.');
     }

@@ -434,6 +434,13 @@ To reconcile one confirmed order:
 npm run payments:reconcile -- --order-id order_xxxxx --apply
 ```
 
+If the Razorpay dashboard shows a captured payment but the order payment list is
+empty, pass the payment ID from the dashboard:
+
+```bash
+npm run payments:reconcile -- --order-id order_xxxxx --payment-id pay_xxxxx --apply
+```
+
 To apply reconciliation for all pending Razorpay orders found in D1:
 
 ```bash
@@ -442,7 +449,9 @@ npm run payments:reconcile -- --apply
 
 The script reads `RAZORPAY_KEY_ID` and `RAZORPAY_KEY_SECRET` from the shell or
 `.dev.vars`, checks Razorpay's order payments API, and only marks D1 rows
-`Success` when it finds a `captured` payment. It is dry-run by default.
+`Success` when it finds a `captured` payment. It is dry-run by default. With
+`--apply`, it also runs EmailOctopus and Google Sheets fulfillment immediately,
+using the same fulfillment secrets from the shell or `.dev.vars`.
 
 For local development, `.env` and `.dev.vars` must contain:
 

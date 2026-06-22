@@ -1,10 +1,14 @@
 import React, { useEffect } from "react";
 import { useStore } from "@nanostores/react";
-import { allOpenLevels, campDays, openCampDays } from "../../lib/campContent";
+import { getLockedCampDays, getOpenCampDays, getOpenLevels } from "../../lib/campContent";
 import { loadProgress, progressStore } from "./progressStore";
 
 export function CampDashboard() {
   const progress = useStore(progressStore);
+  const openCampDays = getOpenCampDays();
+  const lockedDays = getLockedCampDays();
+  const allOpenLevels = getOpenLevels();
+  const openDayLabels = openCampDays.map((day) => day.label.toUpperCase());
 
   useEffect(() => {
     void loadProgress();
@@ -16,7 +20,6 @@ export function CampDashboard() {
   const nextLevel =
     allOpenLevels.find((level) => !completed.includes(level.id)) ?? allOpenLevels[0];
   const percentage = Math.round((completed.length / allOpenLevels.length) * 100);
-  const lockedDays = campDays.filter((day) => day.status === "locked");
 
   return (
     <>
@@ -26,7 +29,7 @@ export function CampDashboard() {
             <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-purple-200 bg-purple-100 px-3 py-1">
               <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-purple-500" />
               <span className="text-xs font-bold tracking-wide text-purple-700">
-                DAYS 1-3 ARE OPEN
+                {openDayLabels.length === 1 ? `${openDayLabels[0]} IS OPEN` : `${openDayLabels.join(", ")} ARE OPEN`}
               </span>
             </div>
             <h1 className="mb-3 text-3xl font-extrabold text-gray-800 sm:text-4xl">
@@ -100,6 +103,37 @@ export function CampDashboard() {
                       <p className="mt-2 max-w-2xl text-sm leading-relaxed text-gray-500">
                         {day.description}
                       </p>
+                      {day.recordingUrl && (
+                        <div className="mt-5 overflow-hidden rounded-2xl border-2 border-purple-100 bg-white shadow-sm">
+                          <div className="aspect-video bg-gray-100">
+                            <iframe
+                              className="h-full w-full"
+                              src={day.recordingEmbedUrl}
+                              title={`${day.label} recorded session`}
+                              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                              allowFullScreen
+                            />
+                          </div>
+                          <div className="flex flex-col gap-3 p-4 sm:flex-row sm:items-center sm:justify-between">
+                            <div>
+                              <p className="text-xs font-bold uppercase tracking-widest text-purple-600">
+                                Recorded session
+                              </p>
+                              <p className="mt-1 text-sm font-semibold text-gray-700">
+                                Watch the Day 1 class replay whenever you need to catch up.
+                              </p>
+                            </div>
+                            <a
+                              href={day.recordingUrl}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="inline-flex items-center justify-center rounded-full border-2 border-purple-200 px-4 py-2 text-xs font-bold text-purple-700 no-underline transition hover:border-purple-400 hover:bg-purple-50"
+                            >
+                              Open on YouTube
+                            </a>
+                          </div>
+                        </div>
+                      )}
                     </div>
                     <div className="min-w-44">
                       <div className="mb-2 flex justify-between text-xs font-bold text-gray-500">

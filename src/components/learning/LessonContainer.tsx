@@ -3,13 +3,13 @@ import { useStore } from "@nanostores/react";
 import { isFinished, resetLesson, setTotal } from "./lessonStore";
 import { completeLevel } from "./progressStore";
 import { LessonAppBar } from "./LessonAppBar";
+import { getOpenLevels } from "../../lib/campContent";
 
 interface LessonContainerProps {
   children: React.ReactNode;
   levelId: string;
   levelTitle: string;
   sectionCount: number;
-  nextLevelId: string | null;
 }
 
 export function LessonContainer({
@@ -17,9 +17,11 @@ export function LessonContainer({
   levelId,
   levelTitle,
   sectionCount,
-  nextLevelId,
 }: LessonContainerProps) {
   const finished = useStore(isFinished);
+  const openLevelIds = getOpenLevels().map((level) => level.id);
+  const currentIndex = openLevelIds.indexOf(levelId);
+  const nextLevelId = currentIndex >= 0 ? openLevelIds[currentIndex + 1] ?? null : null;
 
   useEffect(() => {
     resetLesson();
@@ -29,6 +31,36 @@ export function LessonContainer({
   useEffect(() => {
     if (finished) void completeLevel(levelId);
   }, [finished, levelId]);
+
+  if (currentIndex < 0) {
+    return (
+      <div className="min-h-screen bg-white">
+        <LessonAppBar levelTitle={levelTitle} sectionCount={sectionCount} />
+        <main className="flex min-h-[calc(100vh-72px)] items-center justify-center bg-gradient-to-br from-purple-50 via-white to-indigo-50 px-4 py-16">
+          <section className="w-full max-w-xl rounded-3xl border-2 border-purple-200 bg-white p-8 text-center shadow-xl md:p-12">
+            <div className="mx-auto mb-6 flex h-20 w-20 items-center justify-center rounded-full bg-purple-100 text-3xl font-black text-purple-700">
+              Soon
+            </div>
+            <p className="mb-2 text-xs font-bold uppercase tracking-widest text-purple-600">
+              Available soon
+            </p>
+            <h1 className="mb-3 text-3xl font-extrabold text-gray-800">
+              {levelTitle}
+            </h1>
+            <p className="mb-8 text-base text-gray-500">
+              This lesson opens automatically on its camp day. Day 1 is open now.
+            </p>
+            <a
+              href="/learn"
+              className="inline-flex w-full items-center justify-center rounded-full border-2 border-[#8623d5] bg-[#8623d5] px-6 py-3 text-sm font-bold text-white no-underline transition hover:bg-purple-600 sm:w-auto"
+            >
+              Return to camp
+            </a>
+          </section>
+        </main>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-white">

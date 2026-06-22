@@ -2,15 +2,15 @@
 import { getCollection, render } from "astro:content";
 import PortalLayout from "../../../layouts/PortalLayout.astro";
 import { LessonContainer } from "../../../components/learning/LessonContainer";
-import { allOpenLevels } from "../../../lib/campContent";
+import { allCampLevels } from "../../../lib/campContent";
 
-const openLevelIds = allOpenLevels.map((level) => level.id);
+const campLevelIds = allCampLevels.map((level) => level.id);
 
 export async function getStaticPaths() {
-  const openLevelIds = allOpenLevels.map((level) => level.id);
+  const campLevelIds = allCampLevels.map((level) => level.id);
   const levels = await getCollection("levels");
   return levels
-    .filter((level) => openLevelIds.includes(level.id))
+    .filter((level) => campLevelIds.includes(level.id))
     .map((level) => ({
       params: { id: level.id },
       props: { level },
@@ -18,8 +18,6 @@ export async function getStaticPaths() {
 }
 
 const { level } = Astro.props;
-const currentIndex = openLevelIds.indexOf(level.id);
-const nextLevelId = openLevelIds[currentIndex + 1] ?? null;
 const { Content } = await render(level);
 ---
 
@@ -29,7 +27,6 @@ const { Content } = await render(level);
     levelId={level.id}
     levelTitle={level.data.title}
     sectionCount={level.data.sectionCount}
-    nextLevelId={nextLevelId}
   >
     <Content />
   </LessonContainer>

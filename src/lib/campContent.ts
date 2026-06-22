@@ -11,10 +11,16 @@ export interface CampDay {
   title: string;
   description: string;
   status: "open" | "locked";
+  unlockOffsetDays: number | null;
+  recordingUrl?: string;
+  recordingEmbedUrl?: string;
   levels: CampLevel[];
 }
 
-export const campDays: CampDay[] = [
+const COHORT_START_IST = Date.UTC(2026, 5, 21, 18, 30);
+const DAY_MS = 24 * 60 * 60 * 1000;
+
+const campDayContent: CampDay[] = [
   {
     id: "aicc-day1-prompting",
     label: "Day 1",
@@ -22,6 +28,9 @@ export const campDays: CampDay[] = [
     description:
       "Learn the foundations of AI, practise prompt engineering, and design your own AI superhero.",
     status: "open",
+    unlockOffsetDays: 0,
+    recordingUrl: "https://youtube.com/live/37PT13wn0fo?feature=share",
+    recordingEmbedUrl: "https://www.youtube-nocookie.com/embed/37PT13wn0fo",
     levels: [
       { id: "aicc-meet-ai", title: "About AI", summary: "Discover what AI is and how it learns.", dayId: "aicc-day1-prompting" },
       { id: "aicc-magic-words", title: "The Magic Words", summary: "See how better prompts create better answers.", dayId: "aicc-day1-prompting" },
@@ -38,6 +47,7 @@ export const campDays: CampDay[] = [
     description:
       "Make AI draw, design, and sing. Turn your AI Superhero into real artwork, a comic, and a theme song.",
     status: "open",
+    unlockOffsetDays: 1,
     levels: [
       { id: "aicc-creating-with-ai", title: "Creating with AI", summary: "Turn descriptions into images, designs, music, and video ideas.", dayId: "aicc-day2-creativity" },
       { id: "aicc-creative-toolkit", title: "The Creative Toolkit", summary: "Meet Gemini, Canva, and Suno as creative teammates.", dayId: "aicc-day2-creativity" },
@@ -53,6 +63,7 @@ export const campDays: CampDay[] = [
     description:
       "Study smarter with AI. Make summaries, quizzes, flashcards, and a presentation using NotebookLM, Gemini, and Gamma.",
     status: "open",
+    unlockOffsetDays: 2,
     levels: [
       { id: "aicc-learn-notes", title: "Notes & Summaries", summary: "Use AI to organize notes and explain ideas clearly.", dayId: "aicc-day3-research" },
       { id: "aicc-learn-quiz", title: "Quiz Yourself", summary: "Generate practice questions, flashcards, and study plans.", dayId: "aicc-day3-research" },
@@ -65,6 +76,7 @@ export const campDays: CampDay[] = [
     title: "Computational Thinking + Build a Website",
     description: "Plan like a builder and turn ideas into clear website logic.",
     status: "locked",
+    unlockOffsetDays: null,
     levels: [],
   },
   {
@@ -73,6 +85,7 @@ export const campDays: CampDay[] = [
     title: "Build a Website",
     description: "Ship a polished web project from your AI-assisted plan.",
     status: "locked",
+    unlockOffsetDays: null,
     levels: [],
   },
   {
@@ -81,6 +94,7 @@ export const campDays: CampDay[] = [
     title: "Create an AI Agent",
     description: "Design an AI helper that can follow a workflow.",
     status: "locked",
+    unlockOffsetDays: null,
     levels: [],
   },
   {
@@ -89,12 +103,41 @@ export const campDays: CampDay[] = [
     title: "Demo Day",
     description: "Package your project and share what you built.",
     status: "locked",
+    unlockOffsetDays: null,
     levels: [],
   },
 ];
 
-export const openCampDays = campDays.filter((day) => day.status === "open");
-export const allOpenLevels = openCampDays.flatMap((day) => day.levels);
+function getDayStatus(day: CampDay, now = new Date()): CampDay["status"] {
+  if (!day.levels.length || day.unlockOffsetDays === null) return "locked";
+
+  const elapsedDays = Math.floor((now.getTime() - COHORT_START_IST) / DAY_MS);
+  return elapsedDays >= day.unlockOffsetDays ? "open" : "locked";
+}
+
+export function getCampDays(now = new Date()): CampDay[] {
+  return campDayContent.map((day) => ({
+    ...day,
+    status: getDayStatus(day, now),
+  }));
+}
+
+export function getOpenCampDays(now = new Date()) {
+  return getCampDays(now).filter((day) => day.status === "open");
+}
+
+export function getLockedCampDays(now = new Date()) {
+  return getCampDays(now).filter((day) => day.status === "locked");
+}
+
+export function getOpenLevels(now = new Date()) {
+  return getOpenCampDays(now).flatMap((day) => day.levels);
+}
+
+export const campDays = getCampDays();
+export const openCampDays = getOpenCampDays();
+export const allOpenLevels = getOpenLevels();
+export const allCampLevels = campDayContent.flatMap((day) => day.levels);
 
 export function getCourseIdForLevel(levelId: string) {
   return allOpenLevels.find((level) => level.id === levelId)?.dayId ?? null;

@@ -24,6 +24,8 @@ export function LessonContainer({
   const accessOptions = { unlockAllAvailableDays: hasFullCampAccess(userEmail) };
   const openLevelIds = getOpenLevels(new Date(), accessOptions).map((level) => level.id);
   const currentIndex = openLevelIds.indexOf(levelId);
+  const isCheckingAccess = !authLoaded && currentIndex < 0;
+  const isCurrentLevelOpen = currentIndex >= 0 || isCheckingAccess;
   const nextLevelId = currentIndex >= 0 ? openLevelIds[currentIndex + 1] ?? null : null;
 
   useEffect(() => {
@@ -42,7 +44,7 @@ export function LessonContainer({
     if (finished) void completeLevel(levelId);
   }, [finished, levelId]);
 
-  if (currentIndex < 0) {
+  if (!isCurrentLevelOpen) {
     return (
       <div className="min-h-screen bg-white">
         <LessonAppBar levelTitle={levelTitle} sectionCount={sectionCount} />

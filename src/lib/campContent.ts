@@ -29,7 +29,7 @@ interface CampAccessOptions {
 
 const COHORT_START_IST = Date.UTC(2026, 5, 21, 18, 30);
 const DAY_MS = 24 * 60 * 60 * 1000;
-const FULL_CAMP_ACCESS_EMAILS = new Set(["rkbish@gmail.com"]);
+const FULL_CAMP_ACCESS_EMAILS = new Set(["rkbish@gmail.com", "devashishpuri@gmail.com"]);
 
 const campDayContent: CampDay[] = [
   {

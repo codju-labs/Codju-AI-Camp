@@ -91,6 +91,47 @@ const OPEN_LEVEL_COURSES = new Map([
   ['aicc-learn-present', 'aicc-day3-research'],
 ]);
 
+const COHORT_START_IST = Date.UTC(2026, 5, 21, 18, 30);
+const DAY_MS = 24 * 60 * 60 * 1000;
+const FULL_CAMP_ACCESS_EMAILS = new Set([
+  'rkbish@gmail.com',
+  'devashishpuri@gmail.com',
+]);
+const LEVEL_UNLOCK_OFFSETS = new Map([
+  ['aicc-meet-ai', 0],
+  ['aicc-magic-words', 0],
+  ['aicc-meet-tools', 0],
+  ['aicc-rctf', 0],
+  ['aicc-prompting-in-action', 0],
+  ['aicc-prompt-master', 0],
+  ['aicc-creating-with-ai', 1],
+  ['aicc-creative-toolkit', 1],
+  ['aicc-picture-recipe', 1],
+  ['aicc-creating-in-action', 1],
+  ['aicc-ai-artist', 1],
+  ['aicc-learn-notes', 2],
+  ['aicc-learn-quiz', 2],
+  ['aicc-learn-present', 2],
+]);
+
+function hasFullCampAccess(email) {
+  return FULL_CAMP_ACCESS_EMAILS.has(String(email || '').trim().toLowerCase());
+}
+
+function getLessonIdFromPath(pathname) {
+  const match = pathname.match(/^\/learn\/lesson\/([^/]+)\/?$/);
+  return match ? decodeURIComponent(match[1]) : null;
+}
+
+function isLevelOpenForSession(levelId, session, now = new Date()) {
+  const unlockOffsetDays = LEVEL_UNLOCK_OFFSETS.get(levelId);
+  if (unlockOffsetDays === undefined) return false;
+  if (hasFullCampAccess(session.email)) return true;
+
+  const elapsedDays = Math.floor((now.getTime() - COHORT_START_IST) / DAY_MS);
+  return elapsedDays >= unlockOffsetDays;
+}
+
 async function requirePortalSession(request, env) {
   const session = await getSession(request, env);
   if (!session) {
@@ -862,6 +903,14 @@ export default {
     if (url.pathname === '/learn' || url.pathname.startsWith('/learn/')) {
       const auth = await requirePortalSession(request, env);
       if (auth.response) return auth.response;
+
+      const lessonId = getLessonIdFromPath(url.pathname);
+      if (lessonId && !isLevelOpenForSession(lessonId, auth.session)) {
+        return Response.redirect(
+          new URL('/learn', env.PUBLIC_SITE_URL),
+          302,
+        );
+      }
     }
 
     if (request.method === 'POST' && url.pathname === '/api/create-order') {

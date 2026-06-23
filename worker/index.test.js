@@ -23,6 +23,48 @@ function createD1Stub() {
   };
 }
 
+const AUTH_SECRET = 'test-auth-secret';
+
+function createSessionCookie(email) {
+  const payload = Buffer.from(JSON.stringify({
+    email,
+    name: 'Test Student',
+    exp: Math.floor(Date.now() / 1000) + 3600,
+  })).toString('base64url');
+  const signature = createHmac('sha256', AUTH_SECRET)
+    .update(payload)
+    .digest('base64url');
+  return `codju_aicc_session=${payload}.${signature}`;
+}
+
+async function withMockedNow(value, callback) {
+  const RealDate = globalThis.Date;
+  const fixedTime = new RealDate(value).getTime();
+  globalThis.Date = class extends RealDate {
+    constructor(...args) {
+      return args.length ? new RealDate(...args) : new RealDate(fixedTime);
+    }
+
+    static now() {
+      return fixedTime;
+    }
+
+    static UTC(...args) {
+      return RealDate.UTC(...args);
+    }
+
+    static parse(...args) {
+      return RealDate.parse(...args);
+    }
+  };
+
+  try {
+    return await callback();
+  } finally {
+    globalThis.Date = RealDate;
+  }
+}
+
 const env = {
   REGISTRATION_STATUS: 'open',
   RAZORPAY_KEY_ID: 'rzp_test_example',
@@ -34,6 +76,8 @@ const env = {
   CAMP_PRICE_INR: '2999.00',
   GST_RATE_PERCENT: '18',
   PUBLIC_SITE_URL: 'https://camp.example.com',
+  AUTH_SECRET,
+  ACCESS_TEST_EMAILS: 'student@example.com,rkbish@gmail.com,devashishpuri@gmail.com',
   EMAILOCTOPUS_API_KEY: 'email-api-key',
   EMAILOCTOPUS_LIST_ID: 'list-id',
   EMAILOCTOPUS_AUTOMATION_ID: 'automation-id',
@@ -142,6 +186,35 @@ test('Razorpay authentication failures return 401', async () => {
   } finally {
     globalThis.fetch = originalFetch;
   }
+});
+
+test('Day 3 lessons are available early for full-access students', async () => {
+  const response = await withMockedNow('2026-06-23T12:00:00+05:30', () =>
+    worker.fetch(
+      new Request('https://camp.example.com/learn/lesson/aicc-learn-notes', {
+        headers: { Cookie: createSessionCookie('rkbish@gmail.com') },
+      }),
+      env,
+      { waitUntil() {} },
+    ));
+
+  assert.equal(response.status, 200);
+  assert.equal(await response.text(), 'asset');
+});
+
+test('Day 3 lessons redirect regular students before the unlock date', async () => {
+  const response = await withMockedNow('2026-06-23T12:00:00+05:30', () =>
+    worker.fetch(
+      new Request('https://camp.example.com/learn/lesson/aicc-learn-notes', {
+        headers: { Cookie: createSessionCookie('student@example.com') },
+        redirect: 'manual',
+      }),
+      env,
+      { waitUntil() {} },
+    ));
+
+  assert.equal(response.status, 302);
+  assert.equal(response.headers.get('Location'), 'https://camp.example.com/learn');
 });
 
 test('Razorpay verification accepts a valid signature and marks the order paid', async () => {

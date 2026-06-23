@@ -133,7 +133,7 @@ export function CampDashboard() {
                                 Recorded session
                               </p>
                               <p className="mt-1 text-sm font-semibold text-gray-700">
-                                Watch the Day 1 class replay whenever you need to catch up.
+                                Watch the {day.label} class replay whenever you need to catch up.
                               </p>
                             </div>
                             <a
@@ -145,6 +145,27 @@ export function CampDashboard() {
                               Open on YouTube
                             </a>
                           </div>
+                          {day.resources && day.resources.length > 0 && (
+                            <div className="border-t-2 border-purple-100 px-4 py-4">
+                              <p className="mb-3 text-xs font-bold uppercase tracking-widest text-purple-600">
+                                Resources
+                              </p>
+                              <div className="flex flex-wrap gap-2">
+                                {day.resources.map((resource) => (
+                                  <a
+                                    key={resource.url}
+                                    href={resource.url}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="inline-flex items-center gap-2 rounded-full border-2 border-purple-100 bg-purple-50/60 px-4 py-2 text-sm font-semibold text-gray-700 no-underline transition hover:border-purple-300 hover:bg-purple-100"
+                                  >
+                                    <span className="text-purple-500">▶</span>
+                                    {resource.title}
+                                  </a>
+                                ))}
+                              </div>
+                            </div>
+                          )}
                         </div>
                       )}
                     </div>

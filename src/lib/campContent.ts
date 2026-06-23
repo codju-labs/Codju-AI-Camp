@@ -5,6 +5,11 @@ export interface CampLevel {
   dayId: string;
 }
 
+export interface CampResource {
+  title: string;
+  url: string;
+}
+
 export interface CampDay {
   id: string;
   label: string;
@@ -14,6 +19,7 @@ export interface CampDay {
   unlockOffsetDays: number | null;
   recordingUrl?: string;
   recordingEmbedUrl?: string;
+  resources?: CampResource[];
   levels: CampLevel[];
 }
 
@@ -53,6 +59,11 @@ const campDayContent: CampDay[] = [
       "Make AI draw, design, and sing. Turn your AI Superhero into real artwork, a comic, and a theme song.",
     status: "open",
     unlockOffsetDays: 1,
+    recordingUrl: "https://youtube.com/live/aLNbeWUpdHw?feature=share",
+    recordingEmbedUrl: "https://www.youtube-nocookie.com/embed/aLNbeWUpdHw",
+    resources: [
+      { title: "Canva Masterclass", url: "https://www.youtube.com/live/cQ2EW8YreHI" },
+    ],
     levels: [
       { id: "aicc-creating-with-ai", title: "Creating with AI", summary: "Turn descriptions into images, designs, music, and video ideas.", dayId: "aicc-day2-creativity" },
       { id: "aicc-creative-toolkit", title: "The Creative Toolkit", summary: "Meet Gemini, Canva, and Suno as creative teammates.", dayId: "aicc-day2-creativity" },

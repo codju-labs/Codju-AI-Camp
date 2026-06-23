@@ -67,7 +67,7 @@ const campDayContent: CampDay[] = [
     title: "AI-Assisted Learning",
     description:
       "Study smarter with AI. Make summaries, quizzes, flashcards, and a presentation using NotebookLM, Gemini, and Gamma.",
-    status: "open",
+    status: "locked",
     unlockOffsetDays: 2,
     levels: [
       { id: "aicc-learn-notes", title: "Notes & Summaries", summary: "Use AI to organize notes and explain ideas clearly.", dayId: "aicc-day3-research" },

@@ -80,6 +80,12 @@ const campDayContent: CampDay[] = [
       "Study smarter with AI. Make summaries, quizzes, flashcards, and a presentation using NotebookLM, Gemini, and Gamma.",
     status: "locked",
     unlockOffsetDays: 2,
+    recordingUrl: "https://youtube.com/live/MzYu4geBVoE?feature=share",
+    recordingEmbedUrl: "https://www.youtube-nocookie.com/embed/MzYu4geBVoE",
+    resources: [
+      { title: "Gamma", url: "https://youtu.be/O0xEo-dS9RM?si=ktEzKAZP0dWAQ_XD" },
+      { title: "Notebook LM", url: "https://youtu.be/6vzB41UQjLo?si=FsCbqwdAd4yIiIUA" },
+    ],
     levels: [
       { id: "aicc-learn-notes", title: "Notes & Summaries", summary: "Use AI to organize notes and explain ideas clearly.", dayId: "aicc-day3-research" },
       { id: "aicc-learn-quiz", title: "Quiz Yourself", summary: "Generate practice questions, flashcards, and study plans.", dayId: "aicc-day3-research" },

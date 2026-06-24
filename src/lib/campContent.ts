@@ -96,19 +96,29 @@ const campDayContent: CampDay[] = [
     id: "aicc-day4-founder",
     label: "Day 4",
     title: "Computational Thinking + Build a Website",
-    description: "Plan like a builder and turn ideas into clear website logic.",
+    description:
+      "Think like a builder with DPAA, then turn your plan into a real website with Canva and Lovable.",
     status: "locked",
-    unlockOffsetDays: null,
-    levels: [],
+    unlockOffsetDays: 3,
+    levels: [
+      { id: "aicc-meet-dpaa", title: "Meet DPAA", summary: "Learn four thinking moves that crack any problem.", dayId: "aicc-day4-founder" },
+      { id: "aicc-dpaa-usecase", title: "DPAA on Your Idea", summary: "Turn your own idea into a clear build plan.", dayId: "aicc-day4-founder" },
+      { id: "aicc-build-website", title: "Build a Website", summary: "Use your plan to build and publish a real website.", dayId: "aicc-day4-founder" },
+    ],
   },
   {
     id: "aicc-day5-website",
     label: "Day 5",
-    title: "Build a Website",
-    description: "Ship a polished web project from your AI-assisted plan.",
+    title: "Entrepreneurial Thinking + Build an App",
+    description:
+      "Think like a founder: turn an idea into a startup, pitch it with Gamma, and build a real app with Lovable.",
     status: "locked",
-    unlockOffsetDays: null,
-    levels: [],
+    unlockOffsetDays: 4,
+    levels: [
+      { id: "aicc-founder-plan", title: "Think Like a Founder", summary: "Choose a problem, audience, product, and name for your startup.", dayId: "aicc-day5-website" },
+      { id: "aicc-pitch-it", title: "Pitch It", summary: "Create a 30-second pitch and a Gamma deck prompt.", dayId: "aicc-day5-website" },
+      { id: "aicc-build-app", title: "Build Your App", summary: "Use Lovable and Canva to build the app and logo from your plan.", dayId: "aicc-day5-website" },
+    ],
   },
   {
     id: "aicc-day6-agents",

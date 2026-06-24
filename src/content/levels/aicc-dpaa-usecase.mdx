@@ -1,0 +1,85 @@
+---
+title: "DPAA on Your Idea"
+sectionCount: 3
+---
+
+import { DpaaPlan } from "../../components/ui/DpaaPlan";
+import { SectionWrapper } from "../../components/learning/SectionWrapper";
+import { RevealButton } from "../../components/ui/RevealButton";
+import { ConceptCard } from "../../components/ui/ConceptCard";
+
+{/* -- Section 0: Hero -- */}
+<SectionWrapper index={0} client:load>
+  <style>{`
+    @keyframes heroSlideUp { from { opacity: 0; transform: translateY(40px); } to { opacity: 1; transform: translateY(0); } }
+    @keyframes bob { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-8px); } }
+    .hero-e1 { animation: heroSlideUp 0.7s cubic-bezier(0.16,1,0.3,1) both; }
+    .hero-e2 { animation: heroSlideUp 0.7s cubic-bezier(0.16,1,0.3,1) 0.12s both; }
+    .hero-e3 { animation: heroSlideUp 0.7s cubic-bezier(0.16,1,0.3,1) 0.24s both; }
+    .hero-e4 { animation: heroSlideUp 0.7s cubic-bezier(0.16,1,0.3,1) 0.36s both; }
+    .b1 { animation: bob 2.2s ease-in-out infinite; }
+    @media (prefers-reduced-motion: reduce) { .hero-e1,.hero-e2,.hero-e3,.hero-e4 { animation-duration: 0.01s; } .b1 { animation: none; } }
+  `}</style>
+  <div className="text-center py-14 min-h-[60vh] flex flex-col items-center justify-center">
+    <div className="hero-e1 mb-8 flex items-center justify-center">
+      <span className="b1 flex h-20 w-20 items-center justify-center rounded-3xl bg-[#8B4EC4] text-2xl font-black text-white shadow-md">Idea</span>
+    </div>
+    <h1 className="hero-e2 text-5xl font-black text-slate-900 mb-4">DPAA on Your Idea</h1>
+    <p className="hero-e3 text-xl md:text-2xl text-slate-500 font-bold mb-9 max-w-xl mx-auto leading-relaxed">
+      Same four moves — now on something YOU want to build.
+    </p>
+    <div className="hero-e4">
+      <RevealButton sectionIndex={0} text="Pick my idea" client:load />
+    </div>
+  </div>
+</SectionWrapper>
+
+{/* -- Section 1: Run DPAA on your idea -> build plan -- */}
+<SectionWrapper index={1} client:load>
+  <style>{`
+    @keyframes fadeUp { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
+    .fade-up { animation: fadeUp 0.6s cubic-bezier(0.16,1,0.3,1) both; }
+    @media (prefers-reduced-motion: reduce) { .fade-up { animation: none; } }
+  `}</style>
+  <div className="text-center mb-7 fade-up">
+    <p className="text-sm font-black text-slate-400 uppercase tracking-widest mb-3">Your turn</p>
+    <h2 className="text-4xl font-black text-slate-800 mb-2 tracking-tight">Make Your Build Plan</h2>
+    <p className="text-xl md:text-2xl text-slate-500 font-bold max-w-xl mx-auto">
+      Pick a problem to solve, then run DPAA on it.
+    </p>
+  </div>
+  <div className="fade-up">
+    <DpaaPlan
+      client:only="react"
+      sectionIndex={1}
+      explanation="A great idea is one that solves a real problem. Run the same four moves you learned on the pizza party, and you get a plan clear enough to build."
+    />
+  </div>
+</SectionWrapper>
+
+{/* -- Section 2: Wrap -- */}
+<SectionWrapper index={2} client:load>
+  <style>{`
+    @keyframes fadeUp { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
+    .fade-up { animation: fadeUp 0.6s cubic-bezier(0.16,1,0.3,1) both; }
+    @media (prefers-reduced-motion: reduce) { .fade-up { animation: none; } }
+  `}</style>
+  <div className="text-center mb-7 fade-up">
+    <p className="text-sm font-black text-slate-400 uppercase tracking-widest mb-3">Plan ready</p>
+    <h2 className="text-4xl font-black text-slate-800 mb-2 tracking-tight">You Have a Blueprint</h2>
+  </div>
+  <div className="fade-up">
+    <ConceptCard icon="GO" title="Thinking becomes building">
+      <p className="text-lg mb-3">
+        You just turned a fuzzy idea into a clear plan — the parts, the repeats, the essentials, and the order. That plan is the raw material for your AI website prompt.
+      </p>
+      <div className="rounded-2xl bg-[#faf5ff] border-2 border-[#e9d5ff] px-4 py-3 text-center">
+        <p className="font-black text-[#6b21a8] text-lg">Next lesson: the platform turns this plan into prompts for Lovable and Canva.</p>
+      </div>
+    </ConceptCard>
+    <p className="text-center text-xl md:text-2xl text-slate-500 font-bold mt-6">
+      Final step: build it for real with AI.
+    </p>
+  </div>
+  <RevealButton sectionIndex={2} text="Finish Lesson 2" client:load />
+</SectionWrapper>

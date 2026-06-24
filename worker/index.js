@@ -89,6 +89,12 @@ const OPEN_LEVEL_COURSES = new Map([
   ['aicc-learn-notes', 'aicc-day3-research'],
   ['aicc-learn-quiz', 'aicc-day3-research'],
   ['aicc-learn-present', 'aicc-day3-research'],
+  ['aicc-meet-dpaa', 'aicc-day4-founder'],
+  ['aicc-dpaa-usecase', 'aicc-day4-founder'],
+  ['aicc-build-website', 'aicc-day4-founder'],
+  ['aicc-founder-plan', 'aicc-day5-website'],
+  ['aicc-pitch-it', 'aicc-day5-website'],
+  ['aicc-build-app', 'aicc-day5-website'],
 ]);
 
 const COHORT_START_IST = Date.UTC(2026, 5, 21, 18, 30);
@@ -112,6 +118,12 @@ const LEVEL_UNLOCK_OFFSETS = new Map([
   ['aicc-learn-notes', 2],
   ['aicc-learn-quiz', 2],
   ['aicc-learn-present', 2],
+  ['aicc-meet-dpaa', 3],
+  ['aicc-dpaa-usecase', 3],
+  ['aicc-build-website', 3],
+  ['aicc-founder-plan', 4],
+  ['aicc-pitch-it', 4],
+  ['aicc-build-app', 4],
 ]);
 
 function hasFullCampAccess(email) {

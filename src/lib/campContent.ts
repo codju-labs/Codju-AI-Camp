@@ -100,6 +100,11 @@ const campDayContent: CampDay[] = [
       "Think like a builder with DPAA, then turn your plan into a real website with Canva and Lovable.",
     status: "locked",
     unlockOffsetDays: 3,
+    recordingUrl: "https://youtube.com/live/Dbpbk2lKAJE?feature=share",
+    recordingEmbedUrl: "https://www.youtube-nocookie.com/embed/Dbpbk2lKAJE",
+    resources: [
+      { title: "AI Product Builder", url: "/learn/product-builder" },
+    ],
     levels: [
       { id: "aicc-meet-dpaa", title: "Meet DPAA", summary: "Learn four thinking moves that crack any problem.", dayId: "aicc-day4-founder" },
       { id: "aicc-dpaa-usecase", title: "DPAA on Your Idea", summary: "Turn your own idea into a clear build plan.", dayId: "aicc-day4-founder" },

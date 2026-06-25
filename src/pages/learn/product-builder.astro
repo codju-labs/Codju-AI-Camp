@@ -1,0 +1,11 @@
+---
+import { ProductBuilder } from "../../components/ui/ProductBuilder";
+import PortalLayout from "../../layouts/PortalLayout.astro";
+---
+
+<PortalLayout
+  title="AI Product Builder"
+  description="Turn a DPAA plan into a clear AI app-builder prompt."
+>
+  <ProductBuilder client:only="react" />
+</PortalLayout>

@@ -13,7 +13,7 @@ export const ConceptCard: React.FC<ConceptCardProps> = ({ icon, title, children 
                 <div className="w-12 h-12 bg-indigo-50 rounded-2xl flex items-center justify-center text-2xl shrink-0">
                     {icon}
                 </div>
-                <div>
+                <div className="min-w-0 flex-1">
                     <h4 className="font-black text-slate-900 text-lg mb-1">{title}</h4>
                     <div className="text-slate-600 leading-relaxed text-[15px]">{children}</div>
                 </div>

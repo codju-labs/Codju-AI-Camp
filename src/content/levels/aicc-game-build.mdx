@@ -1,0 +1,55 @@
+---
+title: "Build and Playtest"
+sectionCount: 3
+---
+
+import { SectionWrapper } from "../../components/learning/SectionWrapper";
+import { RevealButton } from "../../components/ui/RevealButton";
+import { ConceptCard } from "../../components/ui/ConceptCard";
+
+<SectionWrapper index={0} client:load>
+  <div className="text-center py-14 min-h-[60vh] flex flex-col items-center justify-center">
+    <div className="mb-8 flex items-center justify-center">
+      <span className="flex h-20 w-20 items-center justify-center rounded-3xl bg-emerald-500 text-2xl font-black text-white shadow-md">go</span>
+    </div>
+    <h1 className="text-5xl font-black text-slate-900 mb-4">Build and Playtest</h1>
+    <p className="text-xl md:text-2xl text-slate-500 font-bold mb-9 max-w-xl mx-auto leading-relaxed">
+      The first version is not the final game. Playtesting is where it becomes fun.
+    </p>
+    <RevealButton sectionIndex={0} text="Start building" client:load />
+  </div>
+</SectionWrapper>
+
+<SectionWrapper index={1} client:load>
+  <div className="text-center mb-7">
+    <p className="text-sm font-black text-slate-400 uppercase tracking-widest mb-3">Live build flow</p>
+    <h2 className="text-4xl font-black text-slate-800 mb-2 tracking-tight">Paste, Play, Improve</h2>
+  </div>
+  <div className="grid gap-4 md:grid-cols-2">
+    <ConceptCard icon="1" title="Paste the prompt"><p className="text-lg">Use Lovable, v0, or another AI app builder. Ask for one playable page first.</p></ConceptCard>
+    <ConceptCard icon="2" title="Play for 60 seconds"><p className="text-lg">Do not judge the art first. Check if the goal, controls, and score work.</p></ConceptCard>
+    <ConceptCard icon="3" title="Ask for one fix"><p className="text-lg">Change only one thing, then test again. That is how real game teams work.</p></ConceptCard>
+  </div>
+  <RevealButton sectionIndex={1} text="Build flow ready" client:load />
+</SectionWrapper>
+
+<SectionWrapper index={2} client:load>
+  <div className="text-center mb-7">
+    <p className="text-sm font-black text-slate-400 uppercase tracking-widest mb-3">Day 6 project</p>
+    <h2 className="text-4xl font-black text-slate-800 mb-2 tracking-tight">Your Playtest Checklist</h2>
+  </div>
+  <div className="space-y-4">
+    <ConceptCard icon="test" title="Ask three players">
+      <p className="text-lg mb-2">Give your game to three people and watch quietly.</p>
+      <div className="space-y-2">
+        <div className="rounded-2xl border-2 border-slate-200 bg-slate-50 px-4 py-3"><p className="text-base font-bold text-slate-700">Did they know what to do in 5 seconds?</p></div>
+        <div className="rounded-2xl border-2 border-slate-200 bg-slate-50 px-4 py-3"><p className="text-base font-bold text-slate-700">Did the controls feel natural?</p></div>
+        <div className="rounded-2xl border-2 border-slate-200 bg-slate-50 px-4 py-3"><p className="text-base font-bold text-slate-700">Did they want to try one more time?</p></div>
+      </div>
+    </ConceptCard>
+    <div className="rounded-3xl bg-[#8B4EC4] px-6 py-8 text-center shadow-md">
+      <p className="text-2xl md:text-3xl font-black text-white leading-tight">Your goal: a playable game link that someone else can open, understand, and enjoy.</p>
+    </div>
+  </div>
+  <RevealButton sectionIndex={2} text="Finish Day 6" client:load />
+</SectionWrapper>

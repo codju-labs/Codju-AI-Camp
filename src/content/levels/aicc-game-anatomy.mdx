@@ -1,0 +1,51 @@
+---
+title: "Game Anatomy"
+sectionCount: 3
+---
+
+import { GameMechanicLab } from "../../components/ui/GameMechanicLab";
+import { SectionWrapper } from "../../components/learning/SectionWrapper";
+import { RevealButton } from "../../components/ui/RevealButton";
+import { ConceptCard } from "../../components/ui/ConceptCard";
+
+<SectionWrapper index={0} client:load>
+  <div className="text-center py-14 min-h-[60vh] flex flex-col items-center justify-center">
+    <div className="mb-8 flex items-center justify-center">
+      <span className="flex h-20 w-20 items-center justify-center rounded-3xl bg-blue-500 text-2xl font-black text-white shadow-md">loop</span>
+    </div>
+    <h1 className="text-5xl font-black text-slate-900 mb-4">Game Anatomy</h1>
+    <p className="text-xl md:text-2xl text-slate-500 font-bold mb-9 max-w-xl mx-auto leading-relaxed">
+      Build the tiny engine inside every fun game.
+    </p>
+    <RevealButton sectionIndex={0} text="Open the engine" client:load />
+  </div>
+</SectionWrapper>
+
+<SectionWrapper index={1} client:load>
+  <div className="text-center mb-7">
+    <p className="text-sm font-black text-slate-400 uppercase tracking-widest mb-3">Design lab</p>
+    <h2 className="text-4xl font-black text-slate-800 mb-2 tracking-tight">Mix a Game Loop</h2>
+    <p className="text-xl md:text-2xl text-slate-500 font-bold max-w-xl mx-auto">
+      Change one ingredient and the whole game feels different.
+    </p>
+  </div>
+  <GameMechanicLab
+    client:only="react"
+    sectionIndex={1}
+    explanation="A game loop combines a goal, a control style, an obstacle, and a reward. Once you can describe the loop, you can ask AI to turn it into playable code."
+  />
+</SectionWrapper>
+
+<SectionWrapper index={2} client:load>
+  <div className="text-center mb-7">
+    <p className="text-sm font-black text-slate-400 uppercase tracking-widest mb-3">Designer eye</p>
+    <h2 className="text-4xl font-black text-slate-800 mb-2 tracking-tight">Balance Makes It Fun</h2>
+  </div>
+  <ConceptCard icon="bal" title="Too easy, too hard, just right">
+    <p className="text-lg mb-3">If a game is too easy, players get bored. If it is too hard, they quit. Great games slowly raise the challenge while keeping rewards visible.</p>
+    <div className="rounded-2xl border-2 border-purple-100 bg-purple-50 px-4 py-3">
+      <p className="text-base font-black text-purple-800">Playtest question: What should get harder after 30 seconds?</p>
+    </div>
+  </ConceptCard>
+  <RevealButton sectionIndex={2} text="Finish Lesson 2" client:load />
+</SectionWrapper>

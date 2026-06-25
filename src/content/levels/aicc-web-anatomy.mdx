@@ -1,0 +1,81 @@
+---
+title: "Anatomy of a Website"
+sectionCount: 3
+---
+
+import { SiteAnatomy } from "../../components/ui/SiteAnatomy";
+import { SectionWrapper } from "../../components/learning/SectionWrapper";
+import { RevealButton } from "../../components/ui/RevealButton";
+import { ConceptCard } from "../../components/ui/ConceptCard";
+
+{/* -- Section 0: Hero -- */}
+<SectionWrapper index={0} client:load>
+  <style>{`
+    @keyframes heroSlideUp { from { opacity: 0; transform: translateY(40px); } to { opacity: 1; transform: translateY(0); } }
+    @keyframes bob { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-8px); } }
+    .hero-e1 { animation: heroSlideUp 0.7s cubic-bezier(0.16,1,0.3,1) both; }
+    .hero-e2 { animation: heroSlideUp 0.7s cubic-bezier(0.16,1,0.3,1) 0.12s both; }
+    .hero-e3 { animation: heroSlideUp 0.7s cubic-bezier(0.16,1,0.3,1) 0.24s both; }
+    .hero-e4 { animation: heroSlideUp 0.7s cubic-bezier(0.16,1,0.3,1) 0.36s both; }
+    .b1 { animation: bob 2.2s ease-in-out infinite; }
+    @media (prefers-reduced-motion: reduce) { .hero-e1,.hero-e2,.hero-e3,.hero-e4 { animation-duration: 0.01s; } .b1 { animation: none; } }
+  `}</style>
+  <div className="text-center py-14 min-h-[60vh] flex flex-col items-center justify-center">
+    <div className="hero-e1 mb-8 flex items-center justify-center">
+      <span className="b1 flex h-20 w-20 items-center justify-center rounded-3xl bg-blue-500 text-2xl font-black text-white shadow-md">8</span>
+    </div>
+    <h1 className="hero-e2 text-5xl font-black text-slate-900 mb-4">Anatomy of a Website</h1>
+    <p className="hero-e3 text-xl md:text-2xl text-slate-500 font-bold mb-9 max-w-xl mx-auto leading-relaxed">
+      Every site you know is built from the same 8 building blocks.
+    </p>
+    <div className="hero-e4">
+      <RevealButton sectionIndex={0} text="See the parts" client:load />
+    </div>
+  </div>
+</SectionWrapper>
+
+{/* -- Section 1: Anatomy -- */}
+<SectionWrapper index={1} client:load>
+  <style>{`
+    @keyframes fadeUp { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
+    .fade-up { animation: fadeUp 0.6s cubic-bezier(0.16,1,0.3,1) both; }
+    @media (prefers-reduced-motion: reduce) { .fade-up { animation: none; } }
+  `}</style>
+  <div className="text-center mb-7 fade-up">
+    <p className="text-sm font-black text-slate-400 uppercase tracking-widest mb-3">The 8 parts</p>
+    <h2 className="text-4xl font-black text-slate-800 mb-2 tracking-tight">Tap to Explore</h2>
+    <p className="text-xl md:text-2xl text-slate-500 font-bold max-w-xl mx-auto">
+      This is a website skeleton. Tap each part to learn its job.
+    </p>
+  </div>
+  <div className="fade-up">
+    <SiteAnatomy
+      client:only="react"
+      sectionIndex={1}
+      explanation="Header, navigation, hero, media, buttons, content, forms, footer. Once you can name these, you can describe any website to an AI and plan your own."
+    />
+  </div>
+</SectionWrapper>
+
+{/* -- Section 2: Wrap -- */}
+<SectionWrapper index={2} client:load>
+  <style>{`
+    @keyframes fadeUp { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
+    .fade-up { animation: fadeUp 0.6s cubic-bezier(0.16,1,0.3,1) both; }
+    @media (prefers-reduced-motion: reduce) { .fade-up { animation: none; } }
+  `}</style>
+  <div className="text-center mb-7 fade-up">
+    <p className="text-sm font-black text-slate-400 uppercase tracking-widest mb-3">Try it yourself</p>
+    <h2 className="text-4xl font-black text-slate-800 mb-2 tracking-tight">Be a Website Detective</h2>
+  </div>
+  <div className="fade-up">
+    <ConceptCard icon="8" title="Spot the parts in the wild">
+      <p className="text-lg mb-3">Open any website you like on a big screen. Point out the header, the menu, the hero, the buttons and the footer. You'll start seeing the 8 parts everywhere.</p>
+      <div className="rounded-2xl bg-[#fff7ed] border-2 border-[#fed7aa] px-4 py-3 text-center">
+        <p className="font-black text-[#b45309] text-lg">Same parts, arranged differently — that's every website.</p>
+      </div>
+    </ConceptCard>
+    <p className="text-center text-xl md:text-2xl text-slate-500 font-bold mt-6">Next: the different types of websites and what they're for.</p>
+  </div>
+  <RevealButton sectionIndex={2} text="Finish Lesson 2" client:load />
+</SectionWrapper>

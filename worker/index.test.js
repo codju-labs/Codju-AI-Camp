@@ -235,7 +235,7 @@ test('Day 4 lessons redirect regular students before the unlock date', async () 
 test('Day 5 lessons are available early for full-access students', async () => {
   const response = await withMockedNow('2026-06-24T12:00:00+05:30', () =>
     worker.fetch(
-      new Request('https://camp.example.com/learn/lesson/aicc-build-app', {
+      new Request('https://camp.example.com/learn/lesson/aicc-web-project', {
         headers: { Cookie: createSessionCookie('devashishpuri@gmail.com') },
       }),
       env,
@@ -244,6 +244,21 @@ test('Day 5 lessons are available early for full-access students', async () => {
 
   assert.equal(response.status, 200);
   assert.equal(await response.text(), 'asset');
+});
+
+test('Day 6 game lessons redirect regular students before the unlock date', async () => {
+  const response = await withMockedNow('2026-06-26T12:00:00+05:30', () =>
+    worker.fetch(
+      new Request('https://camp.example.com/learn/lesson/aicc-game-build', {
+        headers: { Cookie: createSessionCookie('student@example.com') },
+        redirect: 'manual',
+      }),
+      env,
+      { waitUntil() {} },
+    ));
+
+  assert.equal(response.status, 302);
+  assert.equal(response.headers.get('Location'), 'https://camp.example.com/learn');
 });
 
 test('Razorpay verification accepts a valid signature and marks the order paid', async () => {

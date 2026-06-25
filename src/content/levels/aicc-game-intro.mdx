@@ -1,0 +1,69 @@
+---
+title: "What Makes a Game?"
+sectionCount: 3
+---
+
+import { SectionWrapper } from "../../components/learning/SectionWrapper";
+import { RevealButton } from "../../components/ui/RevealButton";
+import { ConceptCard } from "../../components/ui/ConceptCard";
+
+<SectionWrapper index={0} client:load>
+  <style>{`
+    @keyframes heroSlideUp { from { opacity: 0; transform: translateY(40px); } to { opacity: 1; transform: translateY(0); } }
+    @keyframes bob { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-8px); } }
+    .hero-e1 { animation: heroSlideUp 0.7s cubic-bezier(0.16,1,0.3,1) both; }
+    .hero-e2 { animation: heroSlideUp 0.7s cubic-bezier(0.16,1,0.3,1) 0.12s both; }
+    .hero-e3 { animation: heroSlideUp 0.7s cubic-bezier(0.16,1,0.3,1) 0.24s both; }
+    .hero-e4 { animation: heroSlideUp 0.7s cubic-bezier(0.16,1,0.3,1) 0.36s both; }
+    .b1 { animation: bob 2.2s ease-in-out infinite; }
+    @media (prefers-reduced-motion: reduce) { .hero-e1,.hero-e2,.hero-e3,.hero-e4 { animation-duration: 0.01s; } .b1 { animation: none; } }
+  `}</style>
+  <div className="text-center py-14 min-h-[60vh] flex flex-col items-center justify-center">
+    <div className="hero-e1 mb-8 flex items-center justify-center">
+      <span className="b1 flex h-20 w-20 items-center justify-center rounded-3xl bg-[#8B4EC4] text-2xl font-black text-white shadow-md">play</span>
+    </div>
+    <h1 className="hero-e2 text-5xl font-black text-slate-900 mb-4">What Makes a Game?</h1>
+    <p className="hero-e3 text-xl md:text-2xl text-slate-500 font-bold mb-9 max-w-xl mx-auto leading-relaxed">
+      Games are not magic. They are rules, goals, feedback, and choices.
+    </p>
+    <div className="hero-e4">
+      <RevealButton sectionIndex={0} text="Start playing" client:load />
+    </div>
+  </div>
+</SectionWrapper>
+
+<SectionWrapper index={1} client:load>
+  <div className="text-center mb-7">
+    <p className="text-sm font-black text-slate-400 uppercase tracking-widest mb-3">The core loop</p>
+    <h2 className="text-4xl font-black text-slate-800 mb-2 tracking-tight">Every Game Repeats a Loop</h2>
+    <p className="text-xl md:text-2xl text-slate-500 font-bold max-w-xl mx-auto">
+      Do something, see what happens, try again better.
+    </p>
+  </div>
+  <div className="grid gap-4 md:grid-cols-2">
+    <ConceptCard icon="1" title="Action">
+      <p className="text-lg">The player presses, taps, drags, jumps, shoots, moves, or chooses.</p>
+    </ConceptCard>
+    <ConceptCard icon="2" title="Feedback">
+      <p className="text-lg">The game answers with points, sounds, movement, danger, or a new clue.</p>
+    </ConceptCard>
+    <ConceptCard icon="3" title="Decision">
+      <p className="text-lg">The player decides what to do next. That choice creates fun.</p>
+    </ConceptCard>
+  </div>
+  <RevealButton sectionIndex={1} text="I see the loop" client:load />
+</SectionWrapper>
+
+<SectionWrapper index={2} client:load>
+  <div className="text-center mb-7">
+    <p className="text-sm font-black text-slate-400 uppercase tracking-widest mb-3">Lock it in</p>
+    <h2 className="text-4xl font-black text-slate-800 mb-2 tracking-tight">Games Need Four Things</h2>
+  </div>
+  <ConceptCard icon="4" title="Goal, rules, challenge, reward">
+    <p className="text-lg mb-3">A good game tells the player what to do, what is allowed, what makes it hard, and why they should keep going.</p>
+    <div className="rounded-2xl border-2 border-amber-200 bg-amber-50 px-4 py-3 text-center">
+      <p className="text-lg font-black text-amber-800">Tomorrow's builder mindset: describe those four things clearly, and AI can help you make the game.</p>
+    </div>
+  </ConceptCard>
+  <RevealButton sectionIndex={2} text="Finish Lesson 1" client:load />
+</SectionWrapper>

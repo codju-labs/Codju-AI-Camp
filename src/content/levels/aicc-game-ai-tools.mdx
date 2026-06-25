@@ -1,0 +1,50 @@
+---
+title: "How AI Builds Games"
+sectionCount: 3
+---
+
+import { SectionWrapper } from "../../components/learning/SectionWrapper";
+import { RevealButton } from "../../components/ui/RevealButton";
+import { ConceptCard } from "../../components/ui/ConceptCard";
+
+<SectionWrapper index={0} client:load>
+  <div className="text-center py-14 min-h-[60vh] flex flex-col items-center justify-center">
+    <div className="mb-8 flex items-center justify-center gap-4">
+      <span className="flex h-16 w-16 items-center justify-center rounded-full bg-rose-500 text-2xl font-black text-white shadow-md">Lv</span>
+      <span className="flex h-16 w-16 items-center justify-center rounded-full bg-slate-900 text-2xl font-black text-white shadow-md">v0</span>
+    </div>
+    <h1 className="text-5xl font-black text-slate-900 mb-4">How AI Builds Games</h1>
+    <p className="text-xl md:text-2xl text-slate-500 font-bold mb-9 max-w-xl mx-auto leading-relaxed">
+      AI can write the code, but you are still the game designer.
+    </p>
+    <RevealButton sectionIndex={0} text="See the workflow" client:load />
+  </div>
+</SectionWrapper>
+
+<SectionWrapper index={1} client:load>
+  <div className="text-center mb-7">
+    <p className="text-sm font-black text-slate-400 uppercase tracking-widest mb-3">Workflow</p>
+    <h2 className="text-4xl font-black text-slate-800 mb-2 tracking-tight">From Idea to Playable</h2>
+  </div>
+  <div className="grid gap-4 md:grid-cols-2">
+    <ConceptCard icon="1" title="Describe"><p className="text-lg">Explain the player, goal, rules, controls, and style.</p></ConceptCard>
+    <ConceptCard icon="2" title="Generate"><p className="text-lg">AI writes a first playable version.</p></ConceptCard>
+    <ConceptCard icon="3" title="Test"><p className="text-lg">You play it and notice what feels confusing or boring.</p></ConceptCard>
+    <ConceptCard icon="4" title="Improve"><p className="text-lg">Ask AI for changes, then test again.</p></ConceptCard>
+  </div>
+  <RevealButton sectionIndex={1} text="Workflow saved" client:load />
+</SectionWrapper>
+
+<SectionWrapper index={2} client:load>
+  <div className="text-center mb-7">
+    <p className="text-sm font-black text-slate-400 uppercase tracking-widest mb-3">Builder mindset</p>
+    <h2 className="text-4xl font-black text-slate-800 mb-2 tracking-tight">Do Not Ask for Everything at Once</h2>
+  </div>
+  <ConceptCard icon="AI" title="Small changes win">
+    <p className="text-lg mb-3">After the first version works, improve one thing at a time: controls, difficulty, art style, scoring, or win screen.</p>
+    <div className="rounded-2xl border-2 border-emerald-200 bg-emerald-50 px-4 py-3">
+      <p className="text-base font-black text-emerald-800">Good follow-up: Make the asteroids slower for the first 20 seconds, then speed them up gradually.</p>
+    </div>
+  </ConceptCard>
+  <RevealButton sectionIndex={2} text="Finish Lesson 4" client:load />
+</SectionWrapper>

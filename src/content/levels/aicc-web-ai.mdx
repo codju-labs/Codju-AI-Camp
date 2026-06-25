@@ -1,0 +1,103 @@
+---
+title: "How AI Builds Websites"
+sectionCount: 4
+---
+
+import { AiBuildFlow } from "../../components/ui/AiBuildFlow";
+import { WebsiteToolCards } from "../../components/ui/WebsiteToolCards";
+import { SectionWrapper } from "../../components/learning/SectionWrapper";
+import { RevealButton } from "../../components/ui/RevealButton";
+import { ConceptCard } from "../../components/ui/ConceptCard";
+
+{/* -- Section 0: Hero -- */}
+<SectionWrapper index={0} client:load>
+  <style>{`
+    @keyframes heroSlideUp { from { opacity: 0; transform: translateY(40px); } to { opacity: 1; transform: translateY(0); } }
+    @keyframes bob { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-8px); } }
+    .hero-e1 { animation: heroSlideUp 0.7s cubic-bezier(0.16,1,0.3,1) both; }
+    .hero-e2 { animation: heroSlideUp 0.7s cubic-bezier(0.16,1,0.3,1) 0.12s both; }
+    .hero-e3 { animation: heroSlideUp 0.7s cubic-bezier(0.16,1,0.3,1) 0.24s both; }
+    .hero-e4 { animation: heroSlideUp 0.7s cubic-bezier(0.16,1,0.3,1) 0.36s both; }
+    .b1 { animation: bob 2.2s ease-in-out infinite; }
+    .b2 { animation: bob 2.2s ease-in-out 0.3s infinite; }
+    @media (prefers-reduced-motion: reduce) { .hero-e1,.hero-e2,.hero-e3,.hero-e4 { animation-duration: 0.01s; } .b1,.b2 { animation: none; } }
+  `}</style>
+  <div className="text-center py-14 min-h-[60vh] flex flex-col items-center justify-center">
+    <div className="hero-e1 mb-8 flex items-center gap-4">
+      <span className="b1 flex h-16 w-16 items-center justify-center rounded-full bg-rose-500 text-2xl font-black text-white shadow-md">Lv</span>
+      <span className="b2 flex h-16 w-16 items-center justify-center rounded-full bg-slate-900 text-2xl font-black text-white shadow-md">v0</span>
+    </div>
+    <h1 className="hero-e2 text-5xl font-black text-slate-900 mb-4">How AI Builds Websites</h1>
+    <p className="hero-e3 text-xl md:text-2xl text-slate-500 font-bold mb-9 max-w-xl mx-auto leading-relaxed">
+      You describe it in words. AI writes the code and builds it.
+    </p>
+    <div className="hero-e4">
+      <RevealButton sectionIndex={0} text="See the magic" client:load />
+    </div>
+  </div>
+</SectionWrapper>
+
+{/* -- Section 1: Build flow -- */}
+<SectionWrapper index={1} client:load>
+  <style>{`
+    @keyframes fadeUp { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
+    .fade-up { animation: fadeUp 0.6s cubic-bezier(0.16,1,0.3,1) both; }
+    @media (prefers-reduced-motion: reduce) { .fade-up { animation: none; } }
+  `}</style>
+  <div className="text-center mb-7 fade-up">
+    <p className="text-sm font-black text-slate-400 uppercase tracking-widest mb-3">Old way vs new way</p>
+    <h2 className="text-4xl font-black text-slate-800 mb-2 tracking-tight">Two Ways to Build</h2>
+  </div>
+  <div className="fade-up">
+    <AiBuildFlow
+      client:only="react"
+      sectionIndex={1}
+      explanation="The old way needed designers, developers, testers and weeks of work. AI tools collapse that into: idea, prompt, website. You still bring the idea and judgement."
+    />
+  </div>
+</SectionWrapper>
+
+{/* -- Section 2: Tools -- */}
+<SectionWrapper index={2} client:load>
+  <style>{`
+    @keyframes fadeUp { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
+    .fade-up { animation: fadeUp 0.6s cubic-bezier(0.16,1,0.3,1) both; }
+    @media (prefers-reduced-motion: reduce) { .fade-up { animation: none; } }
+  `}</style>
+  <div className="text-center mb-7 fade-up">
+    <p className="text-sm font-black text-slate-400 uppercase tracking-widest mb-3">Meet the builders</p>
+    <h2 className="text-4xl font-black text-slate-800 mb-2 tracking-tight">Two AI Website Tools</h2>
+    <p className="text-xl md:text-2xl text-slate-500 font-bold max-w-xl mx-auto">
+      Tap each card to see what it's best at.
+    </p>
+  </div>
+  <div className="fade-up">
+    <WebsiteToolCards
+      client:only="react"
+      sectionIndex={2}
+      explanation="Lovable builds full working sites with a database. v0 (by Vercel) turns a chat into a sleek, modern site with real code. Both take a prompt and give you a website."
+    />
+  </div>
+</SectionWrapper>
+
+{/* -- Section 3: Wrap -- */}
+<SectionWrapper index={3} client:load>
+  <style>{`
+    @keyframes fadeUp { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
+    .fade-up { animation: fadeUp 0.6s cubic-bezier(0.16,1,0.3,1) both; }
+    @media (prefers-reduced-motion: reduce) { .fade-up { animation: none; } }
+  `}</style>
+  <div className="text-center mb-7 fade-up">
+    <p className="text-sm font-black text-slate-400 uppercase tracking-widest mb-3">The catch</p>
+    <h2 className="text-4xl font-black text-slate-800 mb-2 tracking-tight">AI Is Only as Good as Your Words</h2>
+  </div>
+  <div className="fade-up">
+    <ConceptCard icon="AI" title="The prompt does the heavy lifting">
+      <p className="text-lg mb-3">These tools are powerful, but they can't read your mind. A vague prompt gives a vague site. A clear, detailed prompt gives a site that looks like what you imagined.</p>
+      <div className="rounded-2xl bg-[#fff7ed] border-2 border-[#fed7aa] px-4 py-3 text-center">
+        <p className="font-black text-[#b45309] text-lg">So next, you'll learn to write a great website prompt.</p>
+      </div>
+    </ConceptCard>
+  </div>
+  <RevealButton sectionIndex={3} text="Finish Lesson 4" client:load />
+</SectionWrapper>

@@ -1,0 +1,56 @@
+---
+title: "Prompt Engineering for Games"
+sectionCount: 3
+---
+
+import { GamePromptBuilder } from "../../components/ui/GamePromptBuilder";
+import { SectionWrapper } from "../../components/learning/SectionWrapper";
+import { RevealButton } from "../../components/ui/RevealButton";
+import { ConceptCard } from "../../components/ui/ConceptCard";
+
+<SectionWrapper index={0} client:load>
+  <div className="text-center py-14 min-h-[60vh] flex flex-col items-center justify-center">
+    <div className="mb-8 flex items-center justify-center">
+      <span className="flex h-20 w-20 items-center justify-center rounded-3xl bg-[#8B4EC4] text-2xl font-black text-white shadow-md">say</span>
+    </div>
+    <h1 className="text-5xl font-black text-slate-900 mb-4">Prompt Engineering for Games</h1>
+    <p className="text-xl md:text-2xl text-slate-500 font-bold mb-9 max-w-xl mx-auto leading-relaxed">
+      A game prompt needs rules, controls, challenge, style, and win conditions.
+    </p>
+    <RevealButton sectionIndex={0} text="Build a game prompt" client:load />
+  </div>
+</SectionWrapper>
+
+<SectionWrapper index={1} client:load>
+  <div className="text-center mb-7">
+    <p className="text-sm font-black text-slate-400 uppercase tracking-widest mb-3">Prompt builder</p>
+    <h2 className="text-4xl font-black text-slate-800 mb-2 tracking-tight">Turn Your Idea Into Instructions</h2>
+    <p className="text-xl md:text-2xl text-slate-500 font-bold max-w-xl mx-auto">
+      Edit the fields, then copy the prompt into an AI builder.
+    </p>
+  </div>
+  <GamePromptBuilder
+    client:only="react"
+    sectionIndex={1}
+    explanation="A strong game prompt is specific about what the player does, how they control it, what makes it challenging, and how the game starts, ends, and restarts."
+  />
+</SectionWrapper>
+
+<SectionWrapper index={2} client:load>
+  <div className="text-center mb-7">
+    <p className="text-sm font-black text-slate-400 uppercase tracking-widest mb-3">Quality check</p>
+    <h2 className="text-4xl font-black text-slate-800 mb-2 tracking-tight">Before You Paste</h2>
+  </div>
+  <ConceptCard icon="ok" title="The 7-point game prompt checklist">
+    <div className="space-y-2">
+      <p className="text-lg">1. Game title</p>
+      <p className="text-lg">2. Player character</p>
+      <p className="text-lg">3. Goal</p>
+      <p className="text-lg">4. Controls</p>
+      <p className="text-lg">5. Obstacles</p>
+      <p className="text-lg">6. Scoring or reward</p>
+      <p className="text-lg">7. Start, win, lose, and restart screens</p>
+    </div>
+  </ConceptCard>
+  <RevealButton sectionIndex={2} text="Finish Lesson 5" client:load />
+</SectionWrapper>

@@ -1,0 +1,133 @@
+---
+title: "From Idea to Internet"
+sectionCount: 4
+---
+
+import { HouseAnalogy } from "../../components/ui/HouseAnalogy";
+import { SectionWrapper } from "../../components/learning/SectionWrapper";
+import { RevealButton } from "../../components/ui/RevealButton";
+import { ConceptCard } from "../../components/ui/ConceptCard";
+
+{/* -- Section 0: Hero -- */}
+<SectionWrapper index={0} client:load>
+  <style>{`
+    @keyframes heroSlideUp { from { opacity: 0; transform: translateY(40px); } to { opacity: 1; transform: translateY(0); } }
+    @keyframes bob { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-8px); } }
+    .hero-e1 { animation: heroSlideUp 0.7s cubic-bezier(0.16,1,0.3,1) both; }
+    .hero-e2 { animation: heroSlideUp 0.7s cubic-bezier(0.16,1,0.3,1) 0.12s both; }
+    .hero-e3 { animation: heroSlideUp 0.7s cubic-bezier(0.16,1,0.3,1) 0.24s both; }
+    .hero-e4 { animation: heroSlideUp 0.7s cubic-bezier(0.16,1,0.3,1) 0.36s both; }
+    .b1 { animation: bob 2.2s ease-in-out infinite; }
+    @media (prefers-reduced-motion: reduce) { .hero-e1,.hero-e2,.hero-e3,.hero-e4 { animation-duration: 0.01s; } .b1 { animation: none; } }
+  `}</style>
+  <div className="text-center py-14 min-h-[60vh] flex flex-col items-center justify-center">
+    <div className="hero-e1 mb-8 flex items-center justify-center">
+      <span className="b1 flex h-20 w-20 items-center justify-center rounded-3xl bg-amber-500 text-2xl font-black text-white shadow-md">live</span>
+    </div>
+    <h1 className="hero-e2 text-5xl font-black text-slate-900 mb-4">From Idea to Internet</h1>
+    <p className="hero-e3 text-xl md:text-2xl text-slate-500 font-bold mb-9 max-w-xl mx-auto leading-relaxed">
+      A built site isn't online yet. Here's everything that makes it live.
+    </p>
+    <div className="hero-e4">
+      <RevealButton sectionIndex={0} text="Build the house" client:load />
+    </div>
+  </div>
+</SectionWrapper>
+
+{/* -- Section 1: House analogy -- */}
+<SectionWrapper index={1} client:load>
+  <style>{`
+    @keyframes fadeUp { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
+    .fade-up { animation: fadeUp 0.6s cubic-bezier(0.16,1,0.3,1) both; }
+    @media (prefers-reduced-motion: reduce) { .fade-up { animation: none; } }
+  `}</style>
+  <div className="text-center mb-7 fade-up">
+    <p className="text-sm font-black text-slate-400 uppercase tracking-widest mb-3">The house trick</p>
+    <h2 className="text-4xl font-black text-slate-800 mb-2 tracking-tight">A Website Is Like a House</h2>
+  </div>
+  <div className="fade-up">
+    <HouseAnalogy
+      client:only="react"
+      sectionIndex={1}
+      explanation="Domain = address, hosting = land, server = building, database = storage room, internet = roads, frontend = the rooms you see. Six parts, one live website."
+    />
+  </div>
+</SectionWrapper>
+
+{/* -- Section 2: Building blocks -- */}
+<SectionWrapper index={2} client:load>
+  <style>{`
+    @keyframes fadeUp { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
+    .fade-up { animation: fadeUp 0.6s cubic-bezier(0.16,1,0.3,1) both; }
+    @media (prefers-reduced-motion: reduce) { .fade-up { animation: none; } }
+  `}</style>
+  <div className="text-center mb-7 fade-up">
+    <p className="text-sm font-black text-slate-400 uppercase tracking-widest mb-3">The real names</p>
+    <h2 className="text-4xl font-black text-slate-800 mb-2 tracking-tight">The Building Blocks</h2>
+  </div>
+  <div className="fade-up space-y-4">
+    <ConceptCard icon="FE" title="Frontend &amp; Backend">
+      <p className="text-lg mb-2"><strong>Frontend</strong> is everything you see and click: the layout, colours, buttons. <strong>Backend</strong> is the hidden engine that remembers logins, saves orders and does the thinking.</p>
+      <div className="rounded-2xl bg-slate-50 border-2 border-slate-200 px-4 py-3"><p className="font-bold text-slate-600 text-base">Frontend = the shop floor. Backend = the storeroom and staff behind the scenes.</p></div>
+    </ConceptCard>
+    <ConceptCard icon="DB" title="Databases">
+      <p className="text-lg mb-2">A <strong>database</strong> safely stores everything a site must remember: user accounts, orders, feedback, student details. Anything that changes or grows lives here.</p>
+      <div className="rounded-2xl bg-indigo-50 border-2 border-indigo-100 px-4 py-3"><p className="font-black text-indigo-700 text-base">Popular databases: MySQL, PostgreSQL, MongoDB. AI tools like Lovable can add one for you.</p></div>
+    </ConceptCard>
+    <ConceptCard icon="srv" title="Servers &amp; Hosting">
+      <p className="text-lg mb-2">A <strong>server</strong> is an always-on computer that holds your site. <strong>Hosting</strong> means renting space on one so anyone can visit, day or night.</p>
+      <div className="rounded-2xl bg-emerald-50 border-2 border-emerald-100 px-4 py-3"><p className="font-black text-emerald-700 text-base">Beginner-friendly hosts: Vercel and Netlify. Many AI builders publish to them in one click.</p></div>
+    </ConceptCard>
+    <ConceptCard icon="dom" title="Domain Names">
+      <p className="text-lg mb-2">A <strong>domain</strong> is your site's easy-to-remember address, like codju.com. Behind it, computers actually use a number called an IP address — the domain is the friendly name for it.</p>
+      <div className="rounded-2xl bg-[#fff7ed] border-2 border-[#fed7aa] px-4 py-3">
+        <p className="font-black text-[#b45309] text-base">Endings: .com, .in, .org, .edu. Buy one from GoDaddy or Namecheap in 3 steps: search if it's free, purchase it, register your ownership.</p>
+      </div>
+    </ConceptCard>
+  </div>
+  <RevealButton sectionIndex={2} text="See it all connect" client:load />
+</SectionWrapper>
+
+{/* -- Section 3: Ecosystem + wrap -- */}
+<SectionWrapper index={3} client:load>
+  <style>{`
+    @keyframes fadeUp { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
+    .fade-up { animation: fadeUp 0.6s cubic-bezier(0.16,1,0.3,1) both; }
+    @media (prefers-reduced-motion: reduce) { .fade-up { animation: none; } }
+  `}</style>
+  <div className="text-center mb-7 fade-up">
+    <p className="text-sm font-black text-slate-400 uppercase tracking-widest mb-3">The whole picture</p>
+    <h2 className="text-4xl font-black text-slate-800 mb-2 tracking-tight">The Website Ecosystem</h2>
+    <p className="text-xl md:text-2xl text-slate-500 font-bold max-w-xl mx-auto">
+      How every part works together when someone visits.
+    </p>
+  </div>
+  <div className="fade-up mx-auto max-w-sm space-y-1">
+    {[
+      ["User", "types your address", "bg-[#8B4EC4]"],
+      ["Internet", "carries the request", "bg-blue-500"],
+      ["Domain Name", "points to the right computer", "bg-cyan-600"],
+      ["Hosting Server", "holds your website", "bg-amber-500"],
+      ["Website", "shows the page (frontend)", "bg-rose-500"],
+      ["Database", "supplies the saved data", "bg-indigo-500"],
+    ].map(([t, d, bg], i, arr) => (
+      <div key={t}>
+        <div className="flex items-center gap-3 rounded-2xl border-2 border-slate-200 bg-white px-4 py-3 shadow-sm">
+          <span className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-xl ${bg} text-sm font-black text-white`}>{i + 1}</span>
+          <div>
+            <p className="text-lg font-black text-slate-800">{t}</p>
+            <p className="text-sm font-bold text-slate-500">{d}</p>
+          </div>
+        </div>
+        {i < arr.length - 1 && <p className="text-center text-xl font-black text-slate-300 leading-none py-0.5">{"↓"}</p>}
+      </div>
+    ))}
+  </div>
+  <div className="fade-up mt-6">
+    <ConceptCard icon="live" title="That's the full journey">
+      <p className="text-lg">A visitor's request travels through the internet, finds your domain, reaches your server, loads your website, and pulls saved data from the database — all in under a second.</p>
+    </ConceptCard>
+    <p className="text-center text-xl md:text-2xl text-slate-500 font-bold mt-6">Final lesson: build and publish your own dream website.</p>
+  </div>
+  <RevealButton sectionIndex={3} text="Finish Lesson 7" client:load />
+</SectionWrapper>

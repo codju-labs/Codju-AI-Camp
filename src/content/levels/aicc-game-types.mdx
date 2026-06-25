@@ -1,0 +1,49 @@
+---
+title: "Types of Games"
+sectionCount: 3
+---
+
+import { SectionWrapper } from "../../components/learning/SectionWrapper";
+import { RevealButton } from "../../components/ui/RevealButton";
+import { ConceptCard } from "../../components/ui/ConceptCard";
+
+<SectionWrapper index={0} client:load>
+  <div className="text-center py-14 min-h-[60vh] flex flex-col items-center justify-center">
+    <div className="mb-8 flex items-center justify-center">
+      <span className="flex h-20 w-20 items-center justify-center rounded-3xl bg-cyan-500 text-2xl font-black text-white shadow-md">type</span>
+    </div>
+    <h1 className="text-5xl font-black text-slate-900 mb-4">Types of Games</h1>
+    <p className="text-xl md:text-2xl text-slate-500 font-bold mb-9 max-w-xl mx-auto leading-relaxed">
+      Your genre tells AI what kind of rules, controls, and screens to create.
+    </p>
+    <RevealButton sectionIndex={0} text="Choose a genre" client:load />
+  </div>
+</SectionWrapper>
+
+<SectionWrapper index={1} client:load>
+  <div className="text-center mb-7">
+    <p className="text-sm font-black text-slate-400 uppercase tracking-widest mb-3">Genre map</p>
+    <h2 className="text-4xl font-black text-slate-800 mb-2 tracking-tight">Six Game Shapes</h2>
+  </div>
+  <div className="grid gap-4 md:grid-cols-2">
+    <ConceptCard icon="run" title="Endless runner"><p className="text-lg">Move, dodge, collect, survive longer each try.</p></ConceptCard>
+    <ConceptCard icon="puz" title="Puzzle"><p className="text-lg">Solve a challenge with logic, clues, or matching.</p></ConceptCard>
+    <ConceptCard icon="arc" title="Arcade"><p className="text-lg">Fast action, simple controls, score chasing.</p></ConceptCard>
+    <ConceptCard icon="sim" title="Simulation"><p className="text-lg">Manage a system like a shop, city, garden, or team.</p></ConceptCard>
+    <ConceptCard icon="quiz" title="Quiz"><p className="text-lg">Answer questions, earn points, learn as you play.</p></ConceptCard>
+    <ConceptCard icon="adv" title="Adventure"><p className="text-lg">Explore, collect items, unlock story moments.</p></ConceptCard>
+  </div>
+  <RevealButton sectionIndex={1} text="I know the shapes" client:load />
+</SectionWrapper>
+
+<SectionWrapper index={2} client:load>
+  <div className="text-center mb-7">
+    <p className="text-sm font-black text-slate-400 uppercase tracking-widest mb-3">Prompt tip</p>
+    <h2 className="text-4xl font-black text-slate-800 mb-2 tracking-tight">Name the Genre First</h2>
+  </div>
+  <ConceptCard icon="say" title="A strong first sentence">
+    <p className="text-lg mb-3">Start your AI prompt like this: <strong>Build a browser-based endless runner game...</strong> or <strong>Build a memory puzzle game...</strong></p>
+    <p className="text-lg">That one phrase gives AI the right mental model before you add details.</p>
+  </ConceptCard>
+  <RevealButton sectionIndex={2} text="Finish Lesson 3" client:load />
+</SectionWrapper>

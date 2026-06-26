@@ -119,6 +119,8 @@ const campDayContent: CampDay[] = [
       "Understand how websites really work, then use AI to take your own site from an idea all the way to a live link on the internet.",
     status: "locked",
     unlockOffsetDays: 4,
+    recordingUrl: "https://youtube.com/live/zFxzpbkXsqA?feature=share",
+    recordingEmbedUrl: "https://www.youtube-nocookie.com/embed/zFxzpbkXsqA",
     levels: [
       { id: "aicc-web-intro", title: "What Is a Website?", summary: "Learn what happens when someone opens a website link.", dayId: "aicc-day5-website" },
       { id: "aicc-web-anatomy", title: "Anatomy of a Website", summary: "Spot the common building blocks behind real websites.", dayId: "aicc-day5-website" },

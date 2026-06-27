@@ -150,7 +150,7 @@ function outcomeForDay(dayKey: string) {
     "day-3": "Turned learning material into simple study aids.",
     "day-4": "Organized ideas into a clear presentation.",
     "day-5": "Explored music, mood, lyrics, and AI-assisted composition.",
-    "day-6": "Created an interactive web experience from an idea.",
+    "day-6": "Pulled together camp skills into a final shareable project.",
     "day-7": "Published a website for others to visit.",
     "day-8": "Designed a playable game loop with goals and feedback.",
   };
@@ -232,6 +232,47 @@ function ProjectVisual({ project, large = false }: { project: Project; large?: b
   );
 }
 
+function PublicPortfolioSkeleton() {
+  return (
+    <main className="min-h-screen overflow-hidden bg-white text-gray-900">
+      <nav className="fixed left-0 right-0 top-0 z-40 border-b border-purple-100 bg-white/90 px-4 py-4 backdrop-blur-xl sm:px-5 lg:px-12">
+        <div className="mx-auto flex max-w-6xl items-center justify-between gap-4">
+          <div className="h-5 w-24 animate-pulse rounded-full bg-purple-100" />
+          <div className="hidden gap-5 md:flex">
+            {[0, 1, 2, 3].map((item) => (
+              <div key={item} className="h-4 w-16 animate-pulse rounded-full bg-purple-100" />
+            ))}
+          </div>
+        </div>
+      </nav>
+      <section className="relative flex min-h-[78vh] items-center bg-gradient-to-br from-purple-50 via-white to-indigo-50 px-4 pb-14 pt-28 sm:px-5 lg:px-12">
+        <div className="mx-auto flex w-full max-w-4xl flex-col items-center text-center">
+          <div className="h-36 w-36 animate-pulse rounded-full bg-purple-100 sm:h-44 sm:w-44" />
+          <div className="mt-10 h-10 w-64 max-w-full animate-pulse rounded-full bg-purple-100 sm:w-96" />
+          <div className="mt-5 h-5 w-80 max-w-full animate-pulse rounded-full bg-indigo-100" />
+          <div className="mt-3 h-5 w-56 max-w-full animate-pulse rounded-full bg-indigo-100" />
+          <div className="mt-8 flex flex-wrap justify-center gap-2">
+            {[0, 1, 2, 3].map((item) => (
+              <div key={item} className="h-8 w-28 animate-pulse rounded-full bg-white shadow-sm" />
+            ))}
+          </div>
+        </div>
+      </section>
+      <section className="mx-auto max-w-6xl px-4 py-10 sm:px-5 lg:px-0">
+        <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
+          {[0, 1, 2, 3].map((item) => (
+            <div key={item} className="rounded-3xl border-2 border-purple-100 bg-white p-5">
+              <div className="h-7 w-7 animate-pulse rounded-xl bg-purple-100" />
+              <div className="mt-4 h-9 w-14 animate-pulse rounded-lg bg-purple-100" />
+              <div className="mt-3 h-4 w-24 animate-pulse rounded-full bg-gray-100" />
+            </div>
+          ))}
+        </div>
+      </section>
+    </main>
+  );
+}
+
 export function PublicPortfolio() {
   const [data, setData] = useState<Payload | null>(null);
   const [loading, setLoading] = useState(true);
@@ -240,20 +281,8 @@ export function PublicPortfolio() {
   useEffect(() => {
     const slug = getSlugFromPath();
     if (!slug) {
-      fetch("/api/portfolio")
-        .then(async (response) => {
-          const payload = await response.json();
-          if (!response.ok) throw new Error("Open a creator portfolio link to view it.");
-          return payload as Payload;
-        })
-        .then((payload) => {
-          setData(payload);
-          if (payload.profile.slug) {
-            window.history.replaceState(null, "", `/portfolio/${payload.profile.slug}`);
-          }
-        })
-        .catch((fetchError) => setError(fetchError.message))
-        .finally(() => setLoading(false));
+      setError("Open a creator portfolio link to view it.");
+      setLoading(false);
       return;
     }
 
@@ -275,13 +304,7 @@ export function PublicPortfolio() {
   );
 
   if (loading) {
-    return (
-      <main className="min-h-screen bg-purple-50 px-4 py-20 text-gray-900">
-        <div className="mx-auto max-w-4xl rounded-3xl border-2 border-purple-100 bg-white p-8 text-center font-bold shadow-sm">
-          Loading portfolio...
-        </div>
-      </main>
-    );
+    return <PublicPortfolioSkeleton />;
   }
 
   if (error || !data) {
@@ -428,7 +451,7 @@ export function PublicPortfolio() {
             subtitle="A clean look at the work this student has chosen to share from the camp."
           />
           <div className="mt-10 grid gap-5 md:grid-cols-2">
-            {projects.map((project, index) => {
+            {projects.map((project) => {
               const day = projectDays.find((item) => item.key === project.dayKey) || {
                 key: project.dayKey,
                 label: project.dayLabel,
@@ -445,9 +468,9 @@ export function PublicPortfolio() {
                       <Icon name={DAY_ICONS[day.key] || "sparkles"} className="h-5 w-5" />
                     </div>
                     <div className="min-w-0">
-                      <div className="text-xs font-extrabold uppercase tracking-widest text-purple-600">
-                      {day.label}
-                      </div>
+                      <p className="text-xs font-extrabold uppercase tracking-widest text-purple-600">
+                        {day.category}
+                      </p>
                       <h3 className="mt-1 text-xl font-extrabold text-gray-900">
                         {project.title || day.title}
                       </h3>
@@ -472,12 +495,12 @@ export function PublicPortfolio() {
       </section>
 
       {featuredProject && (
-        <section className="relative bg-white px-4 py-12 sm:px-5 lg:px-12">
+        <section className="relative bg-white px-4 py-8 sm:px-5 lg:px-12">
           <div className="mx-auto max-w-6xl">
-          <div className="relative h-[380px] overflow-hidden rounded-[2rem] border-2 border-purple-100 bg-white sm:h-[460px]">
+          <div className="relative h-[280px] overflow-hidden rounded-[1.75rem] border-2 border-purple-100 bg-white sm:h-[340px]">
             <ProjectVisual project={featuredProject} large />
-            <div className="absolute inset-0 bg-gradient-to-r from-white/95 via-white/70 to-transparent" />
-            <div className="absolute inset-0 flex flex-col justify-end p-7 sm:max-w-xl sm:p-12">
+            <div className="absolute inset-0 bg-gradient-to-r from-white/95 via-white/72 to-transparent" />
+            <div className="absolute inset-0 flex flex-col justify-end p-6 sm:max-w-xl sm:p-10">
               <span className="mb-3 inline-flex w-fit rounded-full bg-purple-50 px-3 py-1 text-xs font-extrabold uppercase tracking-widest text-purple-600">
                 Spotlight · {featuredProject.category}
               </span>
@@ -485,7 +508,7 @@ export function PublicPortfolio() {
                 {featuredProject.title}
               </h3>
               {featuredProject.description && (
-                <p className="mt-3 max-w-md text-sm leading-relaxed text-gray-500 sm:text-base">
+                <p className="mt-3 line-clamp-2 max-w-md text-sm leading-relaxed text-gray-500 sm:text-base">
                   {featuredProject.description}
                 </p>
               )}
@@ -493,7 +516,7 @@ export function PublicPortfolio() {
                 href={featuredProject.projectUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="mt-6 inline-flex w-fit rounded-full bg-[#7b2fc8] px-5 py-3 text-sm font-extrabold text-white no-underline transition hover:bg-[#6f2ab4]"
+                className="mt-5 inline-flex w-fit rounded-full bg-[#7b2fc8] px-5 py-2.5 text-sm font-extrabold text-white no-underline transition hover:bg-[#6f2ab4]"
               >
                 Explore creation
               </a>
@@ -520,9 +543,6 @@ export function PublicPortfolio() {
                 <div className="relative overflow-hidden">
                   <ProjectVisual project={project} />
                   <div className="absolute inset-0 bg-gradient-to-t from-white/80 via-transparent to-transparent" />
-                  <span className="absolute left-3 top-3 rounded-full bg-white/90 px-3 py-1 text-[11px] font-extrabold uppercase tracking-widest text-purple-700">
-                    {project.dayLabel}
-                  </span>
                 </div>
                 <div className="p-5">
                   <p className="text-xs font-extrabold uppercase tracking-widest text-purple-600">

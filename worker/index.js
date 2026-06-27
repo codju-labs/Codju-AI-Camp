@@ -180,12 +180,6 @@ const PORTFOLIO_PROJECT_DAYS = [
     category: 'Music',
   },
   {
-    key: 'day-6',
-    label: 'Day 6',
-    title: 'Interactive Web App',
-    category: 'Web app',
-  },
-  {
     key: 'day-7',
     label: 'Day 7',
     title: 'Website',
@@ -196,6 +190,12 @@ const PORTFOLIO_PROJECT_DAYS = [
     label: 'Day 8',
     title: 'Game',
     category: 'Game project',
+  },
+  {
+    key: 'day-6',
+    label: 'Day 6',
+    title: 'Final Project',
+    category: 'Final showcase',
   },
 ];
 
@@ -354,15 +354,6 @@ function normalizeUrl(value, maxLength = 500) {
   return parsed.toString();
 }
 
-function normalizeFileName(value = 'upload') {
-  const normalized = String(value || 'upload')
-    .toLowerCase()
-    .replace(/[^a-z0-9.]+/g, '-')
-    .replace(/^-+|-+$/g, '')
-    .slice(0, 80);
-  return normalized || 'upload';
-}
-
 function fileExtension(fileName = '', contentType = '') {
   const fromName = String(fileName).split('.').pop()?.toLowerCase();
   if (fromName && fromName !== fileName.toLowerCase()) return fromName;
@@ -382,6 +373,25 @@ function portfolioAssetUrl(request, key) {
   url.search = '';
   url.hash = '';
   return url.toString();
+}
+
+function portfolioAssetKeyFromUrl(value = '') {
+  try {
+    const url = new URL(value);
+    if (!url.pathname.startsWith('/portfolio-assets/')) return '';
+    return decodeURIComponent(url.pathname.replace(/^\/portfolio-assets\//, ''));
+  } catch {
+    return '';
+  }
+}
+
+async function deletePortfolioAsset(env, key) {
+  if (!key || key.includes('..') || !env.PORTFOLIO_ASSETS) return;
+  try {
+    await env.PORTFOLIO_ASSETS.delete(key);
+  } catch (error) {
+    console.warn('Unable to delete portfolio asset', { key, error: error?.message });
+  }
 }
 
 function requirePortfolioAssets(env) {
@@ -634,15 +644,16 @@ async function handleAuthenticatedPortfolio(request, env) {
     requirePortfolioAssets(env);
     const formData = await request.formData();
     const file = formData.get('file');
-    const { buffer, contentType, extension } = await validatePortfolioFile(
+    const { buffer, contentType } = await validatePortfolioFile(
       file,
       PORTFOLIO_FILE_RULES.avatar,
     );
-    const key = `profiles/${profile.slug}/avatar-${crypto.randomUUID()}.${extension}`;
+    const key = `profiles/${profile.slug}/avatar`;
+    const previousAvatarKey = portfolioAssetKeyFromUrl(profile.avatar_url);
     await env.PORTFOLIO_ASSETS.put(key, buffer, {
       httpMetadata: {
         contentType,
-        cacheControl: 'public, max-age=31536000, immutable',
+        cacheControl: 'public, max-age=0, must-revalidate',
       },
       customMetadata: {
         email: session.email,
@@ -656,6 +667,10 @@ async function handleAuthenticatedPortfolio(request, env) {
       SET avatar_url = ?, updated_at = datetime('now')
       WHERE lower(email) = lower(?)
     `).bind(avatarUrl, session.email).run();
+
+    if (previousAvatarKey && previousAvatarKey !== key) {
+      await deletePortfolioAsset(env, previousAvatarKey);
+    }
 
     const updatedProfile = await getPortfolioByEmail(env, session.email);
     const projects = await getPortfolioProjects(env, session.email);
@@ -680,13 +695,12 @@ async function handleAuthenticatedPortfolio(request, env) {
 
     const formData = await request.formData();
     const file = formData.get('file');
-    const { buffer, contentType, extension } = await validatePortfolioFile(file, rule);
-    const fileName = normalizeFileName(file.name || `creation.${extension}`);
-    const key = `projects/${profile.slug}/${dayKey}/${crypto.randomUUID()}-${fileName}`;
+    const { buffer, contentType } = await validatePortfolioFile(file, rule);
+    const key = `projects/${profile.slug}/${dayKey}/creation`;
     await env.PORTFOLIO_ASSETS.put(key, buffer, {
       httpMetadata: {
         contentType,
-        cacheControl: 'public, max-age=31536000, immutable',
+        cacheControl: 'public, max-age=0, must-revalidate',
       },
       customMetadata: {
         email: session.email,
@@ -722,7 +736,7 @@ async function handleAuthenticatedPortfolio(request, env) {
         UPDATE student_portfolios
         SET slug = ?, display_name = ?, headline = ?, bio = ?,
             school_name = ?, city = ?, avatar_url = ?, fingerprint_traits = ?,
-            is_public = ?,
+            is_public = 1,
             updated_at = datetime('now')
         WHERE lower(email) = lower(?)
       `).bind(
@@ -736,7 +750,6 @@ async function handleAuthenticatedPortfolio(request, env) {
         parseFingerprintTraits(Array.isArray(payload.fingerprintTraits)
           ? payload.fingerprintTraits.join(',')
           : payload.fingerprintTraits),
-        payload.isPublic === false ? 0 : 1,
         session.email,
       ).run();
     } catch (error) {
@@ -779,6 +792,11 @@ async function handleAuthenticatedPortfolio(request, env) {
     }
     const sourceType = payload.sourceType === 'upload' ? 'upload' : 'link';
     const assetKey = normalizeText(payload.assetKey, 240);
+    const existingProject = await env.PAYMENTS.prepare(`
+      SELECT asset_key
+      FROM portfolio_projects
+      WHERE lower(email) = lower(?) AND day_key = ?
+    `).bind(session.email, dayKey).first();
 
     await env.PAYMENTS.prepare(`
       INSERT INTO portfolio_projects (
@@ -812,6 +830,10 @@ async function handleAuthenticatedPortfolio(request, env) {
       normalizeText(payload.fileType, 80),
     ).run();
 
+    if (existingProject?.asset_key && existingProject.asset_key !== assetKey) {
+      await deletePortfolioAsset(env, existingProject.asset_key);
+    }
+
     const updatedProfile = await getPortfolioByEmail(env, session.email);
     const projects = await getPortfolioProjects(env, session.email);
     return jsonResponse(serializePortfolio(updatedProfile, projects, true));
@@ -823,11 +845,25 @@ async function handleAuthenticatedPortfolio(request, env) {
       return jsonResponse({ error: 'Unknown portfolio day.' }, 400);
     }
 
+    const existingProject = await env.PAYMENTS.prepare(`
+      SELECT asset_key
+      FROM portfolio_projects
+      WHERE lower(email) = lower(?) AND day_key = ?
+    `).bind(session.email, dayKey).first();
+
     await env.PAYMENTS.prepare(`
       UPDATE portfolio_projects
-      SET is_published = 0, updated_at = datetime('now')
+      SET is_published = 0,
+          source_type = 'link',
+          asset_key = '',
+          file_type = '',
+          updated_at = datetime('now')
       WHERE lower(email) = lower(?) AND day_key = ?
     `).bind(session.email, dayKey).run();
+
+    if (existingProject?.asset_key) {
+      await deletePortfolioAsset(env, existingProject.asset_key);
+    }
 
     const updatedProfile = await getPortfolioByEmail(env, session.email);
     const projects = await getPortfolioProjects(env, session.email);
@@ -853,7 +889,7 @@ async function handlePublicPortfolio(request, env) {
   const profile = await env.PAYMENTS.prepare(`
     SELECT *
     FROM student_portfolios
-    WHERE lower(slug) = lower(?) AND is_public = 1
+    WHERE lower(slug) = lower(?)
   `).bind(slug).first();
   if (!profile) return jsonResponse({ error: 'Portfolio not found.' }, 404);
 
@@ -1575,6 +1611,16 @@ export default {
       return handlePortfolioAsset(request, env);
     }
 
+    if (
+      (request.method === 'GET' || request.method === 'HEAD')
+      && (url.pathname === '/portfolio' || url.pathname.startsWith('/portfolio/'))
+    ) {
+      const assetUrl = new URL(request.url);
+      assetUrl.pathname = '/portfolio/';
+      assetUrl.search = '';
+      return env.ASSETS.fetch(new Request(assetUrl, request));
+    }
+
     if (request.method === 'GET' && url.pathname === '/api/auth/signin') {
       return beginGoogleAuth(env);
     }
@@ -1691,16 +1737,6 @@ export default {
 
     if (request.method === 'POST' && url.pathname === '/api/payments/callback') {
       return handleCallback(request, env, ctx);
-    }
-
-    if (
-      request.method === 'GET'
-      && (url.pathname === '/portfolio' || url.pathname.startsWith('/portfolio/'))
-    ) {
-      const assetUrl = new URL(request.url);
-      assetUrl.pathname = '/portfolio-shell/index.html';
-      assetUrl.search = '';
-      return env.ASSETS.fetch(new Request(assetUrl, request));
     }
 
     return env.ASSETS.fetch(request);

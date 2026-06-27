@@ -89,10 +89,10 @@ const DAY_HINTS: Record<string, { action: string; accept: string; limit: string;
     placeholder: "Dream Big Original Song",
   },
   "day-6": {
-    action: "Paste the live app link.",
+    action: "Paste the final project link.",
     accept: "",
     limit: "Link only",
-    placeholder: "Kindness Bot App",
+    placeholder: "My Final AI Project",
   },
   "day-7": {
     action: "Paste the live website link.",
@@ -135,6 +135,60 @@ function formatTools(tools: string[]) {
 
 function parseTools(value: string) {
   return value.split(",").map((tool) => tool.trim()).filter(Boolean).slice(0, 8);
+}
+
+function PortfolioEditorSkeleton() {
+  return (
+    <main className="bg-slate-50">
+      <section className="bg-gradient-to-br from-[#17142d] via-[#23163f] to-[#0b1022] px-4 py-8 sm:px-5 md:py-10 lg:px-12">
+        <div className="w-lim grid gap-6 lg:grid-cols-[1fr_0.9fr] lg:items-end">
+          <div>
+            <div className="h-4 w-40 animate-pulse rounded-full bg-white/15" />
+            <div className="mt-5 h-10 max-w-xl animate-pulse rounded-2xl bg-white/15" />
+            <div className="mt-3 h-10 max-w-md animate-pulse rounded-2xl bg-white/10" />
+            <div className="mt-5 h-4 max-w-lg animate-pulse rounded-full bg-white/10" />
+          </div>
+          <div className="rounded-2xl border border-white/10 bg-white/8 p-5">
+            <div className="h-4 w-28 animate-pulse rounded-full bg-white/15" />
+            <div className="mt-4 h-5 w-full animate-pulse rounded-full bg-white/10" />
+            <div className="mt-5 flex gap-3">
+              <div className="h-11 w-28 animate-pulse rounded-full bg-white/15" />
+              <div className="h-11 w-28 animate-pulse rounded-full bg-white/10" />
+            </div>
+          </div>
+        </div>
+      </section>
+      <section className="px-4 py-10 sm:px-5 lg:px-12">
+        <div className="w-lim grid gap-6 lg:grid-cols-[320px_minmax(0,1fr)] xl:grid-cols-[360px_minmax(0,1fr)]">
+          <div className="rounded-3xl border-2 border-purple-100 bg-white p-6">
+            <div className="h-4 w-20 animate-pulse rounded-full bg-purple-100" />
+            <div className="mt-5 h-8 w-48 animate-pulse rounded-xl bg-gray-100" />
+            <div className="mt-6 h-28 w-28 animate-pulse rounded-full bg-purple-100" />
+            <div className="mt-6 grid gap-4">
+              {[0, 1, 2, 3].map((item) => (
+                <div key={item} className="h-14 animate-pulse rounded-2xl bg-gray-100" />
+              ))}
+            </div>
+          </div>
+          <div className="rounded-3xl border-2 border-purple-100 bg-white p-6">
+            <div className="h-4 w-40 animate-pulse rounded-full bg-purple-100" />
+            <div className="mt-5 h-8 w-56 animate-pulse rounded-xl bg-gray-100" />
+            <div className="mt-8 flex gap-3 overflow-hidden">
+              {[0, 1, 2, 3, 4].map((item) => (
+                <div key={item} className="h-32 w-40 shrink-0 animate-pulse rounded-2xl bg-purple-50" />
+              ))}
+            </div>
+            <div className="mt-8 grid gap-4">
+              <div className="h-16 animate-pulse rounded-2xl bg-purple-50" />
+              <div className="h-14 animate-pulse rounded-2xl bg-gray-100" />
+              <div className="h-14 animate-pulse rounded-2xl bg-gray-100" />
+              <div className="h-24 animate-pulse rounded-2xl bg-gray-100" />
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+  );
 }
 
 async function compressImage(file: File, maxSize = 900, quality = 0.82) {
@@ -354,13 +408,7 @@ export function PortfolioEditor() {
   }
 
   if (loading) {
-    return (
-      <section className="bg-purple-50 px-4 py-14 sm:px-5 lg:px-12">
-        <div className="w-lim rounded-3xl border-2 border-purple-100 bg-white p-8 text-center font-bold text-purple-700">
-          Loading your portfolio...
-        </div>
-      </section>
-    );
+    return <PortfolioEditorSkeleton />;
   }
 
   return (
@@ -560,19 +608,16 @@ export function PortfolioEditor() {
                       key={day.key}
                       type="button"
                       onClick={() => selectDay(day)}
-                      className={`w-44 shrink-0 snap-start rounded-2xl border-2 px-4 py-3 text-left transition ${
+                      className={`flex min-h-32 w-40 shrink-0 snap-start flex-col justify-between rounded-2xl border-2 px-4 py-4 text-left transition ${
                         active
                           ? "border-purple-500 bg-purple-50 text-purple-800"
                           : "border-purple-100 bg-white text-gray-600 hover:border-purple-300"
                       }`}
                     >
-                      <span className="block text-[11px] font-extrabold uppercase tracking-widest">
-                        {day.label}
-                      </span>
-                      <span className="mt-1 block min-h-10 text-base font-extrabold leading-tight">
+                      <span className="block text-lg font-extrabold leading-tight">
                         {day.title}
                       </span>
-                      <span className={`mt-2 inline-block rounded-full px-2 py-0.5 text-[10px] font-bold ${
+                      <span className={`mt-4 inline-block w-fit rounded-full px-2 py-0.5 text-[10px] font-bold ${
                         project.isPublished ? "bg-green-100 text-green-700" : "bg-gray-100 text-gray-500"
                       }`}>
                         {project.isPublished ? "Published" : "Empty"}

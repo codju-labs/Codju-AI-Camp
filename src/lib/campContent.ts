@@ -140,6 +140,8 @@ const campDayContent: CampDay[] = [
       "Learn what makes games fun, design a game loop, write a strong AI prompt, and build a playable browser game.",
     status: "locked",
     unlockOffsetDays: 5,
+    recordingUrl: "https://youtube.com/live/Mf-fAOE4Eqg?feature=share",
+    recordingEmbedUrl: "https://www.youtube-nocookie.com/embed/Mf-fAOE4Eqg",
     levels: [
       { id: "aicc-game-intro", title: "What Makes a Game?", summary: "Understand goals, rules, feedback, and choices.", dayId: "aicc-day6-agents" },
       { id: "aicc-game-anatomy", title: "Game Anatomy", summary: "Mix a player goal, controls, obstacles, and rewards into a game loop.", dayId: "aicc-day6-agents" },

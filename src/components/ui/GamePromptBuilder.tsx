@@ -45,12 +45,7 @@ Game states:
 Include a start screen, the main gameplay screen, a score display, ${form.win}, and a restart flow.
 
 Implementation:
-Create a plain HTML, CSS, and JavaScript project. Output exactly these files:
-1. index.html
-2. styles.css
-3. script.js
-
-Do not use React, Tailwind CSS, external frameworks, package managers, build tools, or image assets. The game should run by opening index.html in a browser. Add comments only where the logic is tricky. Use simple shapes or CSS sprites so the game works without downloading anything.`,
+Create the game in a format that I can preview and play directly in a browser using the preview feature of tools like ChatGPT, Gemini, Lovable, or v0. Keep it self-contained and easy to test. Add comments only where the logic is tricky. Use simple shapes or built-in browser-friendly visuals so the game works without needing extra assets.`,
     [form],
   );
 

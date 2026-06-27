@@ -133,10 +133,6 @@ function formatTools(tools: string[]) {
   return tools.join(", ");
 }
 
-function parseTools(value: string) {
-  return value.split(",").map((tool) => tool.trim()).filter(Boolean).slice(0, 8);
-}
-
 function PortfolioEditorSkeleton() {
   return (
     <main className="bg-slate-50">
@@ -656,7 +652,7 @@ export function PortfolioEditor() {
                       value={formatTools(draftProject.toolsUsed)}
                       onChange={(event) => setDraftProject({
                         ...draftProject,
-                        toolsUsed: parseTools(event.target.value),
+                        toolsUsed: event.target.value ? [event.target.value] : [],
                       })}
                       className="rounded-2xl border-2 border-purple-100 px-4 py-3 font-body text-sm outline-none transition focus:border-purple-400"
                       placeholder="ChatGPT, Canva, Replit"

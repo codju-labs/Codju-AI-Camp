@@ -897,6 +897,63 @@ async function handlePublicPortfolio(request, env) {
   return jsonResponse(serializePortfolio(profile, projects, false), 200);
 }
 
+async function handlePublicPortfolioDirectory(request, env) {
+  if (request.method !== 'GET') {
+    return jsonResponse({ error: 'Method not allowed' }, 405);
+  }
+  if (!env.PAYMENTS) {
+    return jsonResponse({ error: 'Portfolio storage is not configured.' }, 503);
+  }
+
+  const result = await env.PAYMENTS.prepare(`
+    SELECT
+      sp.*,
+      COUNT(pp.day_key) AS project_count,
+      MAX(pp.updated_at) AS last_published_at
+    FROM student_portfolios sp
+    INNER JOIN portfolio_projects pp
+      ON lower(pp.email) = lower(sp.email)
+      AND pp.is_published = 1
+    GROUP BY sp.email
+    ORDER BY last_published_at DESC, sp.updated_at DESC
+    LIMIT 100
+  `).all();
+
+  const portfolios = [];
+  for (const profile of result.results || []) {
+    const projects = await getPortfolioProjects(env, profile.email, true);
+    const serialized = serializePortfolio(profile, projects, false);
+    const featuredProject =
+      serialized.projects.find((project) => project.thumbnailUrl)
+      || serialized.projects[0]
+      || null;
+
+    portfolios.push({
+      slug: serialized.profile.slug,
+      displayName: serialized.profile.displayName,
+      headline: serialized.profile.headline,
+      bio: serialized.profile.bio,
+      schoolName: serialized.profile.schoolName,
+      city: serialized.profile.city,
+      avatarUrl: serialized.profile.avatarUrl,
+      fingerprintTraits: serialized.profile.fingerprintTraits,
+      projectCount: Number(profile.project_count || serialized.projects.length),
+      featuredProject: featuredProject ? {
+        title: featuredProject.title || featuredProject.dayTitle,
+        category: featuredProject.category,
+        thumbnailUrl: featuredProject.thumbnailUrl,
+        projectUrl: featuredProject.projectUrl,
+        dayTitle: featuredProject.dayTitle,
+      } : null,
+      createdLabels: serialized.projects.map((project) => project.dayTitle).slice(0, 5),
+      updatedAt: profile.last_published_at || serialized.profile.updatedAt,
+      url: `/portfolio/${serialized.profile.slug}`,
+    });
+  }
+
+  return jsonResponse({ portfolios }, 200);
+}
+
 async function handlePortfolioAsset(request, env) {
   if (request.method !== 'GET' && request.method !== 'HEAD') {
     return new Response('Method not allowed', { status: 405 });
@@ -1657,6 +1714,10 @@ export default {
           error.status || 500,
         );
       }
+    }
+
+    if (url.pathname === '/api/public/portfolios') {
+      return handlePublicPortfolioDirectory(request, env);
     }
 
     if (url.pathname.startsWith('/api/public/portfolio/')) {

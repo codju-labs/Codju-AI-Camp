@@ -73,6 +73,32 @@ export function CampDashboard() {
         </div>
       </section>
 
+      <section className="bg-white px-4 py-8 sm:px-5 lg:px-12">
+        <div className="w-lim">
+          <div className="grid gap-5 rounded-3xl border-2 border-purple-100 bg-gradient-to-br from-[#17142d] via-[#241744] to-[#0f172a] p-6 text-white shadow-lg md:grid-cols-[1fr_auto] md:items-center md:p-8">
+            <div>
+              <p className="mb-2 text-xs font-extrabold uppercase tracking-widest text-purple-200">
+                Public creator portfolio
+              </p>
+              <h2 className="text-2xl font-extrabold md:text-3xl">
+                Share your best creation from each camp day.
+              </h2>
+              <p className="mt-2 max-w-2xl text-sm leading-relaxed text-white/70">
+                Add links to your poster, comic, flash cards, presentation, song,
+                app, website, and game so family and friends can explore your AI
+                creator journey.
+              </p>
+            </div>
+            <a
+              href="/learn/portfolio"
+              className="inline-flex items-center justify-center rounded-full bg-white px-5 py-3 text-sm font-extrabold text-[#17142d] no-underline transition hover:bg-purple-100"
+            >
+              Edit portfolio
+            </a>
+          </div>
+        </div>
+      </section>
+
       <section className="bg-white px-4 py-10 sm:px-5 md:py-14 lg:px-12">
         <div className="w-lim">
           <div className="mb-7 flex flex-col justify-between gap-4 sm:flex-row sm:items-end">

@@ -1,0 +1,11 @@
+---
+import PortalLayout from "../../layouts/PortalLayout.astro";
+import { PortfolioEditor } from "../../components/learning/PortfolioEditor";
+---
+
+<PortalLayout
+  title="Creator Portfolio"
+  description="Publish your AI Creator Camp portfolio."
+>
+  <PortfolioEditor client:load />
+</PortalLayout>

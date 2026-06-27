@@ -148,6 +148,109 @@ const LEVEL_UNLOCK_OFFSETS = new Map([
   ['aicc-game-build', 5],
 ]);
 
+const PORTFOLIO_PROJECT_DAYS = [
+  {
+    key: 'day-1',
+    label: 'Day 1',
+    title: 'Poster',
+    category: 'Visual design',
+  },
+  {
+    key: 'day-2',
+    label: 'Day 2',
+    title: 'Comic Book',
+    category: 'Storytelling',
+  },
+  {
+    key: 'day-3',
+    label: 'Day 3',
+    title: 'Flash Cards',
+    category: 'Learning design',
+  },
+  {
+    key: 'day-4',
+    label: 'Day 4',
+    title: 'Presentation',
+    category: 'Communication',
+  },
+  {
+    key: 'day-5',
+    label: 'Day 5',
+    title: 'Song',
+    category: 'Music',
+  },
+  {
+    key: 'day-6',
+    label: 'Day 6',
+    title: 'Interactive Web App',
+    category: 'Web app',
+  },
+  {
+    key: 'day-7',
+    label: 'Day 7',
+    title: 'Website',
+    category: 'Website',
+  },
+  {
+    key: 'day-8',
+    label: 'Day 8',
+    title: 'Game',
+    category: 'Game project',
+  },
+];
+
+const PORTFOLIO_DAY_KEYS = new Set(PORTFOLIO_PROJECT_DAYS.map((day) => day.key));
+
+const PORTFOLIO_FILE_RULES = {
+  avatar: {
+    maxBytes: 1_500_000,
+    types: ['image/jpeg', 'image/png', 'image/webp'],
+    extensions: ['jpg', 'jpeg', 'png', 'webp'],
+  },
+  'day-1': {
+    maxBytes: 6_000_000,
+    types: ['image/jpeg', 'image/png', 'image/webp', 'application/pdf'],
+    extensions: ['jpg', 'jpeg', 'png', 'webp', 'pdf'],
+  },
+  'day-2': {
+    maxBytes: 10_000_000,
+    types: ['image/jpeg', 'image/png', 'image/webp', 'application/pdf'],
+    extensions: ['jpg', 'jpeg', 'png', 'webp', 'pdf'],
+  },
+  'day-3': {
+    maxBytes: 8_000_000,
+    types: ['image/jpeg', 'image/png', 'image/webp', 'application/pdf'],
+    extensions: ['jpg', 'jpeg', 'png', 'webp', 'pdf'],
+  },
+  'day-4': {
+    maxBytes: 12_000_000,
+    types: [
+      'application/pdf',
+      'image/jpeg',
+      'image/png',
+      'image/webp',
+    ],
+    extensions: ['pdf', 'jpg', 'jpeg', 'png', 'webp'],
+  },
+  'day-5': {
+    maxBytes: 15_000_000,
+    types: ['audio/mpeg', 'audio/mp3', 'audio/wav', 'audio/mp4', 'audio/aac'],
+    extensions: ['mp3', 'wav', 'm4a', 'aac'],
+  },
+};
+
+const FINGERPRINT_TRAITS = [
+  'Storytelling',
+  'Visual Design',
+  'Prompt Craft',
+  'Research',
+  'Music',
+  'Presentation',
+  'Coding',
+  'Problem Solving',
+  'Curiosity',
+];
+
 function hasFullCampAccess(email) {
   return FULL_CAMP_ACCESS_EMAILS.has(String(email || '').trim().toLowerCase());
 }
@@ -224,6 +327,566 @@ async function handleProgress(request, env) {
     ) VALUES (?, ?, ?, datetime('now'))
   `).bind(session.email, levelId, courseId).run();
   return jsonResponse({ success: true });
+}
+
+function normalizeSlug(value, fallback = 'creator') {
+  const slug = String(value || '')
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '')
+    .slice(0, 48);
+  return slug || fallback;
+}
+
+function normalizeUrl(value, maxLength = 500) {
+  const raw = normalizeText(value, maxLength);
+  if (!raw) return '';
+  let parsed;
+  try {
+    parsed = new URL(raw);
+  } catch {
+    throw requestError('Please enter a valid https:// or http:// URL.', 400);
+  }
+  if (!['https:', 'http:'].includes(parsed.protocol)) {
+    throw requestError('Only https:// and http:// links are allowed.', 400);
+  }
+  parsed.hash = parsed.hash.slice(0, 120);
+  return parsed.toString();
+}
+
+function normalizeFileName(value = 'upload') {
+  const normalized = String(value || 'upload')
+    .toLowerCase()
+    .replace(/[^a-z0-9.]+/g, '-')
+    .replace(/^-+|-+$/g, '')
+    .slice(0, 80);
+  return normalized || 'upload';
+}
+
+function fileExtension(fileName = '', contentType = '') {
+  const fromName = String(fileName).split('.').pop()?.toLowerCase();
+  if (fromName && fromName !== fileName.toLowerCase()) return fromName;
+  if (contentType.includes('webp')) return 'webp';
+  if (contentType.includes('png')) return 'png';
+  if (contentType.includes('jpeg')) return 'jpg';
+  if (contentType.includes('pdf')) return 'pdf';
+  if (contentType.includes('mpeg')) return 'mp3';
+  if (contentType.includes('wav')) return 'wav';
+  if (contentType.includes('mp4')) return 'm4a';
+  return 'bin';
+}
+
+function portfolioAssetUrl(request, key) {
+  const url = new URL(request.url);
+  url.pathname = `/portfolio-assets/${key}`;
+  url.search = '';
+  url.hash = '';
+  return url.toString();
+}
+
+function requirePortfolioAssets(env) {
+  if (!env.PORTFOLIO_ASSETS) {
+    throw requestError('Portfolio file uploads are not configured.', 503);
+  }
+}
+
+async function validatePortfolioFile(file, rule) {
+  if (!file || typeof file.arrayBuffer !== 'function') {
+    throw requestError('Please choose a file to upload.', 400);
+  }
+
+  const contentType = String(file.type || 'application/octet-stream').toLowerCase();
+  const extension = fileExtension(file.name, contentType);
+  if (!rule.types.includes(contentType) || !rule.extensions.includes(extension)) {
+    throw requestError('This file type is not allowed for this portfolio item.', 400);
+  }
+
+  if (file.size > rule.maxBytes) {
+    const mb = Math.round(rule.maxBytes / 1_000_000);
+    throw requestError(`File is too large. Maximum allowed size is ${mb} MB.`, 413);
+  }
+
+  const buffer = await file.arrayBuffer();
+  if (buffer.byteLength > rule.maxBytes) {
+    const mb = Math.round(rule.maxBytes / 1_000_000);
+    throw requestError(`File is too large. Maximum allowed size is ${mb} MB.`, 413);
+  }
+
+  return { buffer, contentType, extension };
+}
+
+function parseFingerprintTraits(value) {
+  const allowed = new Set(FINGERPRINT_TRAITS.map((trait) => trait.toLowerCase()));
+  return String(value || '')
+    .split(',')
+    .map((trait) => normalizeText(trait, 40))
+    .filter((trait) => allowed.has(trait.toLowerCase()))
+    .slice(0, 5)
+    .join(', ');
+}
+
+function parseTools(value) {
+  return String(value || '')
+    .split(',')
+    .map((tool) => normalizeText(tool, 30))
+    .filter(Boolean)
+    .slice(0, 8)
+    .join(', ');
+}
+
+function htmlEntityDecode(value = '') {
+  return String(value)
+    .replaceAll('&amp;', '&')
+    .replaceAll('&quot;', '"')
+    .replaceAll('&#039;', "'")
+    .replaceAll('&lt;', '<')
+    .replaceAll('&gt;', '>');
+}
+
+function extractMetaContent(html, property) {
+  const escaped = property.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  const pattern = new RegExp(
+    `<meta[^>]+(?:property|name)=["']${escaped}["'][^>]+content=["']([^"']+)["'][^>]*>|<meta[^>]+content=["']([^"']+)["'][^>]+(?:property|name)=["']${escaped}["'][^>]*>`,
+    'i',
+  );
+  const match = html.match(pattern);
+  return htmlEntityDecode(match?.[1] || match?.[2] || '');
+}
+
+async function resolveOpenGraphImage(pageUrl) {
+  if (!pageUrl) return '';
+  try {
+    const response = await fetch(pageUrl, {
+      headers: {
+        Accept: 'text/html,application/xhtml+xml',
+        'User-Agent': 'CodjuPortfolioBot/1.0',
+      },
+      redirect: 'follow',
+    });
+    const contentType = response.headers.get('Content-Type') || '';
+    if (!response.ok || !contentType.toLowerCase().includes('text/html')) {
+      return '';
+    }
+
+    const reader = response.body?.getReader();
+    if (!reader) return '';
+
+    const chunks = [];
+    let received = 0;
+    while (received < 120_000) {
+      const { done, value } = await reader.read();
+      if (done || !value) break;
+      chunks.push(value);
+      received += value.byteLength;
+    }
+    await reader.cancel().catch(() => {});
+
+    const html = new TextDecoder().decode(
+      Uint8Array.from(chunks.flatMap((chunk) => Array.from(chunk))),
+    );
+    const imageUrl =
+      extractMetaContent(html, 'og:image')
+      || extractMetaContent(html, 'og:image:url')
+      || extractMetaContent(html, 'twitter:image');
+    if (!imageUrl) return '';
+
+    return new URL(imageUrl, response.url).toString();
+  } catch {
+    return '';
+  }
+}
+
+function serializePortfolio(profile, projects = [], includeUnpublished = false) {
+  const projectByDay = new Map(projects.map((project) => [project.day_key, project]));
+  const serializedProjects = PORTFOLIO_PROJECT_DAYS.map((day) => {
+    const project = projectByDay.get(day.key);
+    return {
+      dayKey: day.key,
+      dayLabel: day.label,
+      dayTitle: day.title,
+      category: day.category,
+      title: project?.title || '',
+      description: project?.description || '',
+      projectUrl: project?.project_url || '',
+      thumbnailUrl: project?.thumbnail_url || '',
+      toolsUsed: project?.tools_used
+        ? project.tools_used.split(',').map((tool) => tool.trim()).filter(Boolean)
+        : [],
+      reflection: project?.reflection || '',
+      sourceType: project?.source_type || 'link',
+      assetKey: project?.asset_key || '',
+      fileType: project?.file_type || '',
+      displayMode: project?.display_mode || 'link',
+      isPublished: Boolean(project?.is_published),
+      updatedAt: project?.updated_at || null,
+    };
+  }).filter((project) => includeUnpublished || project.isPublished);
+
+  return {
+    profile: {
+      slug: profile.slug,
+      displayName: profile.display_name,
+      headline: profile.headline,
+      bio: profile.bio,
+      schoolName: profile.school_name,
+      city: profile.city,
+      avatarUrl: profile.avatar_url,
+      fingerprintTraits: profile.fingerprint_traits
+        ? profile.fingerprint_traits.split(',').map((trait) => trait.trim()).filter(Boolean)
+        : [],
+      isPublic: Boolean(profile.is_public),
+      updatedAt: profile.updated_at,
+    },
+    projectDays: PORTFOLIO_PROJECT_DAYS,
+    fingerprintTraits: FINGERPRINT_TRAITS,
+    projects: serializedProjects,
+  };
+}
+
+async function getPortfolioByEmail(env, email) {
+  return env.PAYMENTS.prepare(`
+    SELECT *
+    FROM student_portfolios
+    WHERE lower(email) = lower(?)
+  `).bind(email).first();
+}
+
+async function createPortfolioForSession(env, session) {
+  const email = session.email;
+  const displayName = normalizeText(session.name, 80) || email.split('@')[0];
+  const baseSlug = normalizeSlug(displayName || email.split('@')[0], 'creator');
+
+  for (let index = 0; index < 20; index += 1) {
+    const suffix = index === 0 ? '' : `-${index + 1}`;
+    const slug = `${baseSlug}${suffix}`.slice(0, 56);
+    try {
+      await env.PAYMENTS.prepare(`
+        INSERT INTO student_portfolios (
+          email, slug, display_name, headline, bio, avatar_url,
+          created_at, updated_at
+        ) VALUES (?, ?, ?, ?, '', ?, datetime('now'), datetime('now'))
+      `).bind(
+        email,
+        slug,
+        displayName,
+        'AI Creator Camp portfolio',
+        session.image || '',
+      ).run();
+      return getPortfolioByEmail(env, email);
+    } catch (error) {
+      if (!String(error?.message || '').toLowerCase().includes('unique')) {
+        throw error;
+      }
+    }
+  }
+
+  const slug = `${baseSlug}-${crypto.randomUUID().slice(0, 8)}`.slice(0, 64);
+  await env.PAYMENTS.prepare(`
+    INSERT INTO student_portfolios (
+      email, slug, display_name, headline, bio, avatar_url,
+      created_at, updated_at
+    ) VALUES (?, ?, ?, ?, '', ?, datetime('now'), datetime('now'))
+  `).bind(
+    email,
+    slug,
+    displayName,
+    'AI Creator Camp portfolio',
+    session.image || '',
+  ).run();
+  return getPortfolioByEmail(env, email);
+}
+
+async function getOrCreatePortfolio(env, session) {
+  const existing = await getPortfolioByEmail(env, session.email);
+  return existing || createPortfolioForSession(env, session);
+}
+
+async function getPortfolioProjects(env, email, publishedOnly = false) {
+  const result = await env.PAYMENTS.prepare(`
+    SELECT *
+    FROM portfolio_projects
+    WHERE lower(email) = lower(?)
+      ${publishedOnly ? 'AND is_published = 1' : ''}
+    ORDER BY day_key
+  `).bind(email).all();
+  return result.results || [];
+}
+
+async function handleAuthenticatedPortfolio(request, env) {
+  const session = await getSession(request, env);
+  if (!session || !await hasPortalAccess(env, session.email)) {
+    return jsonResponse({ error: 'Unauthorized' }, 401);
+  }
+
+  if (!env.PAYMENTS) {
+    return jsonResponse({ error: 'Portfolio storage is not configured.' }, 503);
+  }
+
+  const url = new URL(request.url);
+  const profile = await getOrCreatePortfolio(env, session);
+
+  if (request.method === 'GET' && url.pathname === '/api/portfolio') {
+    const projects = await getPortfolioProjects(env, session.email);
+    return jsonResponse(serializePortfolio(profile, projects, true));
+  }
+
+  if (request.method === 'POST' && url.pathname === '/api/portfolio/avatar') {
+    requirePortfolioAssets(env);
+    const formData = await request.formData();
+    const file = formData.get('file');
+    const { buffer, contentType, extension } = await validatePortfolioFile(
+      file,
+      PORTFOLIO_FILE_RULES.avatar,
+    );
+    const key = `profiles/${profile.slug}/avatar-${crypto.randomUUID()}.${extension}`;
+    await env.PORTFOLIO_ASSETS.put(key, buffer, {
+      httpMetadata: {
+        contentType,
+        cacheControl: 'public, max-age=31536000, immutable',
+      },
+      customMetadata: {
+        email: session.email,
+        purpose: 'avatar',
+      },
+    });
+
+    const avatarUrl = portfolioAssetUrl(request, key);
+    await env.PAYMENTS.prepare(`
+      UPDATE student_portfolios
+      SET avatar_url = ?, updated_at = datetime('now')
+      WHERE lower(email) = lower(?)
+    `).bind(avatarUrl, session.email).run();
+
+    const updatedProfile = await getPortfolioByEmail(env, session.email);
+    const projects = await getPortfolioProjects(env, session.email);
+    return jsonResponse(serializePortfolio(updatedProfile, projects, true));
+  }
+
+  const uploadMatch = url.pathname.match(/^\/api\/portfolio\/projects\/([^/]+)\/upload$/);
+  if (uploadMatch && request.method === 'POST') {
+    requirePortfolioAssets(env);
+    const dayKey = decodeURIComponent(uploadMatch[1]);
+    if (!PORTFOLIO_DAY_KEYS.has(dayKey)) {
+      return jsonResponse({ error: 'Unknown portfolio day.' }, 400);
+    }
+
+    const rule = PORTFOLIO_FILE_RULES[dayKey];
+    if (!rule) {
+      return jsonResponse(
+        { error: 'This creation should be published as a link.' },
+        400,
+      );
+    }
+
+    const formData = await request.formData();
+    const file = formData.get('file');
+    const { buffer, contentType, extension } = await validatePortfolioFile(file, rule);
+    const fileName = normalizeFileName(file.name || `creation.${extension}`);
+    const key = `projects/${profile.slug}/${dayKey}/${crypto.randomUUID()}-${fileName}`;
+    await env.PORTFOLIO_ASSETS.put(key, buffer, {
+      httpMetadata: {
+        contentType,
+        cacheControl: 'public, max-age=31536000, immutable',
+      },
+      customMetadata: {
+        email: session.email,
+        dayKey,
+      },
+    });
+
+    return jsonResponse({
+      url: portfolioAssetUrl(request, key),
+      assetKey: key,
+      fileType: contentType,
+      sourceType: 'upload',
+    });
+  }
+
+  if (request.method === 'PUT' && url.pathname === '/api/portfolio/profile') {
+    let payload;
+    try {
+      payload = await request.json();
+    } catch {
+      return jsonResponse({ error: 'Invalid JSON body.' }, 400);
+    }
+
+    const nextSlug = normalizeSlug(payload.slug || profile.slug, profile.slug);
+    const displayName = normalizeText(payload.displayName || profile.display_name, 80);
+    if (!displayName) {
+      return jsonResponse({ error: 'Display name is required.' }, 400);
+    }
+
+    const avatarUrl = payload.avatarUrl ? normalizeUrl(payload.avatarUrl, 500) : '';
+    try {
+      await env.PAYMENTS.prepare(`
+        UPDATE student_portfolios
+        SET slug = ?, display_name = ?, headline = ?, bio = ?,
+            school_name = ?, city = ?, avatar_url = ?, fingerprint_traits = ?,
+            is_public = ?,
+            updated_at = datetime('now')
+        WHERE lower(email) = lower(?)
+      `).bind(
+        nextSlug,
+        displayName,
+        normalizeText(payload.headline, 120),
+        normalizeText(payload.bio, 600),
+        normalizeText(payload.schoolName, 120),
+        normalizeText(payload.city, 80),
+        avatarUrl,
+        parseFingerprintTraits(Array.isArray(payload.fingerprintTraits)
+          ? payload.fingerprintTraits.join(',')
+          : payload.fingerprintTraits),
+        payload.isPublic === false ? 0 : 1,
+        session.email,
+      ).run();
+    } catch (error) {
+      if (String(error?.message || '').toLowerCase().includes('unique')) {
+        throw requestError('That portfolio slug is already taken.', 409);
+      }
+      throw error;
+    }
+
+    const updatedProfile = await getPortfolioByEmail(env, session.email);
+    const projects = await getPortfolioProjects(env, session.email);
+    return jsonResponse(serializePortfolio(updatedProfile, projects, true));
+  }
+
+  const projectMatch = url.pathname.match(/^\/api\/portfolio\/projects\/([^/]+)$/);
+  if (projectMatch && request.method === 'PUT') {
+    const dayKey = decodeURIComponent(projectMatch[1]);
+    if (!PORTFOLIO_DAY_KEYS.has(dayKey)) {
+      return jsonResponse({ error: 'Unknown portfolio day.' }, 400);
+    }
+
+    let payload;
+    try {
+      payload = await request.json();
+    } catch {
+      return jsonResponse({ error: 'Invalid JSON body.' }, 400);
+    }
+
+    const title = normalizeText(payload.title, 100);
+    const projectUrl = normalizeUrl(payload.projectUrl, 500);
+    if (!title || !projectUrl) {
+      return jsonResponse({ error: 'Project title and link are required.' }, 400);
+    }
+
+    let thumbnailUrl = payload.thumbnailUrl
+      ? normalizeUrl(payload.thumbnailUrl, 500)
+      : '';
+    if (!thumbnailUrl && payload.sourceType !== 'upload') {
+      thumbnailUrl = await resolveOpenGraphImage(projectUrl);
+    }
+    const sourceType = payload.sourceType === 'upload' ? 'upload' : 'link';
+    const assetKey = normalizeText(payload.assetKey, 240);
+
+    await env.PAYMENTS.prepare(`
+      INSERT INTO portfolio_projects (
+        email, day_key, title, description, project_url, thumbnail_url,
+        tools_used, reflection, source_type, asset_key, file_type, display_mode,
+        is_published, created_at, updated_at
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, '', ?, ?, ?, 'link', 1, datetime('now'), datetime('now'))
+      ON CONFLICT(email, day_key) DO UPDATE SET
+        title = excluded.title,
+        description = excluded.description,
+        project_url = excluded.project_url,
+        thumbnail_url = excluded.thumbnail_url,
+        tools_used = excluded.tools_used,
+        reflection = excluded.reflection,
+        source_type = excluded.source_type,
+        asset_key = excluded.asset_key,
+        file_type = excluded.file_type,
+        display_mode = 'link',
+        is_published = 1,
+        updated_at = datetime('now')
+    `).bind(
+      session.email,
+      dayKey,
+      title,
+      normalizeText(payload.description, 500),
+      projectUrl,
+      thumbnailUrl,
+      parseTools(payload.toolsUsed),
+      sourceType,
+      assetKey,
+      normalizeText(payload.fileType, 80),
+    ).run();
+
+    const updatedProfile = await getPortfolioByEmail(env, session.email);
+    const projects = await getPortfolioProjects(env, session.email);
+    return jsonResponse(serializePortfolio(updatedProfile, projects, true));
+  }
+
+  if (projectMatch && request.method === 'DELETE') {
+    const dayKey = decodeURIComponent(projectMatch[1]);
+    if (!PORTFOLIO_DAY_KEYS.has(dayKey)) {
+      return jsonResponse({ error: 'Unknown portfolio day.' }, 400);
+    }
+
+    await env.PAYMENTS.prepare(`
+      UPDATE portfolio_projects
+      SET is_published = 0, updated_at = datetime('now')
+      WHERE lower(email) = lower(?) AND day_key = ?
+    `).bind(session.email, dayKey).run();
+
+    const updatedProfile = await getPortfolioByEmail(env, session.email);
+    const projects = await getPortfolioProjects(env, session.email);
+    return jsonResponse(serializePortfolio(updatedProfile, projects, true));
+  }
+
+  return jsonResponse({ error: 'Not found' }, 404);
+}
+
+async function handlePublicPortfolio(request, env) {
+  if (request.method !== 'GET') {
+    return jsonResponse({ error: 'Method not allowed' }, 405);
+  }
+  if (!env.PAYMENTS) {
+    return jsonResponse({ error: 'Portfolio storage is not configured.' }, 503);
+  }
+
+  const url = new URL(request.url);
+  const match = url.pathname.match(/^\/api\/public\/portfolio\/([^/]+)$/);
+  const slug = match ? normalizeSlug(decodeURIComponent(match[1])) : '';
+  if (!slug) return jsonResponse({ error: 'Portfolio not found.' }, 404);
+
+  const profile = await env.PAYMENTS.prepare(`
+    SELECT *
+    FROM student_portfolios
+    WHERE lower(slug) = lower(?) AND is_public = 1
+  `).bind(slug).first();
+  if (!profile) return jsonResponse({ error: 'Portfolio not found.' }, 404);
+
+  const projects = await getPortfolioProjects(env, profile.email, true);
+  return jsonResponse(serializePortfolio(profile, projects, false), 200);
+}
+
+async function handlePortfolioAsset(request, env) {
+  if (request.method !== 'GET' && request.method !== 'HEAD') {
+    return new Response('Method not allowed', { status: 405 });
+  }
+  if (!env.PORTFOLIO_ASSETS) {
+    return new Response('Portfolio assets are not configured.', { status: 503 });
+  }
+
+  const url = new URL(request.url);
+  const key = decodeURIComponent(url.pathname.replace(/^\/portfolio-assets\//, ''));
+  if (!key || key.includes('..')) {
+    return new Response('Not found', { status: 404 });
+  }
+
+  const object = await env.PORTFOLIO_ASSETS.get(key);
+  if (!object) return new Response('Not found', { status: 404 });
+
+  const headers = new Headers();
+  object.writeHttpMetadata(headers);
+  headers.set('etag', object.httpEtag);
+  headers.set('Cache-Control', headers.get('Cache-Control') || 'public, max-age=86400');
+  headers.set('X-Content-Type-Options', 'nosniff');
+
+  return new Response(request.method === 'HEAD' ? null : object.body, {
+    headers,
+  });
 }
 
 function requireConfiguration(env) {
@@ -908,6 +1571,10 @@ export default {
   async fetch(request, env, ctx) {
     const url = new URL(request.url);
 
+    if (url.pathname.startsWith('/portfolio-assets/')) {
+      return handlePortfolioAsset(request, env);
+    }
+
     if (request.method === 'GET' && url.pathname === '/api/auth/signin') {
       return beginGoogleAuth(env);
     }
@@ -932,6 +1599,22 @@ export default {
       && (request.method === 'GET' || request.method === 'POST')
     ) {
       return handleProgress(request, env);
+    }
+
+    if (url.pathname === '/api/portfolio' || url.pathname.startsWith('/api/portfolio/')) {
+      try {
+        return await handleAuthenticatedPortfolio(request, env);
+      } catch (error) {
+        console.error('Portfolio request failed', error);
+        return jsonResponse(
+          { error: error.status ? error.message : 'Unable to update portfolio.' },
+          error.status || 500,
+        );
+      }
+    }
+
+    if (url.pathname.startsWith('/api/public/portfolio/')) {
+      return handlePublicPortfolio(request, env);
     }
 
     if (url.pathname === '/learn' || url.pathname.startsWith('/learn/')) {
@@ -1008,6 +1691,16 @@ export default {
 
     if (request.method === 'POST' && url.pathname === '/api/payments/callback') {
       return handleCallback(request, env, ctx);
+    }
+
+    if (
+      request.method === 'GET'
+      && (url.pathname === '/portfolio' || url.pathname.startsWith('/portfolio/'))
+    ) {
+      const assetUrl = new URL(request.url);
+      assetUrl.pathname = '/portfolio-shell/index.html';
+      assetUrl.search = '';
+      return env.ASSETS.fetch(new Request(assetUrl, request));
     }
 
     return env.ASSETS.fetch(request);

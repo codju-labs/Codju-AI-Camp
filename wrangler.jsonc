@@ -13,7 +13,9 @@
 				"/api/*",
 				"/payment/*",
 				"/learn",
-				"/learn/*"
+				"/learn/*",
+				"/portfolio",
+				"/portfolio/*"
 			]
 	},
 		"vars": {
@@ -27,6 +29,12 @@
 			"binding": "PAYMENTS",
 			"database_name": "codju-camp-payments",
 			"database_id": "0fd4579b-8073-46cc-b0e3-7d8c779a20b8"
+		}
+	],
+	"r2_buckets": [
+		{
+			"binding": "PORTFOLIO_ASSETS",
+			"bucket_name": "codju-camp-portfolio-assets"
 		}
 	],
 	"triggers": {

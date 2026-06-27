@@ -45,7 +45,12 @@ Game states:
 Include a start screen, the main gameplay screen, a score display, ${form.win}, and a restart flow.
 
 Implementation:
-Use React and Tailwind CSS. Keep the code in one playable page. Add comments only where the logic is tricky. Use simple shapes or CSS sprites so the game runs without image assets.`,
+Create a plain HTML, CSS, and JavaScript project. Output exactly these files:
+1. index.html
+2. styles.css
+3. script.js
+
+Do not use React, Tailwind CSS, external frameworks, package managers, build tools, or image assets. The game should run by opening index.html in a browser. Add comments only where the logic is tricky. Use simple shapes or CSS sprites so the game works without downloading anything.`,
     [form],
   );
 
@@ -86,7 +91,7 @@ Use React and Tailwind CSS. Keep the code in one playable page. Add comments onl
             <p className="text-xs font-black uppercase tracking-widest text-purple-500">
               AI game prompt
             </p>
-            <h3 className="text-xl font-black text-slate-800">Ready for Lovable or v0</h3>
+            <h3 className="text-xl font-black text-slate-800">Ready for an HTML game build</h3>
           </div>
           {!done && (
             <button

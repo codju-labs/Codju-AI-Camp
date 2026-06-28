@@ -132,6 +132,19 @@ function initials(name: string) {
     .join("") || "AI";
 }
 
+function titleCase(value = "") {
+  return value
+    .trim()
+    .split(/(\s+|-)/)
+    .map((part) => {
+      if (!part.trim() || part === "-") return part;
+      if (/^[A-Z0-9]{2,3}$/.test(part)) return part;
+      const lower = part.toLowerCase();
+      return lower.charAt(0).toUpperCase() + lower.slice(1);
+    })
+    .join("");
+}
+
 function isImageUrl(url = "", fileType = "") {
   return fileType.startsWith("image/")
     || /\.(png|jpe?g|webp|gif|avif)(\?.*)?$/i.test(url);
@@ -210,7 +223,7 @@ function ProjectVisual({ project, large = false }: { project: Project; large?: b
     return (
       <img
         src={image}
-        alt={project.title}
+        alt={titleCase(project.title)}
         onError={() => setFailed(true)}
         className={`w-full object-cover ${large ? "h-full" : "aspect-[16/10]"}`}
       />
@@ -223,7 +236,7 @@ function ProjectVisual({ project, large = false }: { project: Project; large?: b
         <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-3xl border border-purple-200 bg-white">
           <Icon name={DAY_ICONS[project.dayKey] || "sparkles"} className="h-8 w-8 text-purple-600" />
         </div>
-        <p className="mt-4 text-lg font-extrabold text-gray-800">{project.dayTitle}</p>
+        <p className="mt-4 text-lg font-extrabold text-gray-800">{titleCase(project.dayTitle)}</p>
         <p className="mt-1 text-xs font-bold uppercase tracking-widest text-gray-500">
           {project.sourceType === "upload" ? "Uploaded creation" : "Linked creation"}
         </p>
@@ -322,6 +335,7 @@ export function PublicPortfolio() {
   }
 
   const { profile, projects, projectDays } = data;
+  const displayName = titleCase(profile.displayName);
   const completedDays = new Set(projects.map((project) => project.dayKey));
   const createdLabels = projects.map((project) => project.dayTitle);
   const outcomes = projects.map((project) => ({
@@ -339,7 +353,7 @@ export function PublicPortfolio() {
       <nav className="fixed left-0 right-0 top-0 z-40 border-b border-purple-100 bg-white/90 px-4 py-4 backdrop-blur-xl sm:px-5 lg:px-12">
         <div className="mx-auto flex max-w-6xl items-center justify-between gap-4">
           <a href="#top" className="text-lg font-extrabold text-gray-900 no-underline">
-            {profile.displayName.split(" ")[0] || "Creator"}.
+            {displayName.split(" ")[0] || "Creator"}.
           </a>
           <div className="hidden items-center gap-8 text-sm font-bold text-gray-500 md:flex">
             <a href="#snapshot" className="no-underline transition hover:text-purple-700">Snapshot</a>
@@ -361,12 +375,12 @@ export function PublicPortfolio() {
             {profile.avatarUrl ? (
               <img
                 src={profile.avatarUrl}
-                alt={profile.displayName}
+                alt={displayName}
                 className="relative h-32 w-32 rounded-full border-4 border-white object-cover shadow-lg sm:h-40 sm:w-40"
               />
             ) : (
               <div className="relative flex h-32 w-32 items-center justify-center rounded-full border-4 border-white bg-gradient-to-br from-purple-500 to-indigo-500 text-4xl font-extrabold text-white shadow-lg sm:h-40 sm:w-40">
-                {initials(profile.displayName)}
+                {initials(displayName)}
               </div>
             )}
             <div className="absolute -bottom-3 left-1/2 -translate-x-1/2 whitespace-nowrap rounded-full bg-[#7b2fc8] px-4 py-1.5 text-xs font-extrabold text-white shadow-md">
@@ -383,7 +397,7 @@ export function PublicPortfolio() {
               Codju AI Creator Camp
             </a>
             <h1 className="mt-5 bg-gradient-to-r from-purple-700 via-[#7b2fc8] to-indigo-500 bg-clip-text text-4xl font-extrabold leading-tight tracking-normal text-transparent sm:text-5xl md:text-6xl">
-              {profile.displayName}
+              {displayName}
             </h1>
             <div className="mt-5 flex flex-wrap justify-center gap-x-5 gap-y-2 text-sm font-bold text-gray-500">
               {profile.schoolName && (
@@ -472,7 +486,7 @@ export function PublicPortfolio() {
                         {day.category}
                       </p>
                       <h3 className="mt-1 text-xl font-extrabold text-gray-900">
-                        {project.title || day.title}
+                        {titleCase(project.title || day.title)}
                       </h3>
                       <p className="mt-2 text-sm leading-relaxed text-gray-500">
                         {project.description || `${day.title} creation published from the camp.`}
@@ -505,7 +519,7 @@ export function PublicPortfolio() {
                 Spotlight · {featuredProject.category}
               </span>
               <h3 className="text-3xl font-extrabold text-gray-900 sm:text-4xl">
-                {featuredProject.title}
+                {titleCase(featuredProject.title)}
               </h3>
               {featuredProject.description && (
                 <p className="mt-3 line-clamp-2 max-w-md text-sm leading-relaxed text-gray-500 sm:text-base">
@@ -548,7 +562,7 @@ export function PublicPortfolio() {
                   <p className="text-xs font-extrabold uppercase tracking-widest text-purple-600">
                     {project.category}
                   </p>
-                  <h3 className="mt-1 text-xl font-extrabold text-gray-900">{project.title}</h3>
+                  <h3 className="mt-1 text-xl font-extrabold text-gray-900">{titleCase(project.title)}</h3>
                   {project.description && (
                     <p className="mt-2 line-clamp-3 text-sm leading-relaxed text-gray-500">
                       {project.description}

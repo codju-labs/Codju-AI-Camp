@@ -43,6 +43,19 @@ function initials(name: string) {
     .join("") || "AI";
 }
 
+function titleCase(value = "") {
+  return value
+    .trim()
+    .split(/(\s+|-)/)
+    .map((part) => {
+      if (!part.trim() || part === "-") return part;
+      if (/^[A-Z0-9]{2,3}$/.test(part)) return part;
+      const lower = part.toLowerCase();
+      return lower.charAt(0).toUpperCase() + lower.slice(1);
+    })
+    .join("");
+}
+
 function PortfolioDirectorySkeleton() {
   return (
     <main className="min-h-screen bg-gradient-to-br from-purple-50 via-white to-indigo-50 px-4 py-10 text-gray-900 sm:px-5 lg:px-12">
@@ -155,7 +168,7 @@ export function PortfolioDirectory() {
                   {portfolio.featuredProject?.thumbnailUrl ? (
                     <img
                       src={portfolio.featuredProject.thumbnailUrl}
-                      alt={portfolio.featuredProject.title}
+                      alt={titleCase(portfolio.featuredProject.title)}
                       className="h-full w-full object-cover transition group-hover:scale-[1.03]"
                     />
                   ) : (
@@ -174,17 +187,17 @@ export function PortfolioDirectory() {
                     {portfolio.avatarUrl ? (
                       <img
                         src={portfolio.avatarUrl}
-                        alt={portfolio.displayName}
+                        alt={titleCase(portfolio.displayName)}
                         className="h-14 w-14 rounded-full border-2 border-purple-100 object-cover"
                       />
                     ) : (
                       <div className="flex h-14 w-14 items-center justify-center rounded-full bg-[#7b2fc8] text-sm font-extrabold text-white">
-                        {initials(portfolio.displayName)}
+                        {initials(titleCase(portfolio.displayName))}
                       </div>
                     )}
                     <div className="min-w-0">
                       <h2 className="truncate text-xl font-extrabold text-gray-900">
-                        {portfolio.displayName}
+                        {titleCase(portfolio.displayName)}
                       </h2>
                       <p className="mt-1 line-clamp-1 text-xs font-bold text-gray-500">
                         {portfolio.headline || "AI Creator Camp portfolio"}

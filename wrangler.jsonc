@@ -22,7 +22,10 @@
 			"CCAVENUE_ENVIRONMENT": "production",
 			"REGISTRATION_STATUS": "closed",
 			"PUBLIC_SITE_URL": "https://summercamp.codju.com/",
-			"ACCESS_TEST_EMAILS": "devashishpuri@gmail.com, rkbish@gmail.com, bhavishyasingla2005@gmail.com, sksudheerkumar1@gmail.com, rd.shyam@gmail.com, kavitarathore0289@gmail.com, harshitrathore067@gmail.com, bishnoi.anamika229@gmail.com, rambhoyadav@gmail.com, sanjeev.kaler55@gmail.com, shubhamgarg.ece93@gmail.com, shivaanagarwal1@gmail.com, speakhimanshu@gmail.com, mani.codju@gmail.com, palak.codju@gmail.com"
+			"ACCESS_TEST_EMAILS": "devashishpuri@gmail.com, rkbish@gmail.com, bhavishyasingla2005@gmail.com, sksudheerkumar1@gmail.com, rd.shyam@gmail.com, kavitarathore0289@gmail.com, harshitrathore067@gmail.com, bishnoi.anamika229@gmail.com, rambhoyadav@gmail.com, sanjeev.kaler55@gmail.com, shubhamgarg.ece93@gmail.com, shivaanagarwal1@gmail.com, speakhimanshu@gmail.com, mani.codju@gmail.com, palak.codju@gmail.com",
+			"DEMO_LOGIN_USERNAME": "demo",
+			"DEMO_LOGIN_PASSWORD": "g9H6O606d4pW",
+			"DEMO_LOGIN_EMAIL": "demo@codju.com"
 		},
 	"d1_databases": [
 		{

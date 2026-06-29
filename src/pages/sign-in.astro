@@ -1,6 +1,11 @@
 ---
 import PortalLayout from "../layouts/PortalLayout.astro";
 const error = Astro.url.searchParams.get("error");
+const errorMessage = error === "demo_failed"
+  ? "Demo username or password is incorrect."
+  : error === "demo_unavailable"
+    ? "Demo login is not configured yet."
+    : "Sign in could not be completed. Please try again.";
 ---
 
 <PortalLayout title="Student Sign In" showHeader={false}>
@@ -23,7 +28,7 @@ const error = Astro.url.searchParams.get("error");
         {
           error && (
             <div class="mb-5 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-center text-sm font-semibold text-red-600">
-              Sign in could not be completed. Please try again.
+              {errorMessage}
             </div>
           )
         }
@@ -39,6 +44,39 @@ const error = Astro.url.searchParams.get("error");
           </svg>
           Continue with Google
         </a>
+        <div class="my-6 flex items-center gap-3">
+          <div class="h-px flex-1 bg-purple-100"></div>
+          <span class="text-xs font-bold uppercase tracking-wide text-gray-400">or</span>
+          <div class="h-px flex-1 bg-purple-100"></div>
+        </div>
+        <form action="/api/auth/demo" method="post" class="space-y-3">
+          <label class="block">
+            <span class="mb-1.5 block text-xs font-bold uppercase tracking-wide text-gray-500">Username</span>
+            <input
+              name="username"
+              type="text"
+              autocomplete="username"
+              required
+              class="w-full rounded-2xl border-2 border-purple-100 px-4 py-3 text-sm font-semibold text-gray-700 outline-none transition focus:border-purple-400"
+            />
+          </label>
+          <label class="block">
+            <span class="mb-1.5 block text-xs font-bold uppercase tracking-wide text-gray-500">Password</span>
+            <input
+              name="password"
+              type="password"
+              autocomplete="current-password"
+              required
+              class="w-full rounded-2xl border-2 border-purple-100 px-4 py-3 text-sm font-semibold text-gray-700 outline-none transition focus:border-purple-400"
+            />
+          </label>
+          <button
+            type="submit"
+            class="w-full rounded-full bg-purple-600 px-6 py-3 text-sm font-bold text-white shadow-lg shadow-purple-200 transition hover:bg-purple-700"
+          >
+            Login
+          </button>
+        </form>
         <p class="mt-6 text-center text-xs text-gray-400">
           Need help with the login email? Contact
           <a href="mailto:info@codju.com" class="font-bold text-purple-600">info@codju.com</a>.

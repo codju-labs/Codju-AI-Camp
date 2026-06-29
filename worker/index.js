@@ -1,6 +1,7 @@
 import { decrypt, encrypt } from './ccavenue.js';
 import {
   beginGoogleAuth,
+  completeDemoAuth,
   completeGoogleAuth,
   getSession,
   hasPortalAccess,
@@ -1684,6 +1685,10 @@ export default {
 
     if (request.method === 'GET' && url.pathname === '/api/auth/callback') {
       return completeGoogleAuth(request, env);
+    }
+
+    if (request.method === 'POST' && url.pathname === '/api/auth/demo') {
+      return completeDemoAuth(request, env);
     }
 
     if (request.method === 'GET' && url.pathname === '/api/auth/signout') {

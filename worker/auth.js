@@ -193,6 +193,58 @@ export async function completeGoogleAuth(request, env) {
   }
 }
 
+function demoLoginUrl(env, error) {
+  const url = new URL('/sign-in', env.PUBLIC_SITE_URL);
+  url.searchParams.set('error', error);
+  return url;
+}
+
+function configuredDemoEmail(env) {
+  return String(env.DEMO_LOGIN_EMAIL || '').trim().toLowerCase();
+}
+
+export async function completeDemoAuth(request, env) {
+  if (
+    !env.AUTH_SECRET
+    || !env.DEMO_LOGIN_USERNAME
+    || !env.DEMO_LOGIN_PASSWORD
+    || !configuredDemoEmail(env)
+  ) {
+    return Response.redirect(demoLoginUrl(env, 'demo_unavailable'), 302);
+  }
+
+  let formData;
+  try {
+    formData = await request.formData();
+  } catch {
+    return Response.redirect(demoLoginUrl(env, 'demo_failed'), 302);
+  }
+
+  const username = String(formData.get('username') || '').trim();
+  const password = String(formData.get('password') || '');
+  if (
+    username !== String(env.DEMO_LOGIN_USERNAME).trim()
+    || password !== String(env.DEMO_LOGIN_PASSWORD)
+  ) {
+    return Response.redirect(demoLoginUrl(env, 'demo_failed'), 302);
+  }
+
+  const session = await createSessionToken({
+    email: configuredDemoEmail(env),
+    name: String(env.DEMO_LOGIN_NAME || 'Demo Student').trim(),
+    image: null,
+  }, env.AUTH_SECRET);
+
+  return new Response(null, {
+    status: 302,
+    headers: {
+      Location: new URL('/learn', env.PUBLIC_SITE_URL).toString(),
+      'Set-Cookie': createCookie(SESSION_COOKIE, session, env, SESSION_SECONDS),
+      'Cache-Control': 'no-store',
+    },
+  });
+}
+
 export function signOut(env) {
   return new Response(null, {
     status: 302,
@@ -216,6 +268,7 @@ function configuredTestEmails(env) {
 export async function hasPortalAccess(env, email) {
   const normalizedEmail = String(email || '').trim().toLowerCase();
   if (!normalizedEmail || !env.PAYMENTS) return false;
+  if (configuredDemoEmail(env) === normalizedEmail) return true;
   if (configuredTestEmails(env).has(normalizedEmail)) return true;
 
   const paidOrder = await env.PAYMENTS.prepare(`

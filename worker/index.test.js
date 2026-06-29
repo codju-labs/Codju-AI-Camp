@@ -1,8 +1,15 @@
 import assert from 'node:assert/strict';
-import { createHmac } from 'node:crypto';
+import { createHmac, webcrypto } from 'node:crypto';
 import test from 'node:test';
 import { decrypt, encrypt } from './ccavenue.js';
 import worker from './index.js';
+
+if (!globalThis.crypto) {
+  Object.defineProperty(globalThis, 'crypto', {
+    value: webcrypto,
+    configurable: true,
+  });
+}
 
 function createD1Stub() {
   return {

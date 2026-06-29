@@ -80,6 +80,7 @@ Configure these Worker secrets:
 npx wrangler secret put GOOGLE_CLIENT_ID
 npx wrangler secret put GOOGLE_CLIENT_SECRET
 npx wrangler secret put AUTH_SECRET
+npx wrangler secret put DEMO_LOGIN_PASSWORD
 ```
 
 `AUTH_SECRET` should be a long random value. In Google Cloud, allow this OAuth
@@ -88,6 +89,16 @@ redirect URI:
 ```text
 https://summercamp.codju.com/api/auth/callback
 ```
+
+For a fixed demo username/password login alongside Google, configure:
+
+- `DEMO_LOGIN_USERNAME`
+- `DEMO_LOGIN_PASSWORD`
+- `DEMO_LOGIN_EMAIL`
+- `DEMO_LOGIN_NAME` (optional, defaults to `Demo Student`)
+
+The demo email receives portal access automatically, so the same demo user can
+open `/learn/portfolio` and save portfolio projects.
 
 To connect a student's login to a payment made with a parent's email:
 

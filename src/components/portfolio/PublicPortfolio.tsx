@@ -68,7 +68,6 @@ const DAY_ICONS: Record<string, IconName> = {
   "day-4": "chart",
   "day-5": "music",
   "day-6": "puzzle",
-  "day-7": "globe",
   "day-8": "game",
 };
 
@@ -164,7 +163,6 @@ function outcomeForDay(dayKey: string) {
     "day-4": "Organized ideas into a clear presentation.",
     "day-5": "Explored music, mood, lyrics, and AI-assisted composition.",
     "day-6": "Pulled together camp skills into a final shareable project.",
-    "day-7": "Published a website for others to visit.",
     "day-8": "Designed a playable game loop with goals and feedback.",
   };
   return outcomes[dayKey] || "Created and shared a digital artifact.";

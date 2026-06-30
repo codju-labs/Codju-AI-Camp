@@ -1,6 +1,6 @@
 # AI Creator Camp by Codju
 
-Welcome to the **AI Creator Camp by Codju** repository. This is the official landing page for the AI Creator Camp, an immersive 7-day online program designed to teach young students (Grades 6–10) the fundamentals and creative applications of Artificial Intelligence.
+Welcome to the **AI Creator Camp by Codju** repository. This is the official landing page for the AI Creator Camp, an immersive 6-day online program designed to teach young students (Grades 6–10) the fundamentals and creative applications of Artificial Intelligence.
 
 ## 🌟 Overview
 
@@ -9,15 +9,15 @@ Rather than teaching students to fear AI, this camp focuses on empowering them t
 - **Domain:** [codju.com](https://codju.com)
 - **Target Audience:** Students in Grades 6–10 (ages 11–16)
 - **Format:** Live Online (Zoom), 45-minute daily sessions
-- **Dates:** June 22 – 29, 2026
+- **Dates:** June 22 – 27, 2026
 
 ## 🚀 Key Outcomes & Deliverables
 
-- **8 Real Projects:** Students build practical projects during the camp.
+- **Real Projects:** Students build practical projects during the camp.
 - **15+ AI Tools Taught:** Hands-on experience with ChatGPT, Gemini, Perplexity, Canva AI, Leonardo AI, CapCut AI, HeyGen, Suno, Gamma, NotebookLM, Notion AI, Scratch, Miro AI, Wix AI, Lovable, Glide, and Replit AI.
 - **Certificate of Completion:** Verified certificate awarded upon completion.
 - **12 Months of Support:** Includes monthly update sessions, access to future live batches, and an AI mentor hotline.
-- **Demo Day:** Concludes with a team hackathon and live presentation.
+- **Project Showcase:** Students share their final projects and get recognition for standout work.
 
 ## 🛠 Tech Stack
 

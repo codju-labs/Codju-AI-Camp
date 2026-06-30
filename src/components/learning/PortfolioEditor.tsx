@@ -94,12 +94,6 @@ const DAY_HINTS: Record<string, { action: string; accept: string; limit: string;
     limit: "Link only",
     placeholder: "My Final AI Project",
   },
-  "day-7": {
-    action: "Paste the live website link.",
-    accept: "",
-    limit: "Link only",
-    placeholder: "Eco Heroes Website",
-  },
   "day-8": {
     action: "Paste the playable game link.",
     accept: "",

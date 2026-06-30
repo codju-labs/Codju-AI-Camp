@@ -249,43 +249,45 @@ export function CampDashboard() {
         </div>
       </section>
 
-      <section className="bg-purple-50 px-4 py-10 sm:px-5 md:py-14 lg:px-12">
-        <div className="w-lim">
-          <div className="mb-7 text-center">
-            <p className="mb-2 text-xs font-bold uppercase tracking-widest text-purple-600">
-              Coming next
-            </p>
-            <h2 className="text-2xl font-bold text-gray-800 md:text-3xl">
-              The rest of your creator journey
-            </h2>
-            <p className="mx-auto mt-2 max-w-2xl text-sm text-gray-500 md:text-base">
-              New days unlock as the camp progresses.
-            </p>
-          </div>
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            {lockedDays.map((day) => (
-              <div
-                key={day.id}
-                className="rounded-2xl border-2 border-purple-100 bg-white/70 p-5 opacity-75"
-              >
-                <div className="mb-4 flex items-center justify-between">
-                  <span className="text-xs font-bold uppercase tracking-widest text-purple-600">
-                    {day.label}
-                  </span>
-                  <span className="flex h-9 w-9 items-center justify-center rounded-full bg-gray-100 text-gray-500">
-                    <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 15v2m-6 4h12a2 2 0 0 0 2-2v-6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2Zm10-10V7a4 4 0 0 0-8 0v4" />
-                    </svg>
-                  </span>
+      {lockedDays.length > 0 && (
+        <section className="bg-purple-50 px-4 py-10 sm:px-5 md:py-14 lg:px-12">
+          <div className="w-lim">
+            <div className="mb-7 text-center">
+              <p className="mb-2 text-xs font-bold uppercase tracking-widest text-purple-600">
+                Coming next
+              </p>
+              <h2 className="text-2xl font-bold text-gray-800 md:text-3xl">
+                The rest of your creator journey
+              </h2>
+              <p className="mx-auto mt-2 max-w-2xl text-sm text-gray-500 md:text-base">
+                New days unlock as the camp progresses.
+              </p>
+            </div>
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+              {lockedDays.map((day) => (
+                <div
+                  key={day.id}
+                  className="rounded-2xl border-2 border-purple-100 bg-white/70 p-5 opacity-75"
+                >
+                  <div className="mb-4 flex items-center justify-between">
+                    <span className="text-xs font-bold uppercase tracking-widest text-purple-600">
+                      {day.label}
+                    </span>
+                    <span className="flex h-9 w-9 items-center justify-center rounded-full bg-gray-100 text-gray-500">
+                      <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 15v2m-6 4h12a2 2 0 0 0 2-2v-6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2Zm10-10V7a4 4 0 0 0-8 0v4" />
+                      </svg>
+                    </span>
+                  </div>
+                  <h3 className="text-base font-bold text-gray-700">{day.title}</h3>
+                  <p className="mt-2 text-sm leading-relaxed text-gray-500">{day.description}</p>
+                  <p className="mt-2 text-xs font-semibold text-gray-400">Locked for now</p>
                 </div>
-                <h3 className="text-base font-bold text-gray-700">{day.title}</h3>
-                <p className="mt-2 text-sm leading-relaxed text-gray-500">{day.description}</p>
-                <p className="mt-2 text-xs font-semibold text-gray-400">Locked for now</p>
-              </div>
-            ))}
+              ))}
+            </div>
           </div>
-        </div>
-      </section>
+        </section>
+      )}
     </>
   );
 }

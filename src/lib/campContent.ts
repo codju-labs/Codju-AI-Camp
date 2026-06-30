@@ -151,15 +151,6 @@ const campDayContent: CampDay[] = [
       { id: "aicc-game-build", title: "Build and Playtest", summary: "Create, test, improve, and share your game link.", dayId: "aicc-day6-agents" },
     ],
   },
-  {
-    id: "aicc-day7-demo-day",
-    label: "Day 7",
-    title: "Demo Day",
-    description: "Package your project and share what you built.",
-    status: "locked",
-    unlockOffsetDays: null,
-    levels: [],
-  },
 ];
 
 export function hasFullCampAccess(email: string | null | undefined) {

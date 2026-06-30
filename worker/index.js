@@ -181,12 +181,6 @@ const PORTFOLIO_PROJECT_DAYS = [
     category: 'Music',
   },
   {
-    key: 'day-7',
-    label: 'Day 7',
-    title: 'Website',
-    category: 'Website',
-  },
-  {
     key: 'day-8',
     label: 'Day 8',
     title: 'Game',

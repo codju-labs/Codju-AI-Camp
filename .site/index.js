@@ -585,4 +585,49 @@
 
   }
 
+  // --- Testimonial video play/pause ---
+  document.querySelectorAll('.testimonial-video-card__player').forEach((player) => {
+    const video = player.querySelector('.testimonial-video-card__video');
+    const playBtn = player.querySelector('.testimonial-video-card__play-btn');
+    if (!video || !playBtn) return;
+
+    const playSVG = '<svg viewBox="0 0 24 24"><polygon points="6 3 20 12 6 21 6 3" fill="currentColor"/></svg>';
+    const pauseSVG = '<svg viewBox="0 0 24 24"><rect x="5" y="3" width="4" height="18" rx="1" fill="currentColor"/><rect x="15" y="3" width="4" height="18" rx="1" fill="currentColor"/></svg>';
+
+    function pauseAllOthers(currentVideo) {
+      document.querySelectorAll('.testimonial-video-card__video').forEach((v) => {
+        if (v !== currentVideo && !v.paused) {
+          v.pause();
+          v.closest('.testimonial-video-card__player').classList.remove('playing');
+          v.closest('.testimonial-video-card__player').querySelector('.testimonial-video-card__play-btn').innerHTML = playSVG;
+        }
+      });
+    }
+
+    function togglePlay() {
+      if (video.paused) {
+        pauseAllOthers(video);
+        video.play();
+        player.classList.add('playing');
+        playBtn.innerHTML = pauseSVG;
+      } else {
+        video.pause();
+        player.classList.remove('playing');
+        playBtn.innerHTML = playSVG;
+      }
+    }
+
+    playBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      togglePlay();
+    });
+
+    player.addEventListener('click', togglePlay);
+
+    video.addEventListener('ended', () => {
+      player.classList.remove('playing');
+      playBtn.innerHTML = playSVG;
+    });
+  });
+
 })();

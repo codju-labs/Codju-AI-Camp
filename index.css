@@ -2135,6 +2135,126 @@ button {
     font-size: 0.92rem;
   }
 }
+/* ============================================
+   TESTIMONIAL VIDEOS
+   ============================================ */
+.section--testimonial-videos {
+  background: radial-gradient(circle at 10% 90%, rgba(124, 58, 237, 0.03) 0%, transparent 40%),
+              radial-gradient(circle at 90% 10%, rgba(99, 102, 241, 0.03) 0%, transparent 40%),
+              var(--white);
+  padding: 100px 0;
+  border-top: 1px solid var(--gray-100);
+}
+
+.testimonial-videos__grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 28px;
+  margin-top: 56px;
+  max-width: 900px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.testimonial-video-card {
+  background: var(--white);
+  border: 1px solid rgba(124, 58, 237, 0.08);
+  border-radius: 20px;
+  overflow: hidden;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.015);
+  transition: transform 0.4s var(--ease-out), box-shadow 0.4s var(--ease-out), border-color 0.4s var(--ease-out);
+}
+
+.testimonial-video-card:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 16px 40px rgba(124, 58, 237, 0.08);
+  border-color: rgba(124, 58, 237, 0.18);
+}
+
+.testimonial-video-card__player {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 9 / 16;
+  background: var(--gray-100);
+  cursor: pointer;
+  overflow: hidden;
+}
+
+.testimonial-video-card__video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.testimonial-video-card__play-btn {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  background: rgba(124, 58, 237, 0.8);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  color: var(--white);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: transform 0.35s var(--ease-out), background-color 0.3s ease, box-shadow 0.3s ease, opacity 0.3s ease;
+  box-shadow: 0 6px 24px rgba(124, 58, 237, 0.35);
+  z-index: 2;
+}
+
+.testimonial-video-card__play-btn svg {
+  width: 20px;
+  height: 20px;
+  margin-left: 2px;
+}
+
+.testimonial-video-card__play-btn:hover {
+  transform: translate(-50%, -50%) scale(1.1);
+  background: var(--purple-600);
+  box-shadow: 0 10px 32px rgba(124, 58, 237, 0.45);
+}
+
+.testimonial-video-card__player.playing .testimonial-video-card__play-btn {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.testimonial-video-card__player.playing:hover .testimonial-video-card__play-btn {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+@media (max-width: 700px) {
+  .testimonial-videos__grid {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+  }
+
+  .testimonial-video-card {
+    border-radius: 14px;
+  }
+
+  .testimonial-video-card__play-btn {
+    width: 44px;
+    height: 44px;
+  }
+
+  .testimonial-video-card__play-btn svg {
+    width: 16px;
+    height: 16px;
+  }
+
+  .section--testimonial-videos {
+    padding: 72px 0;
+  }
+}
 
 /* ============================================
    FINAL CTA SECTION

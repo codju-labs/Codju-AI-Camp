@@ -1,6 +1,6 @@
 {
 	"$schema": "node_modules/wrangler/config-schema.json",
-	"name": "codju-ai-creator-camp",
+	"name": "codju-ai-camp",
 	"main": "worker/index.js",
 	"compatibility_date": "2026-06-09",
 	"compatibility_flags": [
